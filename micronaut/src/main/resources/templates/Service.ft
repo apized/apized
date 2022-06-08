@@ -1,0 +1,97 @@
+package $module;
+
+import org.apized.core.behaviour.annotation.BehaviourExecution;
+import org.apized.core.model.Action;
+import org.apized.core.model.Layer;
+import org.apized.core.model.Page;
+import org.apized.core.mvc.AbstractModelService;
+import org.apized.core.mvc.ModelRepository;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
+import org.apized.micronaut.annotation.MicronautBehaviourExecution;
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.core.annotation.Introspected;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import java.util.List;
+import java.util.UUID;
+
+@Introspected
+@Singleton
+public class ${type}Service extends AbstractModelService<${type}> {
+  @Inject
+  ${type}Repository repository;
+
+  public ${type}Service(ApplicationContext appContext) {
+    super(appContext);
+  }
+
+  @Override
+  public Class getType(){
+    return ${type}.class;
+  }
+
+  @Override
+  protected ModelRepository<${type}> getRepository() {
+    return repository;
+  }
+#if($actions.contains('LIST'))
+
+  @Override
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.LIST)
+  )
+  public Page<${type}> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
+    return super.list(page, pageSize, search, sort);
+  }
+#end
+
+  @Override
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.LIST)
+  )
+  public Page<${type}> list(List<SearchTerm> search, List<SortTerm> sort) {
+    return super.list(search, sort);
+  }
+#if($actions.contains('GET'))
+
+  @Override
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.GET)
+  )
+  public ${type} get(UUID id) {
+    return super.get(id);
+  }
+#end
+#if($actions.contains('CREATE'))
+
+  @Override
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.CREATE)
+  )
+  public ${type} create(${type} it) {
+    return super.create(it);
+  }
+#end
+#if($actions.contains('UPDATE'))
+
+  @Override
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.UPDATE)
+  )
+  public ${type} update(UUID id, ${type} it) {
+    return super.update(id, it);
+  }
+#end
+#if($actions.contains('DELETE'))
+
+  @Override
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.DELETE)
+  )
+  public ${type} delete(UUID id) {
+    return super.delete(id);
+  }
+#end
+}

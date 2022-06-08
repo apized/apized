@@ -1,0 +1,16 @@
+plugins {
+  id "io.micronaut.library" version "3.4.1"
+}
+
+dependencies {
+  annotationProcessor("org.projectlombok:lombok:1.18.24")
+  annotationProcessor("io.micronaut:micronaut-inject-java")
+
+  compileOnly("org.projectlombok:lombok:1.18.24")
+  compileOnly("org.slf4j:slf4j-api:1.7.25")
+  compileOnly("io.micronaut:micronaut-inject")
+  compileOnly("io.micronaut.data:micronaut-data-model")
+  compileOnly("jakarta.persistence:jakarta.persistence-api:3.0.0")
+  compileOnly("com.fasterxml.jackson.core:jackson-annotations:2.13.2")
+  compileOnly("jakarta.inject:jakarta.inject-api:2.0.1")
+}

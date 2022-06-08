@@ -1,0 +1,107 @@
+package ${module};
+
+import org.apized.core.behaviour.annotation.BehaviourExecution;
+import org.apized.core.model.Action;
+import org.apized.core.model.Layer;
+import org.apized.core.model.Page;
+import org.apized.core.mvc.AbstractModelController;
+import org.apized.core.mvc.ModelService;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
+import org.apized.micronaut.annotation.MicronautBehaviourExecution;
+import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.bind.annotation.Bindable;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.inject.Inject;
+
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.UUID;
+
+@Introspected
+@Transactional
+##For now we can't have multiple @Controller annotations and there's no way to define multiple paths so
+##use the first path until this is resolved - https://github.com/micronaut-projects/micronaut-core/issues/6977
+###foreach( $it in $path )
+##@Controller("$it")
+###end
+@Controller("$path[0]")
+public class ${type}Controller extends AbstractModelController<${type}>{
+  @Inject
+  protected ${type}Service service;
+
+  @Inject
+  protected ApplicationEventPublisher eventPublisher;
+
+  @Override
+  protected ModelService<${type}> getService() {
+    return service;
+  }
+#if($actions.contains('LIST'))
+
+  @Get
+  @Operation(operationId = "List $type", tags = {"$type Controller"})
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.LIST)
+  )
+  public Page<${type}> list(@Bindable(defaultValue = "1") Integer page, @Bindable(defaultValue = "50") Integer pageSize, @Bindable(defaultValue = "") List<SearchTerm> search, @Bindable(defaultValue = "") List<SortTerm> sort) {
+    Page<$type> result = super.list(page - 1, pageSize, search, sort);
+    eventPublisher.publishEvent("${type}Controller::list");
+    return result;
+  }
+#end
+#if($actions.contains('GET'))
+
+  @Get(uri = "/{id}")
+  @Operation(operationId = "Get $type", tags = {"$type Controller"})
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.GET)
+  )
+  public $type get(UUID id) {
+    $type result = super.get(id);
+    eventPublisher.publishEvent("${type}Controller::get");
+    return result;
+  }
+#end
+#if($actions.contains('CREATE'))
+
+  @Post("/")
+  @Operation(operationId = "Create $type", tags = {"$type Controller"})
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.CREATE)
+  )
+  public $type create(@Body $type it) {
+    $type result = super.create(it);
+    eventPublisher.publishEvent("${type}Controller::create");
+    return result;
+  }
+#end
+#if($actions.contains('UPDATE'))
+
+  @Put("/{id}")
+  @Operation(operationId = "Update $type", tags = {"$type Controller"})
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.UPDATE)
+  )
+  public $type update(UUID id, @Body $type it) {
+    $type result = super.update(id, it);
+    eventPublisher.publishEvent("${type}Controller::update");
+    return result;
+  }
+#end
+#if($actions.contains('DELETE'))
+
+  @Delete
+  @Operation(operationId = "Delete $type", tags = {"$type Controller"})
+  @MicronautBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.DELETE)
+  )
+  public $type delete(UUID id) {
+    $type result = super.delete(id);
+    eventPublisher.publishEvent("${type}Controller::delete");
+    return result;
+  }
+#end
+}

@@ -1,0 +1,15 @@
+dependencies {
+  api project(":core")
+
+  compileOnly "jakarta.transaction:jakarta.transaction-api:1.3.3"
+
+  api "org.codehaus.groovy:groovy-all:3.0.9"
+  api("org.spockframework:spock-core:2.1-groovy-3.0")
+  api 'io.cucumber:cucumber-java:7.3.3'
+  api 'io.cucumber:cucumber-junit:7.3.3'
+  api 'io.rest-assured:rest-assured:4.5.0'
+  api 'org.testcontainers:postgresql:1.17.2'
+
+  runtimeOnly 'org.junit.jupiter:junit-jupiter:5.8.2'
+  runtimeOnly 'org.junit.vintage:junit-vintage-engine:5.8.2'
+}

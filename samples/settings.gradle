@@ -1,0 +1,15 @@
+pluginManagement {
+  repositories {
+    mavenLocal()
+    repositories {
+      maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/apized/apized")
+      }
+    }
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}
+rootProject.name = "samples"
+include 'server-micronaut'

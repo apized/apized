@@ -1,0 +1,41 @@
+plugins {
+  id 'org.apized.micronaut' version '0.0.1-SNAPSHOT'
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  annotationProcessor("io.micronaut.openapi:micronaut-openapi")
+
+  implementation("io.micronaut.rabbitmq:micronaut-rabbitmq")
+
+  runtimeOnly("io.micronaut.flyway:micronaut-flyway")
+  runtimeOnly("ch.qos.logback:logback-classic")
+}
+
+application {
+  mainClass.set("org.apized.micronaut.server.Application")
+}
+
+java {
+  sourceCompatibility = JavaVersion.toVersion("17")
+  targetCompatibility = JavaVersion.toVersion("17")
+}
+
+graalvmNative {
+  toolchainDetection = false
+  binaries {
+    main {
+//      imageName.set($project.name)
+      buildArgs.add('--verbose')
+    }
+  }
+}
+
+tasks.named("dockerfile") {
+  args("-Xms64m -Xmx128m")
+  instruction """HEALTHCHECK CMD curl -s localhost:8080/health | grep '"status":"UP"' """
+}

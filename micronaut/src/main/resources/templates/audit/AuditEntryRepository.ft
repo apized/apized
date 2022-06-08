@@ -1,0 +1,15 @@
+package ${module};
+
+import org.apized.core.audit.model.AuditEntry;
+import io.micronaut.data.jdbc.annotation.JdbcRepository;
+import io.micronaut.data.model.query.builder.sql.Dialect;
+import io.micronaut.data.repository.CrudRepository;
+
+import java.util.UUID;
+
+@JdbcRepository(dialect = Dialect.POSTGRES)
+public interface AuditEntryRepository extends CrudRepository<AuditEntry, UUID> {
+  Iterable<AuditEntry> findByTypeAndTargetOrderByTimestampAsc(String type, UUID id);
+
+  Iterable<AuditEntry> findByTypeOrderByTimestampAsc(String type);
+}

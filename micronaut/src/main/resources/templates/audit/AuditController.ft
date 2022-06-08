@@ -1,0 +1,48 @@
+package ${module};
+
+import io.micronaut.core.annotation.Introspected;
+import io.swagger.v3.oas.annotations.Operation;
+import org.apized.core.StringHelper;
+import org.apized.core.audit.model.AuditEntry;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Introspected
+@Transactional
+@Controller("/audit/")
+public class AuditController {
+  private final AuditEntryRepository repository;
+
+  public AuditController(AuditEntryRepository repository) {
+    this.repository = repository;
+  }
+
+  @Get("/{entity}")
+  @Operation(operationId = "Get audits for a given model", tags = {"Audit Controller"})
+  public HttpResponse<List<AuditEntry>> getAuditForType(@PathVariable(value = "entity") String entity) {
+    List<AuditEntry> results = new ArrayList<>();
+    Iterable<AuditEntry> entries = repository.findByTypeOrderByTimestampAsc(StringHelper.capitalize(StringHelper.singularize(entity)));
+    entries.iterator().forEachRemaining(results::add);
+    return HttpResponse.status(HttpStatus.OK).body(results);
+  }
+
+  @Get("/{entity}/{id}")
+  @Operation(operationId = "Get audits for a given model instance", tags = {"Audit Controller"})
+  public HttpResponse<List<AuditEntry>> getAuditForTypeAndTarget(
+    @PathVariable(value = "entity") String entity,
+    @PathVariable(value = "id") UUID id
+  ) {
+    List<AuditEntry> results = new ArrayList<>();
+    Iterable<AuditEntry> entries = repository.findByTypeAndTargetOrderByTimestampAsc(StringHelper.capitalize(StringHelper.singularize(entity)), id);
+    entries.iterator().forEachRemaining(results::add);
+    return HttpResponse.status(HttpStatus.OK).body(results);
+  }
+}

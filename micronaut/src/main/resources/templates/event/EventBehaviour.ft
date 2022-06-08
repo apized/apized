@@ -1,0 +1,12 @@
+package ${module};
+
+import org.apized.core.behaviour.BehaviourManager;
+import org.apized.core.event.AbstractEventBehaviour;
+import jakarta.inject.Singleton;
+
+@Singleton
+public class EventBehaviour extends AbstractEventBehaviour {
+  public EventBehaviour(BehaviourManager manager) {
+    super(manager);
+  }
+}

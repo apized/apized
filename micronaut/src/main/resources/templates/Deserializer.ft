@@ -1,0 +1,20 @@
+package ${module};
+
+import org.apized.core.model.Model;
+import org.apized.micronaut.server.serde.ModelSerde;
+import io.micronaut.core.type.Argument;
+import io.micronaut.serde.Decoder;
+import io.micronaut.serde.Deserializer;
+import jakarta.inject.Inject;
+
+import java.io.IOException;
+
+public class ${type}Deserializer implements Deserializer<${type}> {
+  @Inject
+  ModelSerde serde;
+
+  @Override
+  public ${type} deserialize(Decoder decoder, DecoderContext context, Argument<? super ${type}> type) throws IOException {
+    return (${type}) serde.deserialize(decoder, context, (Argument<? super Model>) type);
+  }
+}

@@ -1,0 +1,75 @@
+micronaut:
+  application:
+    name: Apized Sample Server
+
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**
+      redoc:
+        paths: classpath:META-INF/swagger/views/redoc
+        mapping: /redoc/**
+
+  server:
+    port: ${PORT:8080}
+
+endpoints:
+  all:
+    port: ${MANAGEMENT_PORT:8081}
+  health:
+    details-visible: ANONYMOUS
+    enabled: true
+    sensitive: false
+  info:
+    enabled: false
+  routes:
+    enabled: true
+    sensitive: false
+  threaddump:
+    enabled: false
+  flyway:
+    enabled: false
+  beans:
+    enabled: false
+  refresh:
+    enabled: false
+
+flyway:
+  datasources:
+    default:
+      enabled: true
+
+netty:
+  default:
+    allocator:
+      max-order: 3
+
+datasources:
+  default:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:org}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: none
+        show_sql: true
+
+rabbitmq:
+  host: ${RABBITMQ_HOST:localhost}
+  port: ${RABBITMQ_HOST:-1}
+  username: ${RABBITMQ_USERNAME:guest}
+  password: ${RABBITMQ_PASSWORD:guest}
+
+apized:
+  slug: server
+  token: ${AUTH_TOKEN:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJ3ZWJzdW1taXQiLCJzdWIiOiJkNTY4NzA1YS1hNTgxLTQ5MjMtODI4Yi0wZjk3YzA4OTExNjMiLCJpc3MiOiJ3ZWJzdW1taXQiLCJpYXQiOjE2NjEyNDcyNzMsImp0aSI6IjdhNjM3ZmFkLWY5NTctNDg4Yy04MWY1LTVhM2Y0YmY4MmUxYSJ9.LJh7I4Ma9s8DYJwFWsJ4u9VG-J9tC5MTHEJR4e3NqXE}
+  federation:
+    auth: ${AUTH_API:`https://auth.apized.com`}
