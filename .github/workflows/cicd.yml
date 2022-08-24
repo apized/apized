@@ -13,7 +13,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-      - name: Publish package
+      - name: Run tests
         run: ./gradlew clean test
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
@@ -31,7 +31,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-      - name: Publish package
+      - name: Publish
         run: ./gradlew clean publish
         env:
           GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
