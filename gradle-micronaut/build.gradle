@@ -1,6 +1,5 @@
 plugins {
-  id 'java-gradle-plugin'
-  id 'com.gradle.plugin-publish' version '1.0.0-rc-1'
+  id 'com.gradle.plugin-publish' version '1.0.0'
 }
 
 repositories {
@@ -14,7 +13,7 @@ dependencies {
 }
 
 pluginBundle {
-  website = 'https://www.apized.org/'
+  website = 'https://apized.org/'
   vcsUrl = 'https://github.com/apized/apized'
   tags = [ 'apized' ]
 }
@@ -30,20 +29,6 @@ gradlePlugin {
   }
 }
 
-//publishing {
-//  repositories {
-//    maven {
-//      name = 'localPluginRepository'
-//      url = '../local-plugin-repository'
-//    }
-//  }
-////  publications {
-////    maven(MavenPublication) {
-////      from components.java
-////    }
-////  }
-//}
-
 task generateResources {
   ext {
     propFile = file("$buildDir/generated/gradle.properties")
@@ -54,6 +39,7 @@ task generateResources {
     propFile.text = "version=$project.version"
   }
 }
+
 processResources {
   from files(generateResources)
 }
