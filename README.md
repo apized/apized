@@ -1,3 +1,5 @@
+[![CI/CD](https://github.com/apized/apized/actions/workflows/cicd.yml/badge.svg)](https://github.com/apized/apized/actions/workflows/cicd.yml)
+
 # apized
 
 The apized project's goal is to provide server developers with the constructs for providing all the 
