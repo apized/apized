@@ -16,8 +16,10 @@
 
 package org.apized.micronaut.processor;
 
+import io.micronaut.serde.annotation.Serdeable;
 import org.apized.core.StringHelper;
 import org.apized.core.behaviour.annotation.Behaviour;
+import org.apized.core.federation.Federated;
 import org.apized.core.model.Apized;
 import org.apized.core.model.Layer;
 import org.apache.velocity.Template;
@@ -31,10 +33,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.MirroredTypesException;
 import javax.lang.model.type.TypeMirror;
@@ -68,6 +67,7 @@ public class AnnotationProcessor extends AbstractProcessor {
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     if (isInitialized()) {
       processApis(roundEnv);
+      processFederations(roundEnv);
       processBehaviours(roundEnv);
     }
 
@@ -183,6 +183,30 @@ public class AnnotationProcessor extends AbstractProcessor {
       generateClassFor(bindings.get("module") + "." + "EventBehaviour", "event/EventBehaviour", bindings);
       generateClassFor(bindings.get("module") + "." + "SendEventsOnCommit", "event/SendEventsOnCommit", bindings);
     }
+  }
+
+  private void processFederations(RoundEnvironment roundEnv) {
+    roundEnv.getElementsAnnotatedWith(Serdeable.class).stream().forEach(it -> {
+      if (it.getKind() != ElementKind.CLASS) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Not a class", it);
+        return;
+      }
+
+      boolean assignable = processingEnv.getTypeUtils().isAssignable(
+        it.asType(),
+        processingEnv.getElementUtils().getTypeElement(Federated.class.getName()).asType()
+      );
+
+      if (!assignable) {
+        return;
+      }
+
+      Map<String, Object> bindings = getDefaultBindings();
+      bindings.put("module", ((PackageElement) it.getEnclosingElement()).getQualifiedName().toString());
+      bindings.put("type", it.getSimpleName().toString());
+
+      generateClassFor(bindings.get("module") + "." + bindings.get("type") + "Deserializer", "Deserializer", bindings);
+    });
   }
 
   private List<String> getPaths(String path, List<? extends TypeMirror> scopeTypes) {

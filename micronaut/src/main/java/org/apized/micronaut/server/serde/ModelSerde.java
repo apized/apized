@@ -68,7 +68,7 @@ public class ModelSerde implements Serde<Model> {
     BeanWrapper<Model> deserializationWrapper = BeanWrapper.getWrapper(model);
     List<BeanProperty<? super Model, Object>> touched = new ArrayList<>();
     AnnotationValue<Apized> annotation = introspection.getAnnotation(Apized.class);
-    Class<?> scope = Objects.requireNonNull(annotation).classValue("scope").orElse(null);
+    Class<?> scope = annotation != null ? annotation.classValue("scope").orElse(null) : null;
 
     if (SerdeContext.getInstance().size() > 0) {
       Model peekedValue = SerdeContext.getInstance().peek().getValue();
@@ -155,6 +155,10 @@ public class ModelSerde implements Serde<Model> {
     }
     model._getModelMetadata().getTouched().addAll(touched.stream().map(Named::getName).toList());
 
+    if (Federated.class.isAssignableFrom(model.getClass()) && model.getId() == null) {
+      model.setId(UUID.randomUUID());
+    }
+
     return model;
   }
 
@@ -209,10 +213,15 @@ public class ModelSerde implements Serde<Model> {
           }
           encoder.finishStructure();
         } else {
-          if (isModel && ((Model) val).getId() != null && !fields.containsKey(property.getName())) {
+          if (isModel && !fields.containsKey(property.getName())) {
+            UUID id = ((Model) val).getId();
             encoder.encodeObject(property.asArgument());
             encoder.encodeKey("id");
-            encoder.encodeString(((Model) val).getId().toString());
+            if (id != null) {
+              encoder.encodeString(id.toString());
+            } else {
+              encoder.encodeNull();
+            }
             encoder.finishStructure();
           } else {
             defaultSerialize(encoder, context, Argument.of(val.getClass()), val);

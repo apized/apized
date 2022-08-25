@@ -45,6 +45,7 @@ public class FederationResolver extends AbstractFederationResolver {
     this.config = config;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected Map<String, Object> performRequest(URI url) throws Exception {
     return (Map<String, Object>) client.toBlocking().retrieve(

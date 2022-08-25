@@ -48,7 +48,7 @@ public abstract class AbstractFederationResolver {
 
   public Object resolve(String service, String type, String uri, Federated target, Set<String> fields) {
 
-    if (target == null || fields.size() == 0) {
+    if (target == null || target.getId() == null || fields.size() == 0) {
       return target;
     }
 

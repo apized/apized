@@ -26,7 +26,9 @@ create table if not exists organization
 );
 
 insert into organization
-values ('3fedcab7-97b7-4f81-b49f-2a70864f7cfa', now(), '{"id": "d568705a-a581-4923-828b-0f97c0891163"}', now(), '{}', 0, '{}', 'Org A'),
+values ('3fedcab7-97b7-4f81-b49f-2a70864f7cfa', now(), '{
+  "id": "d568705a-a581-4923-828b-0f97c0891163"
+}', now(), '{}', 0, '{}', 'Org A'),
        ('d79d05fa-d670-44c2-91f1-866bd8798995', now(), '{}', now(), '{}', 0, '{}', 'Org B');
 
 create table if not exists address
@@ -164,6 +166,7 @@ create table if not exists employee
     name            varchar(255),
     position        varchar(255),
     salary          integer not null,
+    favorite_doctor jsonb default '{}',
     address_id      uuid
         constraint fk_employee_address_id_address references address,
     department_id   uuid
@@ -174,31 +177,31 @@ create table if not exists employee
 
 insert into employee
 values ('e9fa40a7-3044-4328-82e9-f710a0911452', now(), '{}', now(), '{}', 0, '{}', 35, 'Sen Eng', 'A Senior Engineer',
-        100000,
+        100000, '{"id":"e9fa40a7-3044-4328-82e9-f710a0911452", "catalogopolisId": 1}',
         '5c0d9686-9f26-4d61-880e-47f99a2dbf03', 'a3a9d141-5614-4686-821e-f3c3e3ace530',
         '3fedcab7-97b7-4f81-b49f-2a70864f7cfa'),
        ('f0203a8f-cb3b-430b-a866-cdf7ea1ed730', now(), '{}', now(), '{}', 0, '{}', 25, 'Jun Eng', 'A Junior Engineer',
-        50000,
+        50000, '{"id":"e9fa40a7-3044-4328-82e9-f710a0911452", "catalogopolisId": 2}',
         'f7963915-a5b4-4214-91f1-b844c9d51b21', 'a3a9d141-5614-4686-821e-f3c3e3ace530',
         '3fedcab7-97b7-4f81-b49f-2a70864f7cfa'),
-       ('f33ebe50-7fe6-42d0-b7c4-56848c93607d', now(), '{}', now(), '{}', 0, '{}', 25, 'Sen Har', 'A Senior HR', 100000,
+       ('f33ebe50-7fe6-42d0-b7c4-56848c93607d', now(), '{}', now(), '{}', 0, '{}', 25, 'Sen Har', 'A Senior HR', 100000, '{}',
         '98859cd5-2963-4657-a98e-efab9a181cf0', '7217d08f-09a4-4ef7-b978-48a4e1c5079a',
         '3fedcab7-97b7-4f81-b49f-2a70864f7cfa'),
-       ('b1b41793-cb41-4036-a3f8-93a06b219fea', now(), '{}', now(), '{}', 0, '{}', 25, 'Jun Har', 'A Junior HR', 50000,
+       ('b1b41793-cb41-4036-a3f8-93a06b219fea', now(), '{}', now(), '{}', 0, '{}', 25, 'Jun Har', 'A Junior HR', 50000, '{}',
         '5f07f454-f811-45cc-ac77-c4ca57073304', '7217d08f-09a4-4ef7-b978-48a4e1c5079a',
         '3fedcab7-97b7-4f81-b49f-2a70864f7cfa'),
 
        ('b603046e-9f5e-40ac-b06b-0cede475b0ea', now(), '{}', now(), '{}', 0, '{}', 35, 'Sen Eng', 'B Senior Engineer',
-        100000,
+        100000, '{}',
         '0bb93356-ad24-4b7b-9dd4-2ca71b328650', 'b614e2f2-bf91-4b78-a39f-48f3ca334f2f',
         'd79d05fa-d670-44c2-91f1-866bd8798995'),
        ('0d7cb6b2-7e67-4aec-b165-41532a09a53b', now(), '{}', now(), '{}', 0, '{}', 25, 'Jun Eng', 'B Junior Engineer',
-        50000,
+        50000, '{}',
         '2438c6ec-34ed-4638-a31f-5818e3a7ec23', 'b614e2f2-bf91-4b78-a39f-48f3ca334f2f',
         'd79d05fa-d670-44c2-91f1-866bd8798995'),
-       ('6b1df6c0-f135-4ec9-9f25-bb0238041173', now(), '{}', now(), '{}', 0, '{}', 25, 'Sen Har', 'B Senior HR', 100000,
+       ('6b1df6c0-f135-4ec9-9f25-bb0238041173', now(), '{}', now(), '{}', 0, '{}', 25, 'Sen Har', 'B Senior HR', 100000, '{}',
         '6b259fa3-da17-4cb8-bff8-f2bd85336c83', 'bee94a58-ec0c-48c9-a36d-60a55673b7f8',
         'd79d05fa-d670-44c2-91f1-866bd8798995'),
-       ('c2867314-2bee-49d7-ac1a-8307d6cd1790', now(), '{}', now(), '{}', 0, '{}', 25, 'Jun Har', 'B Junior HR', 50000,
+       ('c2867314-2bee-49d7-ac1a-8307d6cd1790', now(), '{}', now(), '{}', 0, '{}', 25, 'Jun Har', 'B Junior HR', 50000, '{}',
         '0e3aa568-1b25-4d4e-9be0-3b0e23368ff4', 'bee94a58-ec0c-48c9-a36d-60a55673b7f8',
         'd79d05fa-d670-44c2-91f1-866bd8798995');

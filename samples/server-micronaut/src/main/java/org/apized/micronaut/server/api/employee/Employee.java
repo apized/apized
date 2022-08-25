@@ -16,16 +16,21 @@
 
 package org.apized.micronaut.server.api.employee;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.micronaut.data.annotation.TypeDef;
+import io.micronaut.data.model.DataType;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import lombok.Getter;
+import lombok.Setter;
+import org.apized.core.federation.Federation;
 import org.apized.core.model.Apized;
 import org.apized.core.model.BaseModel;
 import org.apized.micronaut.server.api.address.Address;
 import org.apized.micronaut.server.api.department.Department;
 import org.apized.micronaut.server.api.organization.Organization;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.micronaut.serde.annotation.Serdeable;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
@@ -55,4 +60,8 @@ public class Employee extends BaseModel {
   @ManyToOne
 //  @ApiContext(property = "employees")
   private Department department;
+
+  @TypeDef(type = DataType.JSON)
+  @Federation(value = "catalogopolis", type = "Doctor", uri = "/doctors/{catalogopolisId}")
+  Doctor favoriteDoctor;
 }

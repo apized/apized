@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package org.apized.core.federation;
+package org.apized.micronaut.server.api.employee;
 
-import io.micronaut.core.annotation.Introspected;
-import lombok.AllArgsConstructor;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apized.core.model.Model;
-
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
+import org.apized.core.federation.Federated;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Introspected
-public class Federated implements Model {
-  @NotNull
-  protected UUID id;
+@Serdeable
+public class Doctor extends Federated {
+  Long catalogopolisId;
 }
