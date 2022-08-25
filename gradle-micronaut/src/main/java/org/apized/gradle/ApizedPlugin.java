@@ -16,7 +16,6 @@
 
 package org.apized.gradle;
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin;
 import io.micronaut.gradle.MicronautApplicationPlugin;
 import io.micronaut.gradle.MicronautExtension;
 import org.gradle.api.GradleException;
@@ -34,34 +33,35 @@ public class ApizedPlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
-    project.getExtensions().add("micronautVersion", "3.5.1");
-    project.getExtensions().add("groovy.version", "3.0.9");
-    project.getPlugins().apply("groovy");
-
-    project.getPlugins().apply(MicronautApplicationPlugin.class);
-    project.getPlugins().apply(ShadowPlugin.class);
-    project.getPlugins().withType(JavaPlugin.class, plugin -> {
-      project.getDependencies().add("annotationProcessor", "org.projectlombok:lombok");
-      project.getDependencies().add("compileOnly", "org.projectlombok:lombok");
-    });
-
-    MicronautExtension micronaut = project.getExtensions().getByType(MicronautExtension.class);
-    micronaut.runtime("netty");
-    micronaut.testRuntime("junit5");
-
-    project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
-    project.getDependencies().add("annotationProcessor", "io.micronaut.data:micronaut-data-processor");
-    project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor");
-
-    Properties myProperties = new Properties();
-    Properties apizedProperties = new Properties();
     try {
+      Properties myProperties = new Properties();
+      Properties apizedProperties = new Properties();
       myProperties.load(getClass().getClassLoader().getResourceAsStream("gradle.properties"));
-      String version = myProperties.getProperty("version");
+      String apizedVersion = myProperties.getProperty("version");
+      String micronautVersion = myProperties.getProperty("micronautVersion");
 
-      project.getDependencies().add("annotationProcessor", String.format("org.apized:micronaut:%s", version));
-      project.getDependencies().add("implementation", String.format("org.apized:micronaut:%s", version));
-      project.getDependencies().add("testImplementation", String.format("org.apized:micronaut-test:%s", version));
+      project.getExtensions().add("micronautVersion", micronautVersion);
+      project.getPlugins().apply("groovy");
+
+      project.getPlugins().apply(MicronautApplicationPlugin.class);
+      project.getPlugins().withType(JavaPlugin.class, plugin -> {
+        project.getDependencies().add("annotationProcessor", "org.projectlombok:lombok");
+        project.getDependencies().add("compileOnly", "org.projectlombok:lombok");
+      });
+
+      MicronautExtension micronaut = project.getExtensions().getByType(MicronautExtension.class);
+      micronaut.runtime("netty");
+      micronaut.testRuntime("junit5");
+
+      project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
+      project.getDependencies().add("annotationProcessor", "io.micronaut.data:micronaut-data-processor");
+      project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor");
+
+
+
+      project.getDependencies().add("annotationProcessor", String.format("org.apized:micronaut:%s", apizedVersion));
+      project.getDependencies().add("implementation", String.format("org.apized:micronaut:%s", apizedVersion));
+      project.getDependencies().add("testImplementation", String.format("org.apized:micronaut-test:%s", apizedVersion));
 
       File file = project.file("apized.properties");
       if (!file.exists()) {

@@ -8,8 +8,7 @@ repositories {
 }
 
 dependencies {
-  api "io.micronaut.gradle:micronaut-gradle-plugin:3.5.1"
-  api "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+  api "io.micronaut.gradle:micronaut-gradle-plugin:${project.micronautVersion}"
 }
 
 pluginBundle {
@@ -19,6 +18,17 @@ pluginBundle {
 }
 
 gradlePlugin {
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/apized/apized")
+      credentials {
+        username = System.getenv("GITHUB_ACTOR")
+        password = System.getenv("GITHUB_TOKEN")
+      }
+
+    }
+  }
   plugins {
     apizedProjectPlugin {
       id = 'org.apized.micronaut'
@@ -36,7 +46,7 @@ task generateResources {
   outputs.file propFile
   doLast {
     mkdir propFile.parentFile
-    propFile.text = "version=$project.version"
+    propFile.text = "version=$project.version\nmicronautVersion=$project.micronautVersion"
   }
 }
 
