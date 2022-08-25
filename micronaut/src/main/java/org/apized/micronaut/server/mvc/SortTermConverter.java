@@ -16,20 +16,21 @@
 
 package org.apized.micronaut.server.mvc;
 
-import org.apized.core.search.SearchHelper;
-import org.apized.core.search.SearchTerm;
 import io.micronaut.core.convert.ConversionContext;
 import io.micronaut.core.convert.TypeConverter;
 import jakarta.inject.Singleton;
+import org.apized.core.search.SearchHelper;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
 
 import java.util.Optional;
 
 @Singleton
-class SearchTermConverter implements TypeConverter<String, SearchTerm> {
+class SortTermConverter implements TypeConverter<String, SortTerm> {
 
   @Override
-  public Optional<SearchTerm> convert(String term, Class<SearchTerm> targetType, ConversionContext context) {
-    SearchTerm convert = SearchHelper.convertTerm(term);
+  public Optional<SortTerm> convert(String sort, Class<SortTerm> targetType, ConversionContext context) {
+    SortTerm convert = SearchHelper.convertSort(sort);
     if (convert != null && convert.getField().contains(".")) {
       convert = null;
     }

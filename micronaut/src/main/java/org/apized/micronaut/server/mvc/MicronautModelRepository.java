@@ -39,7 +39,7 @@ public interface MicronautModelRepository<T extends Model> extends ModelReposito
 
     io.micronaut.data.model.Page<T> micronautPage = findAll(
       spec,
-      Pageable.from(page - 1, pageSize, generateSort(sort))
+      Pageable.from(page - 1, pageSize, RepositoryHelper.generateSort(sort))
     );
 
     return Page.<T>builder()
@@ -61,7 +61,7 @@ public interface MicronautModelRepository<T extends Model> extends ModelReposito
   default Page<T> search(List<SearchTerm> search, List<SortTerm> sort) {
     QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(search);
     return Page.<T>builder().content(
-      findAll(spec, generateSort(sort))
+      findAll(spec, RepositoryHelper.generateSort(sort))
     ).build();
   }
 
@@ -82,14 +82,5 @@ public interface MicronautModelRepository<T extends Model> extends ModelReposito
   @Override
   default void delete(UUID it) {
     deleteById(it);
-  }
-
-  private Sort generateSort(List<SortTerm> sort) {
-    return Sort.of(
-      sort.stream().map(s ->
-          s.getDirection() == SortDirection.asc ? Sort.Order.asc(s.getField()) : Sort.Order.desc(s.getField())
-        )
-        .toList()
-        .toArray(new Sort.Order[0]));
   }
 }

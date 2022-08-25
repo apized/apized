@@ -46,6 +46,7 @@ public class PageSerde implements Serde<Page<? extends Model>> {
     if (!RequestContext.getInstance().getFields().containsKey("content")) {
       RequestContext.getInstance().setFields(Map.of("*", Map.of(), "content", RequestContext.getInstance().getFields()));
       RequestContext.getInstance().setSearch(Map.of("content", RequestContext.getInstance().getSearch()));
+      RequestContext.getInstance().setSort(Map.of("content", RequestContext.getInstance().getSort()));
     }
     serde.serialize(encoder, context, type, value);
   }

@@ -17,6 +17,15 @@
 package org.apized.core.search;
 
 public enum SortDirection {
-  asc,
-  desc
+  asc(">"),
+  desc("<");
+  private final String key;
+
+  SortDirection(String key) {
+    this.key = key;
+  }
+
+  public String getKey() {
+    return key;
+  }
 }

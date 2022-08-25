@@ -38,6 +38,7 @@ public class SerdeFilter implements HttpServerFilter {
     RequestContext.getInstance().setPathVariables(getPathVariables(request));
     RequestContext.getInstance().setFields(getParameters(request, "fields"));
     RequestContext.getInstance().setSearch(getParameters(request, "search"));
+    RequestContext.getInstance().setSort(getParameters(request, "sort"));
     RequestContext.getInstance().setReason(request.getHeaders().get("X-Reason"));
 
     return chain.proceed(request);

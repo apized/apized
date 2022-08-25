@@ -16,10 +16,13 @@
 
 package org.apized.micronaut.server.mvc;
 
-import org.apized.core.model.Model;
-import org.apized.core.search.SearchTerm;
+import io.micronaut.data.model.Sort;
 import io.micronaut.data.repository.jpa.criteria.QuerySpecification;
 import jakarta.persistence.criteria.Predicate;
+import org.apized.core.model.Model;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortDirection;
+import org.apized.core.search.SortTerm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,31 +32,42 @@ public abstract class RepositoryHelper {
     QuerySpecification<T> spec = (root, query, builder) -> {
       List<Predicate> criteria = new ArrayList<>();
       for (SearchTerm searchTerm : search) {
+        final String field = searchTerm.getField();
         final Object value = searchTerm.getValue();
+
         switch (searchTerm.getOp()) {
           case eq -> {
             if (value == null) {
-              criteria.add(builder.isNull(root.get(searchTerm.getField())));
+              criteria.add(builder.isNull(root.get(field)));
             } else {
-              criteria.add(builder.equal(root.get(searchTerm.getField()), value));
+              criteria.add(builder.equal(root.get(field), value));
             }
           }
           case ne -> {
             if (value == null) {
-              criteria.add(builder.isNotNull(root.get(searchTerm.getField())));
+              criteria.add(builder.isNotNull(root.get(field)));
             } else {
-              criteria.add(builder.notEqual(root.get(searchTerm.getField()), value));
+              criteria.add(builder.notEqual(root.get(field), value));
             }
           }
-          case like -> criteria.add(builder.like(root.get(searchTerm.getField()), "%" + value.toString() + "%"));
-          case gt -> criteria.add(builder.greaterThan(root.get(searchTerm.getField()), (Comparable) value));
-          case gte -> criteria.add(builder.greaterThanOrEqualTo(root.get(searchTerm.getField()), (Comparable) value));
-          case lt -> criteria.add(builder.lessThan(root.get(searchTerm.getField()), (Comparable) value));
-          case lte -> criteria.add(builder.lessThanOrEqualTo(root.get(searchTerm.getField()), (Comparable) value));
+          case like -> criteria.add(builder.like(root.get(field), "%" + value.toString() + "%"));
+          case gt -> criteria.add(builder.greaterThan(root.get(field), (Comparable) value));
+          case gte -> criteria.add(builder.greaterThanOrEqualTo(root.get(field), (Comparable) value));
+          case lt -> criteria.add(builder.lessThan(root.get(field), (Comparable) value));
+          case lte -> criteria.add(builder.lessThanOrEqualTo(root.get(field), (Comparable) value));
         }
       }
       return builder.and(criteria.toArray(new Predicate[0]));
     };
     return spec;
+  }
+
+  public static <T extends Model> Sort generateSort(List<SortTerm> sort) {
+    return Sort.of(
+      sort.stream().map(s ->
+          s.getDirection() == SortDirection.asc ? Sort.Order.asc(s.getField()) : Sort.Order.desc(s.getField())
+        )
+        .toList()
+        .toArray(new Sort.Order[0]));
   }
 }

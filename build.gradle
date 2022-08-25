@@ -8,8 +8,6 @@ subprojects {
   apply plugin: 'groovy'
   apply plugin: 'java-library'
 
-  ext['groovy.version'] = '3.0.9'
-
   repositories {
     mavenLocal()
     mavenCentral()

@@ -28,6 +28,7 @@ import org.apized.core.mvc.ModelService;
 import org.apized.core.search.SearchHelper;
 import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
 import org.apized.core.serde.RequestContext;
 import org.apized.core.serde.SerdeContext;
 import org.apized.micronaut.federation.FederationResolver;
@@ -157,6 +158,7 @@ public class ModelSerde implements Serde<Model> {
     return model;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void serialize(Encoder encoder, @NonNull EncoderContext context, @NonNull Argument<? extends Model> type, @NonNull Model value) throws IOException {
     encoder.encodeObject(type);
@@ -165,12 +167,12 @@ public class ModelSerde implements Serde<Model> {
     String path = encoder.currentPath().replaceAll("^/", "").replaceAll("/\\d+", "");
     Map<String, Object> fields = RequestContext.getInstance().getFields();
     Map<String, Object> search = RequestContext.getInstance().getSearch();
+    Map<String, Object> sort = RequestContext.getInstance().getSort();
     if (!path.isBlank()) {
       for (String it : path.split("/")) {
-        //noinspection unchecked
         fields = (Map<String, Object>) fields.getOrDefault(it, new HashMap<>());
-        //noinspection unchecked
         search = (Map<String, Object>) search.getOrDefault(it, new HashMap<>());
+        sort = (Map<String, Object>) sort.getOrDefault(it, new HashMap<>());
       }
     }
 
@@ -190,7 +192,7 @@ public class ModelSerde implements Serde<Model> {
       Object val;
       if (isModel) {
         Map<String, Object> subFields = (Map<String, Object>) Optional.ofNullable(fields.get(property.getName())).orElse(Map.of());
-        val = getModelValue(wrapper, property, subType, isCollection, search, MapHelper.flatten(subFields).keySet());
+        val = getModelValue(wrapper, property, subType, isCollection, search, sort, MapHelper.flatten(subFields).keySet());
       } else {
         val = wrapper.getProperty(property.getName(), Object.class).orElse(null);
       }
@@ -207,7 +209,7 @@ public class ModelSerde implements Serde<Model> {
           }
           encoder.finishStructure();
         } else {
-          if (isModel && !fields.containsKey(property.getName())) {
+          if (isModel && ((Model) val).getId() != null && !fields.containsKey(property.getName())) {
             encoder.encodeObject(property.asArgument());
             encoder.encodeKey("id");
             encoder.encodeString(((Model) val).getId().toString());
@@ -234,15 +236,15 @@ public class ModelSerde implements Serde<Model> {
     return subType;
   }
 
-  private Object getModelValue(BeanWrapper<Model> wrapper, BeanProperty<? extends Model, Object> property, Argument<?> subType, boolean isCollection, Map<String, Object> search, Set<String> fields) {
-    //noinspection unchecked
-    List<SearchTerm> terms = ((Map<String, Object>) search.getOrDefault(property.getName(), new HashMap<String, Object>())).keySet().stream().map(SearchHelper::convert).filter(Objects::nonNull).collect(Collectors.toList());
+  @SuppressWarnings("unchecked")
+  private Object getModelValue(BeanWrapper<Model> wrapper, BeanProperty<? extends Model, Object> property, Argument<?> subType, boolean isCollection, Map<String, Object> search, Map<String, Object> sort, Set<String> fields) {
+    List<SearchTerm> terms = ((Map<String, Object>) search.getOrDefault(property.getName(), new HashMap<String, Object>())).keySet().stream().map(SearchHelper::convertTerm).filter(Objects::nonNull).collect(Collectors.toList());
+    List<SortTerm> subSort = ((Map<String, Object>) sort.getOrDefault(property.getName(), new HashMap<String, Object>())).keySet().stream().map(SearchHelper::convertSort).filter(Objects::nonNull).collect(Collectors.toList());
     AnnotationValue<Federation> federation = property.getAnnotation(Federation.class);
     ModelService<?> service = federation == null ? appContext.getBean(new DefaultArgument<>(ModelService.class, subType.getAnnotationMetadata(), subType)) : null;
 
     if (isCollection) {
       //todo get limits from the request properties
-      //todo get sorting from the request properties
       Optional<AnnotationValue<OneToMany>> oneToMany = property.getAnnotationMetadata().findAnnotation(OneToMany.class);
       if (oneToMany.isPresent()) {
         Optional<String> mappedBy = oneToMany.flatMap(annotation -> annotation.stringValue("mappedBy"));
@@ -250,7 +252,7 @@ public class ModelSerde implements Serde<Model> {
       } else {
         terms.add(new SearchTerm(StringHelper.uncapitalize(StringHelper.pluralize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, List.of(wrapper.getProperty("id", UUID.class).orElse(UUID.randomUUID()))));
       }
-      return service.list(terms, List.of()).getContent();
+      return service.list(terms, subSort).getContent();
     } else {
       if (federation != null) {
         return resolver.resolve(
@@ -267,7 +269,7 @@ public class ModelSerde implements Serde<Model> {
           return model == null ? null : service.get(model.getId());
         } else {
           terms.add(new SearchTerm(mappedBy.get(), SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
-          return service.list(terms, List.of()).getContent().stream().findFirst().orElse(null);
+          return service.list(terms, subSort).getContent().stream().findFirst().orElse(null);
         }
       }
     }

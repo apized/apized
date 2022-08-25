@@ -41,4 +41,5 @@ public class RequestContext {
   private Map<String, Object> fields;
   private Map<String, UUID> pathVariables;
   private Map<String, Object> search;
+  private Map<String, Object> sort;
 }

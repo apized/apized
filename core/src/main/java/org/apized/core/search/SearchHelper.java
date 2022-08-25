@@ -16,10 +16,11 @@
 
 package org.apized.core.search;
 
+import java.util.List;
 import java.util.Optional;
 
 public abstract class SearchHelper {
-  public static SearchTerm convert(String term) {
+  public static SearchTerm convertTerm(String term) {
     Optional<SearchOperation> operation = resolveOperation(term);
     if (operation.isPresent()) {
       String[] parts = term.split(operation.get().getKey());
@@ -36,5 +37,22 @@ public abstract class SearchHelper {
       }
     }
     return Optional.ofNullable(result);
+  }
+
+  public static SortTerm convertSort(String sort) {
+    if (sort.length() > 0) {
+      if (List.of('<', '>').contains(sort.charAt(sort.length() - 1))) {
+        return new SortTerm(
+          sort.substring(0, sort.length() - 1),
+          sort.charAt(sort.length() - 1) == '>' ? SortDirection.asc : SortDirection.desc
+        );
+      } else {
+        return new SortTerm(
+          sort,
+          SortDirection.asc
+        );
+      }
+    }
+    return null;
   }
 }
