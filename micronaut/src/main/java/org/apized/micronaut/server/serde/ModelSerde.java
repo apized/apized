@@ -144,20 +144,19 @@ public class ModelSerde implements Serde<Model> {
     }
     decoder.close();
 
-    if (model.getId() != null) {
-      ModelService<?> service = appContext.getBean(new DefaultArgument<>(ModelService.class, type.getAnnotationMetadata(), type));
-      model = (Model) service.get(model.getId());
-      BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
-      touched.forEach(p -> wrapper.setProperty(p.getName(), deserializationWrapper.getProperty(p.getName(), p.getType())));
-      model._getModelMetadata().setAction(Action.UPDATE);
-    } else {
-      model._getModelMetadata().setAction(Action.CREATE);
+    if (!(model instanceof Federated)) {
+      if (model.getId() != null) {
+        ModelService<?> service = appContext.getBean(new DefaultArgument<>(ModelService.class, type.getAnnotationMetadata(), type));
+        model = service.get(model.getId());
+        BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
+        touched.forEach(p -> wrapper.setProperty(p.getName(), deserializationWrapper.getProperty(p.getName(), p.getType())));
+        model._getModelMetadata().setAction(Action.UPDATE);
+      } else {
+        model._getModelMetadata().setAction(Action.CREATE);
+      }
     }
     model._getModelMetadata().getTouched().addAll(touched.stream().map(Named::getName).toList());
 
-    if (Federated.class.isAssignableFrom(model.getClass()) && model.getId() == null) {
-      model.setId(UUID.randomUUID());
-    }
 
     return model;
   }

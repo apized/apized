@@ -16,11 +16,11 @@
 
 package org.apized.core.federation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apized.core.ModelMapper;
 import org.apized.core.model.Apized;
 import org.apized.core.model.Model;
 import org.apized.core.mvc.AbstractModelService;
-import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,7 +48,11 @@ public abstract class AbstractFederationResolver {
 
   public Object resolve(String service, String type, String uri, Federated target, Set<String> fields) {
 
-    if (target == null || target.getId() == null || fields.size() == 0) {
+    if (target == null || target.getId() == null) {
+      return null;
+    }
+
+    if (fields.size() == 0) {
       return target;
     }
 

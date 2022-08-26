@@ -8,7 +8,7 @@ Feature: List Employees
     And I create an employee with
       | name           | Guy 1                                                                 |
       | address        | [ line1 : 'Street', city: 'City', country: 'PT', postalCode: '3000' ] |
-      | favoriteDoctor | [catalogopolisId: 1]                                                  |
+      | favoriteDoctor | [ id: 'c10ec298-aa94-4f1d-8cd2-851b6cd7bcde', catalogopolisId: 1 ]    |
     And I create an employee with
       | name    | Guy 2                                                                 |
       | address | [ line1 : 'Street', city: 'City', country: 'PT', postalCode: '3000' ] |
