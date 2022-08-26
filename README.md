@@ -1,41 +1,35 @@
 [![CI/CD](https://github.com/apized/apized/actions/workflows/cicd.yml/badge.svg)](https://github.com/apized/apized/actions/workflows/cicd.yml)
 
-# apized
+# Apized
 
-The apized project's goal is to provide server developers with the constructs for providing all the 
-features usually present in servers in order to allow the developers to focus on the modelling and business logic.
+[Apized](https://apized.org) is modern JVM-based framework designed to make API development easier. It aims to give
+developers more time to focus on model definition and business logic implementation by automatically providing the 
+underlying implementations to easily create a rich REST API. 
 
-In order to keep our business logic clean and concise we have introduced an execution pipeline implementation which 
-we call behaviours. These behaviours should be kept small and each should cater to a specific business need.
-They can be defined to execute before/after any of the typical server-side MVC flow (Controller, Service & Repository) 
-and can have a specific order (thus establishing a pipeline of execution).
+By adopting apized your API will provide:
 
-To do so we use a regular MVC style pattern with a Controller Service and Repository layers. You are welcome to write these
-yourself on top of the abstractions we have already provided for you but 
+- Audit trail
+- Event publishing
+- Enhanced REST endpoints
+- Request execution pipeline
+- OpenAPI documentation (optional)
+- Security (optional)
 
-**_NOTE:_** This project is experimental and in its early days. 
+and will run on top of:
 
-## Features
+- [Micronaut](https://micronaut.io/)
+- [Spring Boot](https://spring.io/projects/spring-boot) [Planned]
 
-### Included
+For more information on using Apized see the documentation at [apized.org](https://apized.org).
 
-### model
-### behaviour
-### error
-### execution
-### mvc
-### serde
+## Example applications
 
-### Optional
-
-### audit
-### event
-### federation
-### search
-### security
+Example applications can be found under `samples` on this repo.
 
 ## Known Issues
 
+**_NOTE:_** This project is still experimental.
+
 - Right now, we only support OneToOne, OneToMany and ManyToOne relationships. If a
   ManyToMany relationship is needed you will have to declare the joining table as an entity with
-  OneToMany relations to both sides of the ManyToMany relation.
+  OneToMany relations to both sides of the ManyToMany relation. We plan to better support these in the future.
