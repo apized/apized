@@ -57,6 +57,10 @@ public class ApizedPlugin implements Plugin<Project> {
       project.getRepositories().maven(r -> {
         r.setName("Apized GitHub Repository");
         r.setUrl("https://maven.pkg.github.com/apized/apized");
+        r.credentials(c -> {
+          c.setUsername("apized-bot");
+          c.setPassword("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");
+        });
       });
 
       MicronautExtension micronaut = project.getExtensions().getByType(MicronautExtension.class);
