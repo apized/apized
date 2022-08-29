@@ -25,11 +25,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Apized {
   /**
-   * The name of the model in CamelCase.
-   */
-  String value() default "";
-
-  /**
    * Set of components to generate. Generated Repositories are assumed to be for DB access and will not trigger behaviours.
    */
   Layer[] layers() default {Layer.CONTROLLER, Layer.SERVICE, Layer.REPOSITORY};
