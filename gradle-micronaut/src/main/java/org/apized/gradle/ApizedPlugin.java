@@ -18,9 +18,14 @@ package org.apized.gradle;
 
 import io.micronaut.gradle.MicronautApplicationPlugin;
 import io.micronaut.gradle.MicronautExtension;
+import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.repositories.ArtifactRepository;
+import org.gradle.api.artifacts.repositories.RepositoryContentDescriptor;
+import org.gradle.api.internal.artifacts.repositories.DefaultMavenArtifactRepository;
+import org.gradle.api.internal.artifacts.repositories.layout.MavenRepositoryLayout;
 import org.gradle.api.plugins.JavaPlugin;
 
 import java.io.*;
@@ -49,6 +54,11 @@ public class ApizedPlugin implements Plugin<Project> {
         project.getDependencies().add("compileOnly", "org.projectlombok:lombok");
       });
 
+      project.getRepositories().maven(r -> {
+        r.setName("Apized GitHub Repository");
+        r.setUrl("https://maven.pkg.github.com/apized/apized");
+      });
+
       MicronautExtension micronaut = project.getExtensions().getByType(MicronautExtension.class);
       micronaut.runtime("netty");
       micronaut.testRuntime("junit5");
@@ -56,7 +66,6 @@ public class ApizedPlugin implements Plugin<Project> {
       project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
       project.getDependencies().add("annotationProcessor", "io.micronaut.data:micronaut-data-processor");
       project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor");
-
 
 
       project.getDependencies().add("annotationProcessor", String.format("org.apized:micronaut:%s", apizedVersion));
