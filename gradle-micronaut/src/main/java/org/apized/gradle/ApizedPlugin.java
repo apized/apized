@@ -59,7 +59,7 @@ public class ApizedPlugin implements Plugin<Project> {
         r.setUrl("https://maven.pkg.github.com/apized/apized");
         r.credentials(c -> {
           c.setUsername("apized-bot");
-          c.setPassword("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");
+          c.setPassword("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");
         });
       });
 
