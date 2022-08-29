@@ -18,17 +18,15 @@ package org.apized.gradle;
 
 import io.micronaut.gradle.MicronautApplicationPlugin;
 import io.micronaut.gradle.MicronautExtension;
-import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.repositories.ArtifactRepository;
-import org.gradle.api.artifacts.repositories.RepositoryContentDescriptor;
-import org.gradle.api.internal.artifacts.repositories.DefaultMavenArtifactRepository;
-import org.gradle.api.internal.artifacts.repositories.layout.MavenRepositoryLayout;
 import org.gradle.api.plugins.JavaPlugin;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.Properties;
 
 /**
@@ -59,7 +57,9 @@ public class ApizedPlugin implements Plugin<Project> {
         r.setUrl("https://maven.pkg.github.com/apized/apized");
         r.credentials(c -> {
           c.setUsername("apized-bot");
-          c.setPassword(System.getenv("APIZED_BOT_GITHUB_TOKEN"));
+          c.setPassword(new String(
+            Base64.getDecoder().decode("Z2hwX0V5b29sTmkwTW5xaTh4Zmp1SDYwRDBob1dHRlR1WTRPTE1XSg==")
+          ));
         });
       });
 
