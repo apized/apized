@@ -1,21 +1,34 @@
 package org.apized.apized.core.behaviour;
 
-import org.apized.core.behaviour.BehaviourManager;
-import org.apized.core.model.Action;
-import org.apized.core.model.Layer;
-import org.apized.core.model.Model;
-import org.apized.core.model.When;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.runtime.server.event.ServerStartupEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apized.core.behaviour.BehaviourManager;
+import org.apized.core.model.Action;
+import org.apized.core.model.Layer;
+import org.apized.core.model.Model;
+import org.apized.core.model.When;
+import org.apized.micronaut.audit.AuditBehaviour;
+import org.apized.micronaut.audit.EventBehaviour;
+import org.apized.micronaut.core.ApizedConfig;
+import org.apized.micronaut.server.mvc.RepositoryHelper;
 
 import java.util.List;
 
 @Singleton
 @Requires(classes=BehaviourManager.class)
 public class BehaviourRegistration {
+  @Inject
+  ApizedConfig config;
+
+  @Inject
+  AuditBehaviour auditBehaviour;
+
+  @Inject
+  EventBehaviour eventBehaviour;
+
   @Inject
   BehaviourManager manager;
 
@@ -29,6 +42,11 @@ public class BehaviourRegistration {
 #end
   @EventListener
   void onStartup(ServerStartupEvent event) {
+    RepositoryHelper.config = config;
+
+    manager.registerBehaviour(Model.class, Layer.SERVICE, List.of(When.AFTER), List.of(Action.CREATE, Action.UPDATE, Action.DELETE), 1000, auditBehaviour);
+    manager.registerBehaviour(Model.class, Layer.SERVICE, List.of(When.AFTER), List.of(Action.CREATE, Action.UPDATE, Action.DELETE), 1000, eventBehaviour);
+
     #foreach( $it in $behaviours )
     manager.registerBehaviour(${it.annotation.module}.${it.annotation.model}.class, Layer.${it.annotation.layer}, List.of(#expandEnumList('When', ${it.annotation.when})), List.of(#expandEnumList('Action', ${it.annotation.actions})), ${it.annotation.order}, ${it.name});
     #end

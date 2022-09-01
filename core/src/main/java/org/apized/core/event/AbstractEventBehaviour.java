@@ -30,27 +30,14 @@ import org.apized.core.serde.RequestContext;
 import java.util.List;
 
 public abstract class AbstractEventBehaviour implements BehaviourHandler<Model> {
-  private final ModelMapper modelMapper;
-
-  public AbstractEventBehaviour(BehaviourManager manager) {
-    manager.registerBehaviour(
-      Model.class,
-      Layer.CONTROLLER,
-      List.of(When.AFTER),
-      List.of(Action.CREATE, Action.UPDATE, Action.DELETE),
-      1000,
-      this
-    );
-
-    modelMapper = new ModelMapper(EventField.class, EventIgnore.class);
-  }
+  private final ModelMapper modelMapper = new ModelMapper(EventField.class, EventIgnore.class);
 
   @Override
-  public void process(Class<Model> type, When when, Action action, Execution execution) {
-    Model model = (Model) execution.getInputs().get("it");
+  public void process(Class<Model> type, When when, Action action, Execution<Model> execution) {
+    Model model = execution.getInput();
     ScopeHelper.scopeUpUntil(
       model,
-      a -> a.booleanValue("event").orElse(false),
+      a -> a.booleanValue("event").orElse(true),
       i -> EventContext.getInstance().add(new Event(
         RequestContext.getInstance().getId(),
         String.format("%s.%s.%s", "micronaut", type.getSimpleName().toLowerCase(), type.equals(i.getClass()) ? action.getType() : Action.UPDATE),

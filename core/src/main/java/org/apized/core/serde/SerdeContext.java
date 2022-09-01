@@ -32,6 +32,10 @@ public class SerdeContext extends Stack<SerdeContext.SerdeStackEntry> {
     return threadLocalValue.get();
   }
 
+  public static void destroy() {
+    threadLocalValue.remove();
+  }
+
   @AllArgsConstructor
   @Data
   public static class SerdeStackEntry {

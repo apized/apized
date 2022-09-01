@@ -16,25 +16,28 @@
 
 package org.apized.micronaut.federation;
 
+import io.micronaut.serde.ObjectMapper;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apized.core.federation.AbstractFederationResolver;
 import org.apized.core.model.Model;
 import org.apized.core.mvc.AbstractModelService;
 import org.apized.micronaut.core.ApizedConfig;
-import io.micronaut.http.HttpHeaders;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.client.HttpClient;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
 @Singleton
 public class FederationResolver extends AbstractFederationResolver {
   private final ApizedConfig config;
+  HttpClient client = HttpClient.newHttpClient();
+
   @Inject
-  HttpClient client;
+  ObjectMapper mapper;
 
   public FederationResolver(ApizedConfig config, List<AbstractModelService<? extends Model>> services) {
     super(
@@ -48,9 +51,16 @@ public class FederationResolver extends AbstractFederationResolver {
   @SuppressWarnings("unchecked")
   @Override
   protected Map<String, Object> performRequest(URI url) throws Exception {
-    return (Map<String, Object>) client.toBlocking().retrieve(
-      HttpRequest.<Map<String, Object>>GET(url)
-        .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", config.getToken())),
+    HttpRequest request = HttpRequest.newBuilder()
+      .uri(url)
+      .header("AUTHORIZATION", String.format("Bearer %s", config.getToken()))
+      .build();
+
+    return mapper.readValue(
+      client.send(
+        request,
+        HttpResponse.BodyHandlers.ofString()
+      ).body(),
       Map.class
     );
   }

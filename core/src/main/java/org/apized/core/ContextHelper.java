@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-package org.apized.core.model;
+package org.apized.core;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.apized.core.audit.AuditContext;
+import org.apized.core.event.EventContext;
+import org.apized.core.federation.FederationContext;
+import org.apized.core.security.SecurityContext;
+import org.apized.core.serde.RequestContext;
+import org.apized.core.serde.SerdeContext;
 
-import java.util.ArrayList;
-import java.util.List;
+public class ContextHelper {
 
-@Data
-@NoArgsConstructor
-public class ModelMetadata {
-  Model original;
-
-  Action action = Action.NO_OP;
-
-  Boolean saved = false;
-
-  @Setter(value = AccessLevel.NONE)
-  List<String> touched = new ArrayList<>();
-
-  public boolean isDirty() {
-    return getTouched().size() > 0 && !saved;
+  public static void reset(){
+    RequestContext.destroy();
+    SecurityContext.destroy();
+    SerdeContext.destroy();
+    FederationContext.destroy();
+    AuditContext.destroy();
+    EventContext.destroy();
   }
 }

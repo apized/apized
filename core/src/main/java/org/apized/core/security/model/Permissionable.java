@@ -19,13 +19,14 @@ package org.apized.core.security.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.apized.core.model.Model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-public abstract class Permissionable {
+public abstract class Permissionable implements Model {
   protected List<String> permissions = new ArrayList<>();
 
   @JsonIgnore

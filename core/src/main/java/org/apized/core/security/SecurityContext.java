@@ -34,6 +34,10 @@ public class SecurityContext {
   private User user;
   private String token;
 
+  public static void destroy() {
+    threadLocalValue.remove();
+  }
+
   public User getUser() {
     if (user == null) {
       user = new User();

@@ -13,8 +13,12 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.core.annotation.Introspected;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+#foreach( $it in $extension.service.imports )
+import $it;
+#end
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Introspected
@@ -22,6 +26,12 @@ import java.util.UUID;
 public class ${type}Service extends AbstractModelService<${type}> {
   @Inject
   ${type}Repository repository;
+
+#foreach( $it in $extension.service.injects )
+
+  @Inject
+  ${it};
+#end
 
   public ${type}Service(ApplicationContext appContext) {
     super(appContext);
@@ -92,6 +102,16 @@ public class ${type}Service extends AbstractModelService<${type}> {
   )
   public ${type} delete(UUID id) {
     return super.delete(id);
+  }
+#end
+#foreach( $it in $extension.service.methods )
+
+  public ${it.returnType} ${it.name}(${it.parameters}){
+#if($it.returnType != "void")
+    return ${it.callee}.${it.name}(${it.arguments});
+#else
+    ${it.callee}.${it.name}(${it.arguments});
+#end
   }
 #end
 }

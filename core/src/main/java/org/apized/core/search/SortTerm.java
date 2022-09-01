@@ -22,6 +22,8 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SortTerm {
   @JsonProperty(required = true)
   private String field;

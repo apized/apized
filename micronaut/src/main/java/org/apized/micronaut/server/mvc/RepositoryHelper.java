@@ -16,45 +16,97 @@
 
 package org.apized.micronaut.server.mvc;
 
+import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.beans.BeanIntrospection;
+import io.micronaut.data.annotation.Join;
+import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.Sort;
+import io.micronaut.data.model.jpa.criteria.PersistentEntityFrom;
+import io.micronaut.data.model.runtime.RuntimePersistentEntity;
 import io.micronaut.data.repository.jpa.criteria.QuerySpecification;
+import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Predicate;
+import org.apized.core.StringHelper;
+import org.apized.core.model.Apized;
 import org.apized.core.model.Model;
+import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortDirection;
 import org.apized.core.search.SortTerm;
+import org.apized.core.security.SecurityContext;
+import org.apized.core.serde.RequestContext;
+import org.apized.micronaut.core.ApizedConfig;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public abstract class RepositoryHelper {
+  public static ApizedConfig config;
+
   public static <T extends Model> QuerySpecification<T> getQuerySpecification(List<SearchTerm> search) {
     QuerySpecification<T> spec = (root, query, builder) -> {
       List<Predicate> criteria = new ArrayList<>();
+
+      BeanIntrospection<Model> introspection = ((RuntimePersistentEntity) ((PersistentEntityFrom<?, ?>) root).getPersistentEntity()).getIntrospection();
+      AnnotationValue<Apized> apized = introspection.getAnnotation(Apized.class);
+      Map<String, UUID> pathVariables = RequestContext.getInstance().getPathVariables();
+      Arrays.stream(apized.classValues("scope")).forEach(s -> {
+        String uncapitalize = StringHelper.uncapitalize(s.getSimpleName());
+        if (pathVariables.get(uncapitalize) != null || !SecurityContext.getInstance().getUser().isAllowed(config.getSlug())) {
+          search.add(new SearchTerm(uncapitalize, SearchOperation.eq, pathVariables.get(uncapitalize)));
+        }
+      });
+
+      introspection.getBeanProperties()
+        .stream()
+        .filter(p -> p.getName().equals("owner.id"))
+        .forEach(p -> {
+          if (!SecurityContext.getInstance().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
+            search.add(new SearchTerm(p.getName(), SearchOperation.eq, SecurityContext.getInstance().getUser().getId()));
+          }
+        });
+
       for (SearchTerm searchTerm : search) {
-        final String field = searchTerm.getField();
-        final Object value = searchTerm.getValue();
+        String field = searchTerm.getField();
+        Object value = searchTerm.getValue();
+        From from = root;
+
+        if (field.contains(".")) {
+          List<String> split = List.of(searchTerm.getField().split("\\."));
+          AnnotationValue<TypeDef> json = introspection.getProperty(split.get(0)).get().getAnnotation(TypeDef.class);
+          if (json == null) {
+            from = ((PersistentEntityFrom<?, ?>) root).join(split.get(0), Join.Type.INNER);
+            field = split.get(1);
+          } else {
+            //todo figure out a way to query metadata fields
+//            field = split.stream().collect(Collectors.joining("->>"));
+//            criteria.add(
+//              new ExpressionBinaryPredicate(((PersistentEntityFrom<?, ?>) root).getPersistentEntity().get.literal(split.get(0) + " ->> '" + split.get(1) + "'"), builder.literal(value), PredicateBinaryOp.EQUALS)
+////              builder.literal(String.join("->", split) + "=" +value).in()
+//            );
+            continue;
+          }
+        }
 
         switch (searchTerm.getOp()) {
           case eq -> {
             if (value == null) {
-              criteria.add(builder.isNull(root.get(field)));
+              criteria.add(builder.isNull(from.get(field)));
             } else {
-              criteria.add(builder.equal(root.get(field), value));
+              criteria.add(builder.equal(from.get(field), value));
             }
           }
           case ne -> {
             if (value == null) {
-              criteria.add(builder.isNotNull(root.get(field)));
+              criteria.add(builder.isNotNull(from.get(field)));
             } else {
-              criteria.add(builder.notEqual(root.get(field), value));
+              criteria.add(builder.notEqual(from.get(field), value));
             }
           }
-          case like -> criteria.add(builder.like(root.get(field), "%" + value.toString() + "%"));
-          case gt -> criteria.add(builder.greaterThan(root.get(field), (Comparable) value));
-          case gte -> criteria.add(builder.greaterThanOrEqualTo(root.get(field), (Comparable) value));
-          case lt -> criteria.add(builder.lessThan(root.get(field), (Comparable) value));
-          case lte -> criteria.add(builder.lessThanOrEqualTo(root.get(field), (Comparable) value));
+          case like -> criteria.add(builder.like(from.get(field), "%" + value.toString() + "%"));
+          case gt -> criteria.add(builder.greaterThan(from.get(field), (Comparable) value));
+          case gte -> criteria.add(builder.greaterThanOrEqualTo(from.get(field), (Comparable) value));
+          case lt -> criteria.add(builder.lessThan(from.get(field), (Comparable) value));
+          case lte -> criteria.add(builder.lessThanOrEqualTo(from.get(field), (Comparable) value));
         }
       }
       return builder.and(criteria.toArray(new Predicate[0]));
@@ -63,6 +115,10 @@ public abstract class RepositoryHelper {
   }
 
   public static <T extends Model> Sort generateSort(List<SortTerm> sort) {
+    if (sort.size() == 0) {
+      sort = List.of(new SortTerm("createdAt", SortDirection.desc));
+    }
+
     return Sort.of(
       sort.stream().map(s ->
           s.getDirection() == SortDirection.asc ? Sort.Order.asc(s.getField()) : Sort.Order.desc(s.getField())

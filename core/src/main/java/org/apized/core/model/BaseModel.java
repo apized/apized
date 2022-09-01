@@ -16,9 +16,6 @@
 
 package org.apized.core.model;
 
-import org.apized.core.federation.Federated;
-import org.apized.core.federation.Federation;
-import org.apized.core.security.SecurityContext;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
@@ -26,6 +23,8 @@ import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.DataType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apized.core.federation.Federation;
+import org.apized.core.security.SecurityContext;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -49,18 +48,16 @@ public abstract class BaseModel implements Model {
   private Long version = 0L;
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  @TypeDef(type = DataType.JSON)
   @Federation(value = "auth", type = "User", uri = "/auth/users/{id}")
-  private Federated createdBy;
+  private UUID createdBy;
 
   @Temporal(TemporalType.TIMESTAMP)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime createdAt;
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  @TypeDef(type = DataType.JSON)
   @Federation(value = "auth", type = "User", uri = "/auth/users/{id}")
-  private Federated lastUpdatedBy;
+  private UUID lastUpdatedBy;
 
   @Temporal(TemporalType.TIMESTAMP)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -84,16 +81,16 @@ public abstract class BaseModel implements Model {
   public void beforeCreate() {
     id = id != null ? id : UUID.randomUUID();
     createdAt = LocalDateTime.now(ZoneId.of("UTC"));
-    createdBy = new Federated(SecurityContext.getInstance().getUser().getId());
+    createdBy = SecurityContext.getInstance().getUser().getId();
     lastUpdatedAt = LocalDateTime.now(ZoneId.of("UTC"));
-    lastUpdatedBy = new Federated(SecurityContext.getInstance().getUser().getId());
+    lastUpdatedBy = SecurityContext.getInstance().getUser().getId();
     _getModelMetadata().setSaved(true);
   }
 
   @PreUpdate
   public void beforeUpdate() {
     lastUpdatedAt = LocalDateTime.now(ZoneId.of("UTC"));
-    lastUpdatedBy = new Federated(SecurityContext.getInstance().getUser().getId());
+    lastUpdatedBy = SecurityContext.getInstance().getUser().getId();
     _getModelMetadata().setSaved(true);
   }
 }

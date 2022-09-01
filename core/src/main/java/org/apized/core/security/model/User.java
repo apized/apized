@@ -16,6 +16,7 @@
 
 package org.apized.core.security.model;
 
+import io.micronaut.core.annotation.Introspected;
 import org.apized.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -27,7 +28,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User extends Permissionable implements Model {
+@Introspected
+public class User extends Permissionable {
   protected UUID id;
   protected String username;
   protected String name;
@@ -41,7 +43,9 @@ public class User extends Permissionable implements Model {
     this.id = id;
     this.username = username;
     this.name = name;
-    this.roles = roles;
+    if (roles != null) {
+      this.roles = roles;
+    }
     if (permissions != null) {
       this.permissions = permissions;
     }

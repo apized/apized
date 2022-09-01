@@ -34,9 +34,13 @@ public class EventContext {
 
 
   private final Map<String, String> headers = new HashMap<>();
-  private final List<Event> events = new ArrayList<>();
+  private final Map<String, Event> events = new HashMap<>();
+
+  public static void destroy() {
+    threadLocalValue.remove();
+  }
 
   public void add(Event entry) {
-    events.add(entry);
+    events.put(entry.getTopic(), entry);
   }
 }

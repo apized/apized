@@ -35,9 +35,29 @@ public @interface Apized {
    */
   Action[] operations() default {Action.LIST, Action.GET, Action.CREATE, Action.UPDATE, Action.DELETE};
 
+  Class<?>[] extensions() default {};
+
   Class<? extends Model>[] scope() default {};
 
   boolean audit() default true;
 
   boolean event() default true;
+
+
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.TYPE)
+  @interface Extension {
+    /**
+     * The layer this is extending.
+     * todo do controllers actually need this or can I simply declare a new controller
+     */
+    Layer layer();
+
+    /**
+     * For Repository extensions (an interface) the exclusions list the methods that we shouldn't create a Server layer
+     * "proxy" for.
+     * For Service extensions (a Singleton) the exclusions list the methods that shouldn't be present in the service itself.
+     */
+    String[] exclude() default {};
+  }
 }

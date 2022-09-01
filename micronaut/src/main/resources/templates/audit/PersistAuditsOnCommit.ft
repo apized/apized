@@ -14,9 +14,10 @@ class PersistAuditsOnCommit {
 
   @TransactionalEventListener(TransactionalEventListener.TransactionPhase.BEFORE_COMMIT)
   public void beforeCommit(Object event) {
-    log.info("Saving {} audit logs triggered by {}.", AuditContext.getInstance().getAuditEntries().size(), event);
-    if (AuditContext.getInstance().getAuditEntries().size() > 0) {
-      repository.saveAll(AuditContext.getInstance().getAuditEntries());
+    int size = AuditContext.getInstance().getAuditEntries().size();
+    log.info("Saving {} audit logs triggered by {}.", size, event);
+    if (size > 0) {
+      repository.saveAll(AuditContext.getInstance().getAuditEntries().values());
     }
   }
 }

@@ -31,6 +31,9 @@ import io.micronaut.core.annotation.AnnotationValue;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import java.util.Map;
+import java.util.UUID;
+
 @SuppressWarnings({"unchecked", "OptionalGetWithoutIsPresent"})
 @Singleton
 @InterceptorBean(MicronautBehaviourExecution.class)
@@ -48,12 +51,16 @@ public class BehaviourExecutor implements MethodInterceptor<Object, Model> {
     Layer layer = execution.enumValue("layer", Layer.class).get();
     Action action = execution.enumValue("action", Action.class).get();
 
+    Map<String, Object> parameterValueMap = context.getParameterValueMap();
+    UUID id = (UUID) parameterValueMap.values().stream().filter(v -> v instanceof UUID).findFirst().orElse(null);
+    Model input = (Model) parameterValueMap.values().stream().filter(v -> v instanceof Model).findFirst().orElse(null);
+
     manager.executeBehavioursFor(
       model,
       layer,
       When.BEFORE,
       action,
-      Execution.builder().inputs(context.getParameterValueMap()).build()
+      Execution.builder().id(id).input(input).build()
     );
 
     Model result = context.proceed();
@@ -63,7 +70,7 @@ public class BehaviourExecutor implements MethodInterceptor<Object, Model> {
       layer,
       When.AFTER,
       action,
-      Execution.builder().inputs(context.getParameterValueMap()).output(result).build()
+      Execution.builder().id(id).input(input).output(result).build()
     );
 
     return result;

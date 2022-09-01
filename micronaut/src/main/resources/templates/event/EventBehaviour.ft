@@ -5,8 +5,4 @@ import org.apized.core.event.AbstractEventBehaviour;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class EventBehaviour extends AbstractEventBehaviour {
-  public EventBehaviour(BehaviourManager manager) {
-    super(manager);
-  }
-}
+public class EventBehaviour extends AbstractEventBehaviour { }

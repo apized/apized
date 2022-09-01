@@ -46,9 +46,9 @@ public abstract class AbstractFederationResolver {
 
   protected abstract Map<String, Object> performRequest(URI url) throws Exception;
 
-  public Object resolve(String service, String type, String uri, Federated target, Set<String> fields) {
+  public Object resolve(String service, String type, String uri, Object target, Set<String> fields) {
 
-    if (target == null || target.getId() == null) {
+    if (target == null || (target instanceof Model && ((Model) target).getId() == null)) {
       return null;
     }
 
@@ -57,13 +57,13 @@ public abstract class AbstractFederationResolver {
     }
 
     if (service.equals(slug)) {
-      log.info("Resolve {} (local) with id {}", type, target.getId());
+      log.info("Resolve {} (local) with id {}", type, target);
       return services
         .stream()
         .filter(it -> it.getType().getSimpleName().equals(type))
         .findFirst()
         .get()
-        .get(target.getId());
+        .get(((Model)target).getId());
     } else {
       try {
         URI url = createUri(
@@ -72,11 +72,13 @@ public abstract class AbstractFederationResolver {
         );
 
         if (FederationContext.getInstance().getCache().containsKey(url)) {
-          log.info("Resolve {} (cached) with id {} - {}", type, target.getId(), url);
+          log.info("Resolve {} (cached) with id {} - {}", type, target, url);
           return FederationContext.getInstance().getCache().get(url);
         } else {
-          log.info("Resolve {} (remote) with id {} - {}", type, target.getId(), url);
-          return performRequest(url);
+          log.info("Resolve {} (remote) with id {} - {}", type, target, url);
+          Map<String, Object> federated = performRequest(url);
+          FederationContext.getInstance().getCache().put(url, federated);
+          return federated;
         }
       } catch (Exception e) {
         log.error(e.getMessage(), e);

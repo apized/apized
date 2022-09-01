@@ -47,7 +47,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.LIST)
   )
   public Page<${type}> list(@Bindable(defaultValue = "1") Integer page, @Bindable(defaultValue = "50") Integer pageSize, @Bindable(defaultValue = "") List<SearchTerm> search, @Bindable(defaultValue = "") List<SortTerm> sort) {
-    Page<$type> result = super.list(page - 1, pageSize, search, sort);
+    Page<$type> result = super.list(page, pageSize, search, sort);
     eventPublisher.publishEvent("${type}Controller::list");
     return result;
   }

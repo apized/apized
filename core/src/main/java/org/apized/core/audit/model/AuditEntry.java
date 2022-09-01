@@ -16,17 +16,15 @@
 
 package org.apized.core.audit.model;
 
-import org.apized.core.model.Action;
-import org.apized.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.DataType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.apized.core.model.Action;
+import org.apized.core.model.Model;
 
 import java.util.Date;
 import java.util.Map;
@@ -34,12 +32,15 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "audit_trail")
 public class AuditEntry implements Model {
 
   @Id
+  @Builder.Default
   private UUID id = UUID.randomUUID();
 
   private UUID transactionId;
@@ -66,16 +67,4 @@ public class AuditEntry implements Model {
 
   @JsonIgnore
   private long epoch;
-
-  public AuditEntry(UUID transactionId, Action action, String type, UUID by, String reason, UUID target, Map<String, Object> payload, Date timestamp, long epoch) {
-    this.transactionId = transactionId;
-    this.action = action;
-    this.type = type;
-    this.by = by;
-    this.reason = reason;
-    this.target = target;
-    this.payload = payload;
-    this.timestamp = timestamp;
-    this.epoch = epoch;
-  }
 }

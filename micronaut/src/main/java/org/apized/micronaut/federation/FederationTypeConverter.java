@@ -16,7 +16,6 @@
 
 package org.apized.micronaut.federation;
 
-import org.apized.core.federation.Federated;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanWrapper;
 import io.micronaut.core.convert.ConversionContext;
@@ -25,6 +24,7 @@ import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.model.Model;
 
 import java.io.IOException;
 import java.util.Map;
@@ -32,21 +32,21 @@ import java.util.Optional;
 
 @Slf4j
 @Singleton
-public class FederationTypeConverter implements TypeConverter<String, Federated> {
+public class FederationTypeConverter implements TypeConverter<String, Model> {
   @Inject
   ObjectMapper mapper;
 
   @Override
-  public Optional<Federated> convert(String object, Class<Federated> targetType) {
+  public Optional<Model> convert(String object, Class<Model> targetType) {
     return TypeConverter.super.convert(object, targetType);
   }
 
   @Override
-  public Optional<Federated> convert(String object, Class<Federated> targetType, ConversionContext context) {
-    Federated result = null;
+  public Optional<Model> convert(String object, Class<Model> targetType, ConversionContext context) {
+    Model result = null;
     try {
-      Federated instantiate = BeanIntrospection.getIntrospection(targetType).instantiate();
-      BeanWrapper<Federated> wrapper = BeanWrapper.getWrapper(instantiate);
+      Model instantiate = BeanIntrospection.getIntrospection(targetType).instantiate();
+      BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(instantiate);
       mapper.readValue(object, Map.class).forEach((k, v) -> {
         wrapper.setProperty(k.toString(), v);
       });

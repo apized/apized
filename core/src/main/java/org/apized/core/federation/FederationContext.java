@@ -31,4 +31,8 @@ public class FederationContext {
   }
 
   private final Map<URI, Object>  cache = new HashMap<>();
+
+  public static void destroy() {
+    threadLocalValue.remove();
+  }
 }

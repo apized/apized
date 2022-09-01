@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package org.apized.core.security.model;
+package org.apized.micronaut.security;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.type.Argument;
+import io.micronaut.serde.Decoder;
+import io.micronaut.serde.Deserializer;
+import jakarta.inject.Inject;
 import org.apized.core.model.Model;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.apized.core.security.model.User;
+import org.apized.micronaut.server.serde.ModelSerde;
 
-import java.util.UUID;
+import java.io.IOException;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@Introspected
-public class Role extends Permissionable {
-  protected UUID id;
-  protected String name;
-  protected String description;
+public class UserDeserializer implements Deserializer<User> {
+  @Inject
+  ModelSerde serde;
+
+  @Override
+  public User deserialize(Decoder decoder, Deserializer.DecoderContext context, Argument<? super User> type) throws IOException {
+    return (User) serde.deserialize(decoder, context, (Argument<? super Model>) type);
+  }
 }

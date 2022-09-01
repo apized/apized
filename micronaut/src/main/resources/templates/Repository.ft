@@ -3,6 +3,9 @@ package ${module};
 import org.apized.micronaut.server.mvc.MicronautModelRepository;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
+#foreach( $it in ${extension.repository.imports})
+import $it;
+#end
 
 @JdbcRepository(dialect = Dialect.${dialect})
-public interface ${type}Repository extends MicronautModelRepository<${type}>{}
+public interface ${type}Repository extends MicronautModelRepository<${type}>#foreach( $it in ${extension.repository.implements}), $it #end{}

@@ -28,6 +28,7 @@ import io.micronaut.data.repository.PageableRepository;
 import io.micronaut.data.repository.jpa.JpaSpecificationExecutor;
 import io.micronaut.data.repository.jpa.criteria.QuerySpecification;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,7 +36,7 @@ import java.util.UUID;
 public interface MicronautModelRepository<T extends Model> extends ModelRepository<T>, PageableRepository<T, UUID>, JpaSpecificationExecutor<T> {
   @Override
   default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
-    QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(search);
+    QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(new ArrayList<>(search));
 
     io.micronaut.data.model.Page<T> micronautPage = findAll(
       spec,
@@ -53,13 +54,13 @@ public interface MicronautModelRepository<T extends Model> extends ModelReposito
 
   @Override
   default Optional<T> searchOne(List<SearchTerm> search) {
-    QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(search);
+    QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(new ArrayList<>(search));
     return findOne(spec);
   }
 
   @Override
   default Page<T> search(List<SearchTerm> search, List<SortTerm> sort) {
-    QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(search);
+    QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(new ArrayList<>(search));
     return Page.<T>builder().content(
       findAll(spec, RepositoryHelper.generateSort(sort))
     ).build();

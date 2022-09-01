@@ -26,24 +26,22 @@ import java.util.UUID;
 
 public abstract class AbstractApiBehaviourHandler<T extends Model> implements BehaviourHandler<T> {
   @Override
-  public void process(Class<T> type, When when, Action action, Execution execution) {
+  public void process(Class<T> type, When when, Action action, Execution<T> execution) {
     if (when == When.BEFORE) {
       switch (action) {
-        case CREATE -> preCreate(execution, (T) execution.getInputs().get("it"));
+        case CREATE -> preCreate(execution, execution.getInput());
         case LIST -> preList(execution);
-        case GET -> preGet(execution, (UUID) execution.getInputs().get("id"));
-        case UPDATE ->
-          preUpdate(execution, (UUID) execution.getInputs().get("id"), (T) execution.getInputs().get("it"));
-        case DELETE -> preDelete(execution, (UUID) execution.getInputs().get("id"));
+        case GET -> preGet(execution, execution.getId());
+        case UPDATE -> preUpdate(execution, execution.getId(), execution.getInput());
+        case DELETE -> preDelete(execution, execution.getId());
       }
     } else {
       switch (action) {
-        case CREATE -> postCreate(execution, (T) execution.getInputs().get("it"), (T) execution.getOutput());
+        case CREATE -> postCreate(execution, execution.getInput(), execution.getOutput());
         case LIST -> postList(execution, (Page<T>) execution.getOutput());
-        case GET -> postGet(execution, (UUID) execution.getInputs().get("id"), (T) execution.getOutput());
-        case UPDATE ->
-          postUpdate(execution, (UUID) execution.getInputs().get("id"), (T) execution.getInputs().get("it"), (T) execution.getOutput());
-        case DELETE -> postDelete(execution, (UUID) execution.getInputs().get("id"), (T) execution.getOutput());
+        case GET -> postGet(execution, execution.getId(), execution.getOutput());
+        case UPDATE -> postUpdate(execution, execution.getId(), execution.getInput(), execution.getOutput());
+        case DELETE -> postDelete(execution, execution.getId(), execution.getOutput());
       }
     }
   }
@@ -60,9 +58,9 @@ public abstract class AbstractApiBehaviourHandler<T extends Model> implements Be
 
   public void postGet(Execution execution, UUID id, T output) { }
 
-  public void preUpdate(Execution execution, UUID id, T it) { }
+  public void preUpdate(Execution execution, UUID id, T input) { }
 
-  public void postUpdate(Execution execution, UUID id, T output, T executionOutput) { }
+  public void postUpdate(Execution execution, UUID id, T input, T output) { }
 
   public void preDelete(Execution execution, UUID id) { }
 

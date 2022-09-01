@@ -16,22 +16,6 @@
 
 package org.apized.micronaut.server.serde;
 
-import org.apized.core.MapHelper;
-import org.apized.core.StringHelper;
-import org.apized.core.federation.Federated;
-import org.apized.core.federation.Federation;
-import org.apized.core.model.Action;
-import org.apized.core.model.ApiContext;
-import org.apized.core.model.Apized;
-import org.apized.core.model.Model;
-import org.apized.core.mvc.ModelService;
-import org.apized.core.search.SearchHelper;
-import org.apized.core.search.SearchOperation;
-import org.apized.core.search.SearchTerm;
-import org.apized.core.search.SortTerm;
-import org.apized.core.serde.RequestContext;
-import org.apized.core.serde.SerdeContext;
-import org.apized.micronaut.federation.FederationResolver;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -45,9 +29,25 @@ import io.micronaut.core.type.DefaultArgument;
 import io.micronaut.serde.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import org.apized.core.MapHelper;
+import org.apized.core.StringHelper;
+import org.apized.core.federation.Federation;
+import org.apized.core.model.Action;
+import org.apized.core.model.ApiContext;
+import org.apized.core.model.Apized;
+import org.apized.core.model.Model;
+import org.apized.core.mvc.ModelService;
+import org.apized.core.search.SearchHelper;
+import org.apized.core.search.SearchOperation;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
+import org.apized.core.serde.RequestContext;
+import org.apized.core.serde.SerdeContext;
+import org.apized.micronaut.federation.FederationResolver;
 
 import java.io.IOException;
 import java.util.*;
@@ -140,23 +140,27 @@ public class ModelSerde implements Serde<Model> {
           deserializationWrapper.setProperty(key, decoder.decodeArbitrary());
         }
         SerdeContext.getInstance().pop();
+      } else {
+        decoder.skipValue();
       }
     }
     decoder.close();
 
-    if (!(model instanceof Federated)) {
-      if (model.getId() != null) {
-        ModelService<?> service = appContext.getBean(new DefaultArgument<>(ModelService.class, type.getAnnotationMetadata(), type));
-        model = service.get(model.getId());
-        BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
-        touched.forEach(p -> wrapper.setProperty(p.getName(), deserializationWrapper.getProperty(p.getName(), p.getType())));
-        model._getModelMetadata().setAction(Action.UPDATE);
-      } else {
-        model._getModelMetadata().setAction(Action.CREATE);
-      }
+    model.setId(model.getId() != null ? model.getId() : RequestContext.getInstance().getPathVariables().get(StringHelper.uncapitalize(type.getTypeString(true))));
+    Optional<ModelService> service = appContext.findBean(new DefaultArgument<>(ModelService.class, type.getAnnotationMetadata(), type));
+    if (service.isPresent() && model.getId() != null) {
+      model = service.get().get(model.getId());
+      model._getModelMetadata().setOriginal(service.get().get(model.getId()));
+      BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
+      touched.forEach(p ->
+        wrapper.setProperty(p.getName(), deserializationWrapper.getProperty(p.getName(), p.getType()).orElse(null))
+      );
+      model._getModelMetadata().setAction(Action.UPDATE);
+    } else {
+      model._getModelMetadata().setAction(Action.CREATE);
     }
-    model._getModelMetadata().getTouched().addAll(touched.stream().map(Named::getName).toList());
 
+    model._getModelMetadata().getTouched().addAll(touched.stream().map(Named::getName).toList());
 
     return model;
   }
@@ -193,7 +197,7 @@ public class ModelSerde implements Serde<Model> {
       boolean isModel = Model.class.isAssignableFrom(subType.getType());
 
       Object val;
-      if (isModel) {
+      if (isModel || property.getAnnotation(Federation.class) != null) {
         Map<String, Object> subFields = (Map<String, Object>) Optional.ofNullable(fields.get(property.getName())).orElse(Map.of());
         val = getModelValue(wrapper, property, subType, isCollection, search, sort, MapHelper.flatten(subFields).keySet());
       } else {
@@ -253,10 +257,13 @@ public class ModelSerde implements Serde<Model> {
 
     if (isCollection) {
       //todo get limits from the request properties
+      Optional<AnnotationValue<ManyToMany>> manyToMany = property.getAnnotationMetadata().findAnnotation(ManyToMany.class);
       Optional<AnnotationValue<OneToMany>> oneToMany = property.getAnnotationMetadata().findAnnotation(OneToMany.class);
       if (oneToMany.isPresent()) {
         Optional<String> mappedBy = oneToMany.flatMap(annotation -> annotation.stringValue("mappedBy"));
         terms.add(new SearchTerm(mappedBy.isEmpty() ? property.getName() : mappedBy.get(), SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
+      } else if (manyToMany.isPresent()) {
+        terms.add(new SearchTerm(property.getName() + ".id", SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
       } else {
         terms.add(new SearchTerm(StringHelper.uncapitalize(StringHelper.pluralize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, List.of(wrapper.getProperty("id", UUID.class).orElse(UUID.randomUUID()))));
       }
@@ -267,7 +274,7 @@ public class ModelSerde implements Serde<Model> {
           federation.stringValue("value").orElse(null),
           federation.stringValue("type").orElse(null),
           federation.stringValue("uri").orElse(null),
-          wrapper.getProperty(property.getName(), Federated.class).orElse(null),
+          wrapper.getProperty(property.getName(), Object.class).orElse(null),
           fields
         );
       } else {

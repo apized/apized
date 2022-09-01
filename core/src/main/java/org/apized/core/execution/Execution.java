@@ -20,13 +20,16 @@ package org.apized.core.execution;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.apized.core.model.Model;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-public class Execution {
-  private Map<String, Object> inputs;
-  private Object output;
+public class Execution<T extends Model> {
+  private UUID id;
+  private T input;
+  private T output;
 }

@@ -5,8 +5,4 @@ import org.apized.core.behaviour.BehaviourManager;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class AuditBehaviour extends AbstractAuditBehaviour {
-  public AuditBehaviour(BehaviourManager manager) {
-    super(manager);
-  }
-}
+public class AuditBehaviour extends AbstractAuditBehaviour { }

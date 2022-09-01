@@ -16,22 +16,13 @@
 
 package org.apized.core.federation;
 
-import io.micronaut.core.annotation.Introspected;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.apized.core.model.Model;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Introspected
-public class Federated implements Model {
-  @NotNull
-  protected UUID id;
+@Target({ElementType.TYPE})
+@Retention(RUNTIME)
+public @interface Federated {
 }

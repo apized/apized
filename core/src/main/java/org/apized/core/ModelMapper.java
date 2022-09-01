@@ -38,36 +38,41 @@ public class ModelMapper {
     this.ignoreAnnotation = ignoreAnnotation;
   }
 
-  public Map<String, Object> createMapOf(Model instance) {
+  public Map<String, Object> createMapOf(Object instance) {
+
     Map<String, Object> result = new HashMap<>();
 
     if (instance != null) {
-      BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(instance);
+      if (instance instanceof Model) {
+        BeanWrapper<Model> wrapper = BeanWrapper.getWrapper((Model) instance);
 
-      for (BeanProperty<Model, Object> field : wrapper.getBeanProperties()) {
-        boolean ignore = field.getAnnotation(fieldAnnotation) == null && (field.getAnnotation(JsonIgnore.class) != null || field.getAnnotation(ignoreAnnotation) != null);
+        for (BeanProperty<Model, Object> field : wrapper.getBeanProperties()) {
+          boolean ignore = field.getAnnotation(fieldAnnotation) == null && (field.getAnnotation(JsonIgnore.class) != null || field.getAnnotation(ignoreAnnotation) != null);
 
-        if (!ignore) {
-          List<String> included = new ArrayList<>();
-          if (field.getAnnotation(fieldAnnotation) != null) {
-            Optional.ofNullable(field.getAnnotation(fieldAnnotation)).ifPresent((annotation -> included.addAll(Arrays.asList(annotation.stringValues("value")))));
-          }
-
-          Object value = wrapper.getProperty(field.getName(), field.getType()).orElse(null);
-          if (included.size() > 0 && value != null) {
-            if (List.class.isAssignableFrom(value.getClass())) {
-              result.put(field.getName(), ((List<?>) value).stream().map(it -> getObjectMap(included, it)).collect(Collectors.toList()));
-            } else {
-              result.put(field.getName(), getObjectMap(included, value));
+          if (!ignore) {
+            List<String> included = new ArrayList<>();
+            if (field.getAnnotation(fieldAnnotation) != null) {
+              Optional.ofNullable(field.getAnnotation(fieldAnnotation)).ifPresent((annotation -> included.addAll(Arrays.asList(annotation.stringValues("value")))));
             }
-          } else if (value != null) {
-            if (List.class.isAssignableFrom(value.getClass())) {
-              result.put(field.getName(), ((List<?>) value).stream().map(this::retrieveValueFrom).collect(Collectors.toList()));
-            } else {
-              result.put(field.getName(), retrieveValueFrom(value));
+
+            Object value = wrapper.getProperty(field.getName(), field.getType()).orElse(null);
+            if (included.size() > 0 && value != null) {
+              if (List.class.isAssignableFrom(value.getClass())) {
+                result.put(field.getName(), ((List<?>) value).stream().map(it -> getObjectMap(included, it)).collect(Collectors.toList()));
+              } else {
+                result.put(field.getName(), getObjectMap(included, value));
+              }
+            } else if (value != null) {
+              if (List.class.isAssignableFrom(value.getClass())) {
+                result.put(field.getName(), ((List<?>) value).stream().map(this::retrieveValueFrom).collect(Collectors.toList()));
+              } else {
+                result.put(field.getName(), retrieveValueFrom(value));
+              }
             }
           }
         }
+      } else {
+        result.put("id", instance);
       }
     }
 
@@ -79,7 +84,7 @@ public class ModelMapper {
     for (String subFieldName : included) {
       BeanWrapper<Object> subWrapper = BeanWrapper.getWrapper(it);
       BeanIntrospection<Object> subIntrospection = subWrapper.getIntrospection();
-      subResult.put(subFieldName, subWrapper.getProperty(subFieldName, subIntrospection.getProperty(subFieldName).get().getType()));
+      subResult.put(subFieldName, subWrapper.getProperty(subFieldName, subIntrospection.getProperty(subFieldName).get().getType()).orElse(null));
     }
     return subResult;
   }

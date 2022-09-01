@@ -19,8 +19,7 @@ package org.apized.core.audit;
 import org.apized.core.audit.model.AuditEntry;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Getter
 public class AuditContext {
@@ -30,9 +29,13 @@ public class AuditContext {
     return threadLocalValue.get();
   }
 
-  private final List<AuditEntry> auditEntries = new ArrayList<>();
+  private final Map<UUID, AuditEntry> auditEntries = new HashMap<>();
+
+  public static void destroy() {
+    threadLocalValue.remove();
+  }
 
   public void add(AuditEntry entry) {
-    auditEntries.add(entry);
+    auditEntries.put(entry.getTarget(), entry);
   }
 }

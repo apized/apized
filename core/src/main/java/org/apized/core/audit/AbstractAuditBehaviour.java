@@ -35,38 +35,26 @@ import java.util.*;
 
 public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> {
 
-  private final ModelMapper modelMapper;
-
-  public AbstractAuditBehaviour(BehaviourManager manager) {
-    manager.registerBehaviour(
-      Model.class,
-      Layer.CONTROLLER,
-      List.of(When.AFTER),
-      List.of(Action.CREATE, Action.UPDATE, Action.DELETE),
-      1000,
-      this
-    );
-
-    modelMapper = new ModelMapper(AuditField.class, AuditIgnore.class);
-  }
+  private final ModelMapper modelMapper = new ModelMapper(AuditField.class, AuditIgnore.class);
 
   @Override
-  public void process(Class<Model> type, When when, Action action, Execution execution) {
-    Model model = (Model) execution.getInputs().get("it");
+  public void process(Class<Model> type, When when, Action action, Execution<Model> execution) {
+    Model model = execution.getInput();
     ScopeHelper.scopeUpUntil(
       model,
-      a -> a.booleanValue("audit").orElse(false),
-      i -> AuditContext.getInstance().add(new AuditEntry(
-        RequestContext.getInstance().getId(),
-        type.equals(i.getClass()) ? action : Action.UPDATE,
-        type.getSimpleName(),
-        SecurityContext.getInstance().getUser().getId(),
-        RequestContext.getInstance().getReason(),
-        model.getId(),
-        (type.equals(i.getClass()) ? action : Action.UPDATE) != Action.DELETE ? modelMapper.createMapOf(model) : Map.of(),
-        RequestContext.getInstance().getTimestamp(),
-        System.nanoTime()
-      ))
+      a -> a.booleanValue("audit").orElse(true),
+      i -> AuditContext.getInstance().add(AuditEntry.builder()
+        .transactionId(RequestContext.getInstance().getId())
+        .action(type.equals(i.getClass()) ? action : Action.UPDATE)
+        .type(type.getSimpleName())
+        .by(SecurityContext.getInstance().getUser().getId())
+        .reason(RequestContext.getInstance().getReason())
+        .target(model.getId())
+        .payload((type.equals(i.getClass()) ? action : Action.UPDATE) != Action.DELETE ? modelMapper.createMapOf(model) : Map.of())
+        .timestamp(RequestContext.getInstance().getTimestamp())
+        .epoch(System.nanoTime())
+        .build()
+      )
     );
   }
 }

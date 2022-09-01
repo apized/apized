@@ -22,5 +22,5 @@ import org.apized.core.model.When;
 import org.apized.core.execution.Execution;
 
 public interface BehaviourHandler<T extends Model> {
-  void process(Class<T> type, When when, Action action, Execution execution);
+  void process(Class<T> type, When when, Action action, Execution<T> execution);
 }

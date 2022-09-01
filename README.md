@@ -29,7 +29,3 @@ Example applications can be found under `samples` on this repo.
 ## Known Issues
 
 **_NOTE:_** This project is still experimental.
-
-- Right now, we only support OneToOne, OneToMany and ManyToOne relationships. If a
-  ManyToMany relationship is needed you will have to declare the joining table as an entity with
-  OneToMany relations to both sides of the ManyToMany relation. We plan to better support these in the future.

@@ -16,27 +16,13 @@
 
 package org.apized.core.model;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Data
-@NoArgsConstructor
-public class ModelMetadata {
-  Model original;
-
-  Action action = Action.NO_OP;
-
-  Boolean saved = false;
-
-  @Setter(value = AccessLevel.NONE)
-  List<String> touched = new ArrayList<>();
-
-  public boolean isDirty() {
-    return getTouched().size() > 0 && !saved;
-  }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RepositoryExtension {
+  String[] exclude() default {};
 }

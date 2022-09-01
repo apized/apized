@@ -16,18 +16,19 @@
 
 package org.apized.core.mvc;
 
-import org.apized.core.error.exception.NotFoundException;
-import org.apized.core.federation.Federated;
-import org.apized.core.model.Model;
-import org.apized.core.model.Page;
-import org.apized.core.search.SearchTerm;
-import org.apized.core.search.SortTerm;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanWrapper;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.DefaultArgument;
 import jakarta.persistence.*;
+import org.apized.core.error.exception.NotFoundException;
+import org.apized.core.federation.Federated;
+import org.apized.core.federation.Federation;
+import org.apized.core.model.Model;
+import org.apized.core.model.Page;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
 
 import java.util.*;
 
@@ -148,7 +149,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     BeanIntrospection<T> introspection = BeanIntrospection.getIntrospection(getType());
 
     introspection.getBeanProperties().stream()
-      .filter(p -> !Federated.class.isAssignableFrom(p.getType()))
+      .filter(p -> p.getAnnotation(Federation.class) == null)
       .filter(p -> Model.class.isAssignableFrom(p.getType()) || (Collection.class.isAssignableFrom(p.getType()) && Model.class.isAssignableFrom(p.asArgument().getTypeParameters()[0].getType())))
       .filter(p -> isBefore == (
           (p.hasAnnotation(OneToOne.class) && p.getAnnotation(OneToOne.class).stringValue("mappedBy").isEmpty())

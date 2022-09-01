@@ -54,8 +54,8 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
   }
 
   @Override
-  public void process(Class<Model> type, When when, Action action, Execution execution) {
-    Model model = (Model) execution.getInputs().get("it");
+  public void process(Class<Model> type, When when, Action action, Execution<Model> execution) {
+    Model model = execution.getInput();
     String modelId = model != null && model.getId() != null ? model.getId().toString() : null;
     String entityName = StringHelper.uncapitalize(type.getSimpleName());
 
