@@ -31,6 +31,8 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
+//todo eventually replace this with Services that forward the operations
+// this should simplify a bit as well as expanding the federation to more than retrieve only.
 @Singleton
 public class FederationResolver extends AbstractFederationResolver {
   private final ApizedConfig config;

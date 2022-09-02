@@ -33,7 +33,7 @@ public class EventContext {
   }
 
 
-  private final Map<String, String> headers = new HashMap<>();
+  private final Map<String, Object> headers = new HashMap<>();
   private final Map<String, Event> events = new HashMap<>();
 
   public static void destroy() {

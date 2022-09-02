@@ -21,21 +21,18 @@ import org.apized.core.serde.RequestContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public interface ESBAdapter {
   default void send(Event event) {
-    sendInEnvelope(event.getTopic(), event.getPayload());
-  }
-
-  default void sendInEnvelope(String topic, Map<String, Object> payload) {
-    Map<String, String> headers = new HashMap<>();
+    Map<String, Object> headers = new HashMap<>();
     RequestContext.getInstance().getPathVariables().entrySet().forEach(e ->
       headers.put(e.getKey(), e.getValue() != null ? e.getValue().toString() : null)
     );
     headers.putAll(EventContext.getInstance().getHeaders());
 
-    send(topic, Map.of("header", headers, "payload", payload));
+    send(event.getId(), event.getTopic(), headers, event.getPayload());
   }
 
-  void send(String topic, Map<String, Object> payload);
+  void send(UUID messageId, String topic, Map<String, Object> headers, Map<String, Object> payload);
 }
