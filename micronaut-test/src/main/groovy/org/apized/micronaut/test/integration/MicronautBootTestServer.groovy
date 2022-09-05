@@ -46,7 +46,7 @@ class MicronautBootTestServer {
 
   static ServerConfig boot() {
     application = ApplicationContext
-      .builder('test')
+      .builder()
       .eagerInitSingletons(true)
       .run(NettyEmbeddedServer)
     int port = application.port
