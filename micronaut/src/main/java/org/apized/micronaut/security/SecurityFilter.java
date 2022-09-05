@@ -57,4 +57,9 @@ public class SecurityFilter implements HttpServerFilter {
 
     return chain.proceed(request);
   }
+
+  @Override
+  public int getOrder() {
+    return -100_000;
+  }
 }

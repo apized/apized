@@ -26,5 +26,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorEntry {
+  public String field;
   public String message;
 }

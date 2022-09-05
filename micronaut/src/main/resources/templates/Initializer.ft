@@ -1,4 +1,4 @@
-package org.apized.apized.core.behaviour;
+package org.apized.core.init;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Singleton
 @Requires(classes=BehaviourManager.class)
-public class BehaviourRegistration {
+public class Initializer {
   @Inject
   ApizedConfig config;
 

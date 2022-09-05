@@ -93,7 +93,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #end
 #if($actions.contains('DELETE'))
 
-  @Delete
+  @Delete("/{id}")
   @Operation(operationId = "Delete $type", tags = {"$type Controller"})
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.DELETE)

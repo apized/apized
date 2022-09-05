@@ -56,7 +56,7 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
   @Override
   public void process(Class<Model> type, When when, Action action, Execution<Model> execution) {
     Model model = execution.getInput();
-    String modelId = model != null && model.getId() != null ? model.getId().toString() : null;
+    String modelId = execution.getId() != null ? execution.getId().toString() : null;
     String entityName = StringHelper.uncapitalize(type.getSimpleName());
 
     String fullPerm = slug + "." + entityName + "." + action.getType() + (modelId != null ? "." + modelId : "");
@@ -81,17 +81,16 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
         } else if (isJsonb) {
           String fieldPerm = slug + "." + entityName + "." + action.getType() + (modelId != null ? "." + modelId : "") + "." + field;
           if (!SecurityContext.getInstance().getUser().isAllowed(fieldPerm)) {
-            //todo ensure the original is here so we can compare it with the input
-//            Map<String, Object> originalFlatMap = flatten((Map<String, Object>) ReflectionHelper.getProperty(execution.getOriginal(), field), List.of(field));
+            Map<String, Object> originalFlatMap = MapHelper.flatten(BeanWrapper.getWrapper(model._getModelMetadata().getOriginal()).getProperty(field, Map.class).orElse(Map.of()), List.of(field));
             Map<String, Object> flatMap = MapHelper.flatten((Map<String, Object>) value, List.of(field));
 
             Set<String> keys = new HashSet<>(flatMap.keySet());
-//            keys.addAll(originalFlatMap.keySet());
+            keys.addAll(originalFlatMap.keySet());
 
             for (String key : keys) {
-//              if (!Objects.equals(originalFlatMap.get(key), flatMap.get(key))) {
-              verifyPermissionForFieldAndValue(entityName, action, model, key, flatMap.get(key));
-//              }
+              if (!Objects.equals(originalFlatMap.get(key), flatMap.get(key))) {
+                verifyPermissionForFieldAndValue(entityName, action, model, key, flatMap.get(key));
+              }
             }
           }
         } else {
@@ -101,14 +100,14 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
     }
 
     if (!allowed) {
-      throw new ForbiddenException("Not allowed to " + action.getType() + " " + entityName + (model != null && model.getId() != null ? " with id " + model.getId() : ""), fullPerm);
+      throw new ForbiddenException("Not allowed to " + action.getType() + " " + StringHelper.capitalize(entityName) + (modelId != null ? " with id " + modelId : ""), fullPerm);
     }
   }
 
   private void verifyPermissionForFieldAndValue(String entityName, Action action, Model model, String field, Object value) {
     String perm = slug + "." + entityName + "." + action.getType() + (model.getId() != null ? "." + model.getId() : "") + "." + field + "." + value;
     if (!SecurityContext.getInstance().getUser().isAllowed(perm)) {
-      throw new ForbiddenException("Not allowed to " + action.getType() + " " + entityName + (model.getId() != null ? " with id " + model.getId() : "") + " with `" + field + "` set to " + value, perm);
+      throw new ForbiddenException("Not allowed to " + action.getType() + " " + StringHelper.capitalize(entityName) + (model.getId() != null ? " with id " + model.getId() : "") + " with `" + field + "` set to " + value, perm);
     }
   }
 }

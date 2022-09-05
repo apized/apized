@@ -74,4 +74,8 @@ public class SerdeFilter implements HttpServerFilter {
     return params;
   }
 
+  @Override
+  public int getOrder() {
+    return -100_000;
+  }
 }

@@ -20,21 +20,25 @@ package org.apized.test.integration.steps
 import groovy.json.JsonSlurper
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.Before
+import io.cucumber.java.BeforeAll
 import io.cucumber.java.Scenario
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.apized.test.integration.core.IntegrationConfig
+import org.apized.test.integration.core.IntegrationContext
 import org.apized.test.integration.core.TestRunner
 import org.junit.Assume
 
 class CommonSteps extends AbstractSteps {
-  TestRunner testRunner
-
-  @Before(order = 100_000)
-  void setup(Scenario scenario) {
+  @BeforeAll
+  static void setup() {
     testRunner = IntegrationConfig.getTestRunner()
     context = testRunner.context
+  }
+
+  @Before
+  void step(Scenario scenario) {
     testRunner.clearData()
     if (scenario.sourceTagNames && !scenario.sourceTagNames.contains(testRunner.getTag())) {
       Assume.assumeTrue("Skipped", false)

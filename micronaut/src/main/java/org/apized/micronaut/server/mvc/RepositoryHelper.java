@@ -56,9 +56,10 @@ public abstract class RepositoryHelper {
         }
       });
 
+      // todo owner
       introspection.getBeanProperties()
         .stream()
-        .filter(p -> p.getName().equals("owner.id"))
+        .filter(p -> p.getName().equals("owner"))
         .forEach(p -> {
           if (!SecurityContext.getInstance().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
             search.add(new SearchTerm(p.getName(), SearchOperation.eq, SecurityContext.getInstance().getUser().getId()));

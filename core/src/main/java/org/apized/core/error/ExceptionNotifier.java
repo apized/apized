@@ -18,5 +18,5 @@ package org.apized.core.error;
 
 public interface ExceptionNotifier {
 
-  void report(Exception exception);
+  void report(Throwable exception);
 }

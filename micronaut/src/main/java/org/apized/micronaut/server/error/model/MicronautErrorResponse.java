@@ -26,7 +26,7 @@ import java.util.List;
 @Serdeable
 public class MicronautErrorResponse extends ErrorResponse {
   @Builder
-  public MicronautErrorResponse(String message, List<ErrorEntry> errors) {
+  public MicronautErrorResponse(String message, List<? extends ErrorEntry> errors) {
     super(message, errors);
   }
 }

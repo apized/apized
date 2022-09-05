@@ -29,5 +29,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ErrorResponse {
   protected String message;
-  protected List<ErrorEntry> errors;
+  protected List<? extends ErrorEntry> errors;
 }

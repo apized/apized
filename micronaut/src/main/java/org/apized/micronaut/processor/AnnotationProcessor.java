@@ -112,8 +112,8 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     if (behaviours.size() > 0) {
       generateClassFor(
-        "org.apized.core.behaviour.BehaviourRegistration",
-        "RegisterBehaviours",
+        "org.apized.core.init.Initializer",
+        "Initializer",
         new HashMap<>(
           Map.of(
             "behaviours", behaviours

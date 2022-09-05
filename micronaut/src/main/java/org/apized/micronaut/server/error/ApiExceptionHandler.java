@@ -16,6 +16,8 @@
 
 package org.apized.micronaut.server.error;
 
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
 import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.error.exception.ServerException;
 import org.apized.micronaut.server.error.model.MicronautErrorEntry;
@@ -29,39 +31,121 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.ElementKind;
 import java.util.List;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Singleton
-public class ApiExceptionHandler implements ExceptionHandler<ServerException, HttpResponse<MicronautErrorResponse>> {
+@Replaces(ConstraintExceptionHandler.class)
+public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResponse<MicronautErrorResponse>> {
   @Inject
   List<ExceptionNotifier> notifiers;
 
+  List<ElementKind> excludedPathKinds = List.of(ElementKind.METHOD, ElementKind.PARAMETER, ElementKind.CONSTRUCTOR);
+
   @Override
-  public HttpResponse<MicronautErrorResponse> handle(HttpRequest request, ServerException exception) {
+  public HttpResponse<MicronautErrorResponse> handle(HttpRequest request, Throwable exception) {
     return switch (exception.getClass().getSimpleName()) {
-      case "BadRequestException" -> HttpResponse.badRequest(MicronautErrorResponse.builder().errors(List.of(
-        MicronautErrorEntry.builder().message(exception.getMessage()).build()
-      )).build());
-      case "ForbiddenException" ->
-        HttpResponseFactory.INSTANCE.status(HttpStatus.FORBIDDEN).body(MicronautErrorResponse.builder().errors(List.of(
-          MicronautErrorEntry.builder().message(exception.getMessage()).build()
-        )).build());
-      case "NotImplementedException", "NotFoundException" ->
-        HttpResponse.notFound(MicronautErrorResponse.builder().errors(List.of(
-          MicronautErrorEntry.builder().message(exception.getMessage()).build()
-        )).build());
-      case "ServiceUnavailableException" ->
-        HttpResponseFactory.INSTANCE.status(HttpStatus.SERVICE_UNAVAILABLE).body(MicronautErrorResponse.builder().errors(List.of(
-          MicronautErrorEntry.builder().message(exception.getMessage()).build()
-        )).build());
+      case "ConstraintViolationException" -> HttpResponse.badRequest(
+        MicronautErrorResponse
+          .builder()
+          .message("Bad Request")
+          .errors(
+            ((ConstraintViolationException) exception).getConstraintViolations().stream().map(v ->
+              MicronautErrorEntry
+                .builder()
+                .field(
+                  StreamSupport.stream(v.getPropertyPath().spliterator(), false)
+                    .filter(node -> {
+                      return !excludedPathKinds.contains(node.getKind());
+                    })
+                    .map(node -> node.getName() + ((node.getIndex() != null) ? String.format("[%d]", node.getIndex()) : ""))
+                    .collect(Collectors.joining("."))
+                )
+                .message(v.getMessage())
+                .build()
+            ).toList()
+          )
+          .build()
+      );
+      case "BadRequestException" -> HttpResponse.badRequest(
+        MicronautErrorResponse
+          .builder()
+          .errors(
+            List.of(
+              MicronautErrorEntry
+                .builder()
+                .message(exception.getMessage())
+                .build()
+            )
+          )
+          .build()
+      );
+      case "ForbiddenException" -> HttpResponseFactory.INSTANCE.status(HttpStatus.FORBIDDEN).body(
+        MicronautErrorResponse
+          .builder()
+          .errors(
+            List.of(
+              MicronautErrorEntry
+                .builder()
+                .message(exception.getMessage())
+                .build()
+            )
+          )
+          .build()
+      );
+      case "NotImplementedException", "NotFoundException" -> HttpResponse.notFound(
+        MicronautErrorResponse
+          .builder()
+          .errors(
+            List.of(
+              MicronautErrorEntry
+                .builder()
+                .message(exception.getMessage())
+                .build()
+            )
+          )
+          .build()
+      );
+      case "ServiceUnavailableException" -> HttpResponseFactory.INSTANCE.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+        MicronautErrorResponse
+          .builder()
+          .errors(
+            List.of(
+              MicronautErrorEntry
+                .builder()
+                .message(exception.getMessage())
+                .build()
+            )
+          )
+          .build()
+      );
       case "UnauthorizedException" -> HttpResponse.unauthorized();
       default -> {
         log.error(exception.getMessage(), exception);
         notifiers.forEach(n -> n.report(exception));
-        yield HttpResponse.serverError(MicronautErrorResponse.builder().errors(List.of(
-          MicronautErrorEntry.builder().message(String.format("Missing handler for [%s]: %s", exception.getClass(), exception.getMessage())).build()
-        )).build());
+        yield HttpResponse.serverError(
+          MicronautErrorResponse
+            .builder()
+            .errors(
+              List.of(
+                MicronautErrorEntry
+                  .builder()
+                  .message(
+                    String.format(
+                      "Missing handler for [%s]: %s",
+                      exception.getClass(),
+                      exception.getMessage()
+                    )
+                  ).build()
+              )
+            )
+            .build()
+        );
       }
     };
   }

@@ -27,6 +27,7 @@ import io.micronaut.core.naming.Named;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.DefaultArgument;
 import io.micronaut.serde.*;
+import io.micronaut.serde.jackson.JacksonDecoder;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.persistence.ManyToMany;
@@ -45,6 +46,7 @@ import org.apized.core.search.SearchHelper;
 import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
+import org.apized.core.security.SecurityContext;
 import org.apized.core.serde.RequestContext;
 import org.apized.core.serde.SerdeContext;
 import org.apized.micronaut.federation.FederationResolver;
@@ -64,11 +66,23 @@ public class ModelSerde implements Serde<Model> {
   @Override
   public Model deserialize(@NonNull Decoder decoder, @NonNull DecoderContext context, Argument<? super Model> type) throws IOException {
     BeanIntrospection<? super Model> introspection = BeanIntrospection.getIntrospection(type.getType());
-    Model model = (Model) introspection.getConstructor().instantiate();
+    boolean isId = false;
+    Model model;
+
+    try {
+      String id = decoder.decodeString();
+      model = appContext.findBean(new DefaultArgument<>(ModelService.class, type.getAnnotationMetadata(), type))
+        .get().get(UUID.fromString(id));
+      isId = true;
+    } catch (IOException e) {
+      model = (Model) introspection.getConstructor().instantiate();
+    }
+
+
     BeanWrapper<Model> deserializationWrapper = BeanWrapper.getWrapper(model);
     List<BeanProperty<? super Model, Object>> touched = new ArrayList<>();
     AnnotationValue<Apized> annotation = introspection.getAnnotation(Apized.class);
-    Class<?> scope = annotation != null ? annotation.classValue("scope").orElse(null) : null;
+    List<Class<?>> scopes = annotation != null ? List.of(annotation.classValues("scope")) : List.of();
 
     if (SerdeContext.getInstance().size() > 0) {
       Model peekedValue = SerdeContext.getInstance().peek().getValue();
@@ -76,7 +90,7 @@ public class ModelSerde implements Serde<Model> {
       Class<?> peekedPropertyType = Collection.class.isAssignableFrom(peekedProperty.getType()) ? peekedProperty.asArgument().getTypeParameters()[0].getType() : peekedProperty.getType();
 
       introspection.getBeanProperties().stream()
-        .filter(p -> scope == null || !p.getName().equals(StringHelper.uncapitalize(scope.getSimpleName())))
+        .filter(p -> scopes.size() == 0 || !scopes.stream().map(Class::getSimpleName).toList().contains(p.getName()))
         .filter(p -> !p.hasAnnotation(ApiContext.class))
         .filter(p -> p.hasAnnotation(ManyToOne.class))
         .filter(p -> peekedValue.getClass().equals(p.getType()))
@@ -93,7 +107,7 @@ public class ModelSerde implements Serde<Model> {
         .forEach(p -> deserializationWrapper.setProperty(p.getName(), peekedValue));
     }
 
-    if (scope != null) {
+    for (Class<?> scope : scopes) {
       BeanIntrospection<?> scopeIntrospection = BeanIntrospection.getIntrospection(scope);
       String scopeTypeName = StringHelper.uncapitalize(scope.getSimpleName());
       UUID scopeId = RequestContext.getInstance().getPathVariables().get(scopeTypeName);
@@ -110,6 +124,8 @@ public class ModelSerde implements Serde<Model> {
         );
       }
     }
+
+    if (isId) return model;
 
     decoder.decodeObject();
     String key;
@@ -158,6 +174,15 @@ public class ModelSerde implements Serde<Model> {
       model._getModelMetadata().setAction(Action.UPDATE);
     } else {
       model._getModelMetadata().setAction(Action.CREATE);
+    }
+
+    //todo owner
+    if (introspection.getBeanProperties().stream().anyMatch(p -> p.getName().equals("owner"))) {
+      BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
+      if (wrapper.getProperty("owner", UUID.class).isEmpty()) {
+        wrapper.setProperty("owner", SecurityContext.getInstance().getUser().getId());
+//        touched.add(introspection.getProperty("owner").get());
+      }
     }
 
     model._getModelMetadata().getTouched().addAll(touched.stream().map(Named::getName).toList());
@@ -217,15 +242,7 @@ public class ModelSerde implements Serde<Model> {
           encoder.finishStructure();
         } else {
           if (isModel && !fields.containsKey(property.getName())) {
-            UUID id = ((Model) val).getId();
-            encoder.encodeObject(property.asArgument());
-            encoder.encodeKey("id");
-            if (id != null) {
-              encoder.encodeString(id.toString());
-            } else {
-              encoder.encodeNull();
-            }
-            encoder.finishStructure();
+            encoder.encodeString(((Model) val).getId().toString());
           } else {
             defaultSerialize(encoder, context, Argument.of(val.getClass()), val);
           }

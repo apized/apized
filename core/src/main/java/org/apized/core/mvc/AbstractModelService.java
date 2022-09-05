@@ -185,7 +185,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
               switch (subModel._getModelMetadata().getAction()) {
                 case CREATE -> service.create(subModel);
                 case UPDATE -> service.update(subModelId, subModel);
-                case DELETE -> service.delete(subModelId);//todo should have the reverse order of create/update
+                case DELETE -> service.delete(subModelId);//todo should this have the reverse order of create/update?
               }
             });
         }

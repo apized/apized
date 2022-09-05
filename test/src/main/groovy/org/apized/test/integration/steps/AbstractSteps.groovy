@@ -16,13 +16,16 @@
 
 package org.apized.test.integration.steps
 
-
+import io.cucumber.java.BeforeAll
+import org.apized.test.integration.core.IntegrationConfig
 import org.apized.test.integration.core.IntegrationContext
+import org.apized.test.integration.core.TestRunner
 
 import java.util.regex.Pattern
 
 abstract class AbstractSteps {
-  protected IntegrationContext context
+  static TestRunner testRunner
+  static IntegrationContext context
 
   @SuppressWarnings(['GroovyAssignabilityCheck', 'GrEqualsBetweenInconvertibleTypes'])
   def verifyElementMatches(Object obj, Map<String, Object> match) {
