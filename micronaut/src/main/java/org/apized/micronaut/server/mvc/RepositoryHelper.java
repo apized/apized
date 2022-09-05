@@ -49,10 +49,21 @@ public abstract class RepositoryHelper {
       BeanIntrospection<Model> introspection = ((RuntimePersistentEntity) ((PersistentEntityFrom<?, ?>) root).getPersistentEntity()).getIntrospection();
       AnnotationValue<Apized> apized = introspection.getAnnotation(Apized.class);
       Map<String, UUID> pathVariables = RequestContext.getInstance().getPathVariables();
+
+      //todo this probably needs to be recursive
       Arrays.stream(apized.classValues("scope")).forEach(s -> {
         String uncapitalize = StringHelper.uncapitalize(s.getSimpleName());
         if (pathVariables.get(uncapitalize) != null || !SecurityContext.getInstance().getUser().isAllowed(config.getSlug())) {
           search.add(new SearchTerm(uncapitalize, SearchOperation.eq, pathVariables.get(uncapitalize)));
+
+          // todo owner
+          BeanIntrospection.getIntrospection(s).getBeanProperties().stream()
+            .filter(p -> p.getName().equals("owner"))
+            .forEach(p -> {
+              if (!SecurityContext.getInstance().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
+                search.add(new SearchTerm(uncapitalize + "." + p.getName(), SearchOperation.eq, SecurityContext.getInstance().getUser().getId()));
+              }
+            });
         }
       });
 
