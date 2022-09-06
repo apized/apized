@@ -38,21 +38,23 @@ public class SecurityFilter implements HttpServerFilter {
 
   @Override
   public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    try {
-      String authorization = request.getHeaders().get("Authorization");
-      String token;
+    if (!request.getPath().startsWith("health")) {
+      try {
+        String authorization = request.getHeaders().get("Authorization");
+        String token;
 
-      if (authorization != null) {
-        token = authorization.replaceAll("Bearer (.*)", "$1");
-      } else {
-        token = request.getCookies().findCookie("token").orElse(new SimpleCookie("token", null)).getValue();
+        if (authorization != null) {
+          token = authorization.replaceAll("Bearer (.*)", "$1");
+        } else {
+          token = request.getCookies().findCookie("token").orElse(new SimpleCookie("token", null)).getValue();
+        }
+        SecurityContext.getInstance().setToken(token);
+        long start = System.currentTimeMillis();
+        SecurityContext.getInstance().setUser(resolver.getUser(token));
+        log.info("User {} resolved in {} ms for {}", SecurityContext.getInstance().getUser() != null ? SecurityContext.getInstance().getUser().getUsername() : null, System.currentTimeMillis() - start, request.getPath());
+      } catch (Exception ignored) {
+        log.error(ignored.getMessage(), ignored);
       }
-      SecurityContext.getInstance().setToken(token);
-      long start = System.currentTimeMillis();
-      SecurityContext.getInstance().setUser(resolver.getUser(token));
-      log.info("User {} resolved in {} ms for {}", SecurityContext.getInstance().getUser() != null ? SecurityContext.getInstance().getUser().getUsername() : null, System.currentTimeMillis() - start, request.getPath());
-    } catch (Exception ignored) {
-      log.error(ignored.getMessage(), ignored);
     }
 
     return chain.proceed(request);
