@@ -1,5 +1,6 @@
 package ${module};
 
+import io.micronaut.context.annotation.Requires;
 import org.apized.core.event.ESBAdapter;
 import org.apized.core.event.EventContext;
 import io.micronaut.transaction.annotation.TransactionalEventListener;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@Requires(bean = ESBAdapter.class)
 class SendEventsOnCommit {
   @Inject
   ESBAdapter esb;

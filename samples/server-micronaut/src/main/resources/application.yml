@@ -62,12 +62,6 @@ jpa:
           auto: none
         show_sql: true
 
-rabbitmq:
-  host: ${RABBITMQ_HOST:localhost}
-  port: ${RABBITMQ_HOST:-1}
-  username: ${RABBITMQ_USERNAME:guest}
-  password: ${RABBITMQ_PASSWORD:guest}
-
 apized:
   slug: server
   token: ${AUTH_TOKEN:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJ3ZWJzdW1taXQiLCJzdWIiOiJkNTY4NzA1YS1hNTgxLTQ5MjMtODI4Yi0wZjk3YzA4OTExNjMiLCJpc3MiOiJ3ZWJzdW1taXQiLCJpYXQiOjE2NjEyNDcyNzMsImp0aSI6IjdhNjM3ZmFkLWY5NTctNDg4Yy04MWY1LTVhM2Y0YmY4MmUxYSJ9.LJh7I4Ma9s8DYJwFWsJ4u9VG-J9tC5MTHEJR4e3NqXE}

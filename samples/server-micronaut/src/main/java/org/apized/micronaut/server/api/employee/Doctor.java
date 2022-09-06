@@ -21,11 +21,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apized.core.federation.Federated;
+import org.apized.core.model.Model;
+
+import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Serdeable
-public class Doctor extends Federated {
+@Federated
+public class Doctor implements Model {
+  UUID id;
   Long catalogopolisId;
 }

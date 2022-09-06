@@ -1,5 +1,5 @@
 plugins {
-  id 'org.apized.micronaut' version '0.0.2-SNAPSHOT'
+  id 'org.apized.micronaut' version '0.0.13-SNAPSHOT'
 }
 
 repositories {
@@ -9,8 +9,6 @@ repositories {
 
 dependencies {
   annotationProcessor("io.micronaut.openapi:micronaut-openapi")
-
-  implementation("io.micronaut.rabbitmq:micronaut-rabbitmq")
 
   runtimeOnly("io.micronaut.flyway:micronaut-flyway")
   runtimeOnly("ch.qos.logback:logback-classic")
