@@ -34,13 +34,17 @@ import org.reactivestreams.Subscription;
 public class RequestFilter implements HttpServerFilter {
   @Override
   public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    long start = System.currentTimeMillis();
-    ContextHelper.reset();
-    log.info("Request {} started: {}", RequestContext.getInstance().getId(), request.getPath());
-    return Publishers.then(
-      chain.proceed(request),
-      response -> log.info("Request {} took {}ms", RequestContext.getInstance().getId(), System.currentTimeMillis() - start)
-    );
+    if (!request.getPath().startsWith("/health")) {
+      long start = System.currentTimeMillis();
+      ContextHelper.reset();
+      log.info("Request {} started: {}", RequestContext.getInstance().getId(), request.getPath());
+      return Publishers.then(
+        chain.proceed(request),
+        response -> log.info("Request {} took {}ms", RequestContext.getInstance().getId(), System.currentTimeMillis() - start)
+      );
+    } else {
+      return chain.proceed(request);
+    }
   }
 
   @Override

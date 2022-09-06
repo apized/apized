@@ -35,11 +35,13 @@ public class SerdeFilter implements HttpServerFilter {
 
   @Override
   public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    RequestContext.getInstance().setPathVariables(getPathVariables(request));
-    RequestContext.getInstance().setFields(getParameters(request, "fields"));
-    RequestContext.getInstance().setSearch(getParameters(request, "search"));
-    RequestContext.getInstance().setSort(getParameters(request, "sort"));
-    RequestContext.getInstance().setReason(request.getHeaders().get("X-Reason"));
+    if (!request.getPath().startsWith("/health")) {
+      RequestContext.getInstance().setPathVariables(getPathVariables(request));
+      RequestContext.getInstance().setFields(getParameters(request, "fields"));
+      RequestContext.getInstance().setSearch(getParameters(request, "search"));
+      RequestContext.getInstance().setSort(getParameters(request, "sort"));
+      RequestContext.getInstance().setReason(request.getHeaders().get("X-Reason"));
+    }
 
     return chain.proceed(request);
   }
