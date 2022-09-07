@@ -34,6 +34,7 @@ import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortDirection;
 import org.apized.core.search.SortTerm;
+import org.apized.core.security.annotation.Owner;
 import org.apized.micronaut.core.ApizedConfig;
 
 import java.util.*;
@@ -55,9 +56,8 @@ public abstract class RepositoryHelper {
         if (pathVariables.get(uncapitalize) != null || !ApizedContext.getSecurity().getUser().isAllowed(config.getSlug())) {
           search.add(new SearchTerm(uncapitalize, SearchOperation.eq, pathVariables.get(uncapitalize)));
 
-          // todo owner
           BeanIntrospection.getIntrospection(s).getBeanProperties().stream()
-            .filter(p -> p.getName().equals("owner"))
+            .filter(p -> p.getAnnotation(Owner.class) != null)
             .forEach(p -> {
               if (!ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
                 search.add(new SearchTerm(uncapitalize + "." + p.getName(), SearchOperation.eq, ApizedContext.getSecurity().getUser().getId()));
@@ -66,10 +66,9 @@ public abstract class RepositoryHelper {
         }
       });
 
-      // todo owner
       introspection.getBeanProperties()
         .stream()
-        .filter(p -> p.getName().equals("owner"))
+        .filter(p -> p.getAnnotation(Owner.class) != null)
         .forEach(p -> {
           if (!ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
             search.add(new SearchTerm(p.getName(), SearchOperation.eq, ApizedContext.getSecurity().getUser().getId()));

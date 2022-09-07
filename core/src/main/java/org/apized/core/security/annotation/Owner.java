@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.apized.test.integration.core
+package org.apized.core.security.annotation;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.apized.core.model.Model
-
-class ServerConfig {
-  String baseUrl
-  List<Class<Model>> types
-}
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface Owner { }

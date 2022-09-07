@@ -23,14 +23,14 @@ class IntegrationConfig {
   static ThreadLocal<TestRunner> threadLocal = new ThreadLocal<>()
   static IntegrationConfig instance
 
-  int port
+  String baseUrl
   List<Class<Model>> types
 
   static void setTestRunner(TestRunner testRunner, ServerConfig config) {
     threadLocal.set(testRunner)
     if (!instance) {
       instance = new IntegrationConfig()
-      instance.port = config.port
+      instance.baseUrl = config.baseUrl
       instance.types = config.types
     }
   }

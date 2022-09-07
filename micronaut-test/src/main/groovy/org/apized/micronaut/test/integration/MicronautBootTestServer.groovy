@@ -18,9 +18,12 @@ package org.apized.micronaut.test.integration
 
 import io.cucumber.java.BeforeAll
 import io.micronaut.context.ApplicationContext
+import io.micronaut.core.beans.BeanIntrospectionReference
+import io.micronaut.core.beans.BeanIntrospector
 import io.micronaut.core.reflect.GenericTypeUtils
 import io.micronaut.http.server.netty.NettyEmbeddedServer
 import io.micronaut.runtime.server.EmbeddedServer
+import org.apized.core.model.Apized
 import org.apized.core.mvc.ModelService
 import org.apized.test.integration.core.IntegrationConfig
 import org.apized.test.integration.core.IntegrationContext
@@ -47,12 +50,14 @@ class MicronautBootTestServer {
   static ServerConfig boot() {
     application = ApplicationContext
       .builder()
+      .defaultEnvironments("test")
       .eagerInitSingletons(true)
       .run(NettyEmbeddedServer)
-    int port = application.port
-    List<Class> types = application.applicationContext.getBeansOfType(ModelService).collect {
-      GenericTypeUtils.resolveSuperGenericTypeArgument(it.class.superclass).get()
-    }
-    new ServerConfig(port: port, types: types)
+    new ServerConfig(
+      baseUrl: "http://localhost:${application.port}",
+      types: application.applicationContext.getBeansOfType(ModelService).collect {
+        GenericTypeUtils.resolveSuperGenericTypeArgument(it.class.superclass).get()
+      }
+    )
   }
 }

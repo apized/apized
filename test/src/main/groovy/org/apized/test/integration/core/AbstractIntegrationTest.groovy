@@ -102,7 +102,7 @@ abstract class AbstractIntegrationTest implements TestRunner {
   RequestSpecification getClient(IntegrationContext context = null, String user = null) {
     def client = given()
       .contentType(ContentType.JSON)
-      .port(IntegrationConfig.getInstance().getPort())
+      .baseUri(IntegrationConfig.getInstance().baseUrl)
       .config(newConfig())
       .header('Content-Type', 'application/json')
 
@@ -124,8 +124,7 @@ abstract class AbstractIntegrationTest implements TestRunner {
     }
 
     client = client
-      .baseUri('http://localhost')
-    .given()
+      .given()
       .filter(new TestClientLogFilter(getTag()))
 
     client

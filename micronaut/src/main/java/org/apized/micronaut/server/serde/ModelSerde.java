@@ -47,6 +47,7 @@ import org.apized.core.search.SearchHelper;
 import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
+import org.apized.core.security.annotation.Owner;
 import org.apized.micronaut.federation.FederationResolver;
 
 import java.io.IOException;
@@ -123,7 +124,9 @@ public class ModelSerde implements Serde<Model> {
       }
     }
 
-    if (isId) return model;
+    if (isId) {
+      return model;
+    }
 
     decoder.decodeObject();
     String key;
@@ -174,12 +177,11 @@ public class ModelSerde implements Serde<Model> {
       model._getModelMetadata().setAction(Action.CREATE);
     }
 
-    //todo owner
-    if (introspection.getBeanProperties().stream().anyMatch(p -> p.getName().equals("owner"))) {
+    for (BeanProperty<? super Model, Object> property : introspection.getBeanProperties().stream().filter(p -> p.getAnnotation(Owner.class) != null).toList()) {
       BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
-      if (wrapper.getProperty("owner", UUID.class).isEmpty()) {
-        wrapper.setProperty("owner", ApizedContext.getSecurity().getUser().getId());
-//        touched.add(introspection.getProperty("owner").get());
+      boolean replace = property.getAnnotation(Owner.class).isTrue("replace");
+      if (replace || wrapper.getProperty(property.getName(), UUID.class).isEmpty()) {
+        wrapper.setProperty(property.getName(), ApizedContext.getSecurity().getUser().getId());
       }
     }
 
