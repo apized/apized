@@ -16,8 +16,8 @@
 
 package org.apized.core.event;
 
+import org.apized.core.context.ApizedContext;
 import org.apized.core.event.model.Event;
-import org.apized.core.serde.RequestContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,10 +26,10 @@ import java.util.UUID;
 public interface ESBAdapter {
   default void send(Event event) {
     Map<String, Object> headers = new HashMap<>();
-    RequestContext.getInstance().getPathVariables().entrySet().forEach(e ->
+    ApizedContext.getRequest().getPathVariables().entrySet().forEach(e ->
       headers.put(e.getKey(), e.getValue() != null ? e.getValue().toString() : null)
     );
-    headers.putAll(EventContext.getInstance().getHeaders());
+    headers.putAll(ApizedContext.getEvent().getHeaders());
 
     send(event.getId(), event.getTopic(), headers, event.getPayload());
   }

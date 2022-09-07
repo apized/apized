@@ -18,6 +18,7 @@ package org.apized.core.federation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.ModelMapper;
+import org.apized.core.context.ApizedContext;
 import org.apized.core.model.Apized;
 import org.apized.core.model.Model;
 import org.apized.core.mvc.AbstractModelService;
@@ -71,13 +72,13 @@ public abstract class AbstractFederationResolver {
           mapper.createMapOf(target)
         );
 
-        if (FederationContext.getInstance().getCache().containsKey(url)) {
+        if (ApizedContext.getFederation().getCache().containsKey(url)) {
           log.info("Resolve {} (cached) with id {} - {}", type, target, url);
-          return FederationContext.getInstance().getCache().get(url);
+          return ApizedContext.getFederation().getCache().get(url);
         } else {
           log.info("Resolve {} (remote) with id {} - {}", type, target, url);
           Map<String, Object> federated = performRequest(url);
-          FederationContext.getInstance().getCache().put(url, federated);
+          ApizedContext.getFederation().getCache().put(url, federated);
           return federated;
         }
       } catch (Exception e) {

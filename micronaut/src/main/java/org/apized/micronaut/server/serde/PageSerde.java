@@ -16,9 +16,6 @@
 
 package org.apized.micronaut.server.serde;
 
-import org.apized.core.model.Model;
-import org.apized.core.model.Page;
-import org.apized.core.serde.RequestContext;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.type.Argument;
 import io.micronaut.serde.Decoder;
@@ -26,6 +23,9 @@ import io.micronaut.serde.Encoder;
 import io.micronaut.serde.Serde;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apized.core.context.ApizedContext;
+import org.apized.core.model.Model;
+import org.apized.core.model.Page;
 
 import java.io.IOException;
 import java.util.Map;
@@ -43,10 +43,10 @@ public class PageSerde implements Serde<Page<? extends Model>> {
 
   @Override
   public void serialize(Encoder encoder, EncoderContext context, Argument<? extends Page<? extends Model>> type, Page<? extends Model> value) throws IOException {
-    if (!RequestContext.getInstance().getFields().containsKey("content")) {
-      RequestContext.getInstance().setFields(Map.of("*", Map.of(), "content", RequestContext.getInstance().getFields()));
-      RequestContext.getInstance().setSearch(Map.of("content", RequestContext.getInstance().getSearch()));
-      RequestContext.getInstance().setSort(Map.of("content", RequestContext.getInstance().getSort()));
+    if (!ApizedContext.getRequest().getFields().containsKey("content")) {
+      ApizedContext.getRequest().setFields(Map.of("*", Map.of(), "content", ApizedContext.getRequest().getFields()));
+      ApizedContext.getRequest().setSearch(Map.of("content", ApizedContext.getRequest().getSearch()));
+      ApizedContext.getRequest().setSort(Map.of("content", ApizedContext.getRequest().getSort()));
     }
     serde.serialize(encoder, context, type, value);
   }

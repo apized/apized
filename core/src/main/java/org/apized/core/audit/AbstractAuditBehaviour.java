@@ -16,20 +16,18 @@
 
 package org.apized.core.audit;
 
-import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.beans.BeanIntrospection;
 import org.apized.core.ModelMapper;
 import org.apized.core.ScopeHelper;
-import org.apized.core.audit.annotation.*;
 import org.apized.core.audit.annotation.AuditField;
 import org.apized.core.audit.annotation.AuditIgnore;
 import org.apized.core.audit.model.AuditEntry;
 import org.apized.core.behaviour.BehaviourHandler;
-import org.apized.core.behaviour.BehaviourManager;
+import org.apized.core.context.ApizedContext;
+import org.apized.core.context.AuditContext;
 import org.apized.core.execution.Execution;
 import org.apized.core.model.*;
-import org.apized.core.security.SecurityContext;
-import org.apized.core.serde.RequestContext;
+import org.apized.core.context.SecurityContext;
+import org.apized.core.context.RequestContext;
 
 import java.util.*;
 
@@ -43,15 +41,15 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
     ScopeHelper.scopeUpUntil(
       model,
       a -> a.booleanValue("audit").orElse(true),
-      i -> AuditContext.getInstance().add(AuditEntry.builder()
-        .transactionId(RequestContext.getInstance().getId())
+      i -> ApizedContext.getAudit().add(AuditEntry.builder()
+        .transactionId(ApizedContext.getRequest().getId())
         .action(type.equals(i.getClass()) ? action : Action.UPDATE)
         .type(type.getSimpleName())
-        .by(SecurityContext.getInstance().getUser().getId())
-        .reason(RequestContext.getInstance().getReason())
+        .by(ApizedContext.getSecurity().getUser().getId())
+        .reason(ApizedContext.getRequest().getReason())
         .target(model.getId())
         .payload((type.equals(i.getClass()) ? action : Action.UPDATE) != Action.DELETE ? modelMapper.createMapOf(model) : Map.of())
-        .timestamp(RequestContext.getInstance().getTimestamp())
+        .timestamp(ApizedContext.getRequest().getTimestamp())
         .epoch(System.nanoTime())
         .build()
       )

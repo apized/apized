@@ -27,7 +27,6 @@ import io.micronaut.core.naming.Named;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.DefaultArgument;
 import io.micronaut.serde.*;
-import io.micronaut.serde.jackson.JacksonDecoder;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.persistence.ManyToMany;
@@ -36,6 +35,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import org.apized.core.MapHelper;
 import org.apized.core.StringHelper;
+import org.apized.core.context.ApizedContext;
+import org.apized.core.context.SerdeContext;
 import org.apized.core.federation.Federation;
 import org.apized.core.model.Action;
 import org.apized.core.model.ApiContext;
@@ -46,9 +47,6 @@ import org.apized.core.search.SearchHelper;
 import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
-import org.apized.core.security.SecurityContext;
-import org.apized.core.serde.RequestContext;
-import org.apized.core.serde.SerdeContext;
 import org.apized.micronaut.federation.FederationResolver;
 
 import java.io.IOException;
@@ -84,9 +82,9 @@ public class ModelSerde implements Serde<Model> {
     AnnotationValue<Apized> annotation = introspection.getAnnotation(Apized.class);
     List<Class<?>> scopes = annotation != null ? List.of(annotation.classValues("scope")) : List.of();
 
-    if (SerdeContext.getInstance().size() > 0) {
-      Model peekedValue = SerdeContext.getInstance().peek().getValue();
-      BeanProperty<?, ?> peekedProperty = SerdeContext.getInstance().peek().getProperty();
+    if (ApizedContext.getSerde().size() > 0) {
+      Model peekedValue = ApizedContext.getSerde().peek().getValue();
+      BeanProperty<?, ?> peekedProperty = ApizedContext.getSerde().peek().getProperty();
       Class<?> peekedPropertyType = Collection.class.isAssignableFrom(peekedProperty.getType()) ? peekedProperty.asArgument().getTypeParameters()[0].getType() : peekedProperty.getType();
 
       introspection.getBeanProperties().stream()
@@ -110,17 +108,17 @@ public class ModelSerde implements Serde<Model> {
     for (Class<?> scope : scopes) {
       BeanIntrospection<?> scopeIntrospection = BeanIntrospection.getIntrospection(scope);
       String scopeTypeName = StringHelper.uncapitalize(scope.getSimpleName());
-      UUID scopeId = RequestContext.getInstance().getPathVariables().get(scopeTypeName);
+      UUID scopeId = ApizedContext.getRequest().getPathVariables().get(scopeTypeName);
       if (scopeId != null) {
         deserializationWrapper.setProperty(
           scopeTypeName,
           appContext.getBean(new DefaultArgument<>(ModelService.class, scopeIntrospection.getAnnotationMetadata(), Argument.of(scope)))
             .get(scopeId)
         );
-      } else if (SerdeContext.getInstance().stream().anyMatch(e -> StringHelper.uncapitalize(e.getValue().getClass().getSimpleName()).equals(scopeTypeName))) {
+      } else if (ApizedContext.getSerde().stream().anyMatch(e -> StringHelper.uncapitalize(e.getValue().getClass().getSimpleName()).equals(scopeTypeName))) {
         deserializationWrapper.setProperty(
           scopeTypeName,
-          SerdeContext.getInstance().stream().map(SerdeContext.SerdeStackEntry::getValue).filter(e -> StringHelper.uncapitalize(e.getClass().getSimpleName()).equals(scopeTypeName)).findFirst().orElse(null)
+          ApizedContext.getSerde().stream().map(SerdeContext.SerdeStackEntry::getValue).filter(e -> StringHelper.uncapitalize(e.getClass().getSimpleName()).equals(scopeTypeName)).findFirst().orElse(null)
         );
       }
     }
@@ -134,7 +132,7 @@ public class ModelSerde implements Serde<Model> {
       if (propOpt.isPresent()) {
         BeanProperty<? super Model, Object> property = propOpt.get();
         touched.add(property);
-        SerdeContext.getInstance().push(new SerdeContext.SerdeStackEntry(model, property));
+        ApizedContext.getSerde().push(new SerdeContext.SerdeStackEntry(model, property));
         if (Collection.class.isAssignableFrom(property.getType()) && Model.class.isAssignableFrom(property.asArgument().getTypeParameters()[0].getType())) {
           //noinspection rawtypes
           Class subType = property.asArgument().getTypeParameters()[0].getType();
@@ -155,14 +153,14 @@ public class ModelSerde implements Serde<Model> {
         } else {
           deserializationWrapper.setProperty(key, decoder.decodeArbitrary());
         }
-        SerdeContext.getInstance().pop();
+        ApizedContext.getSerde().pop();
       } else {
         decoder.skipValue();
       }
     }
     decoder.close();
 
-    model.setId(model.getId() != null ? model.getId() : RequestContext.getInstance().getPathVariables().get(StringHelper.uncapitalize(type.getTypeString(true))));
+    model.setId(model.getId() != null ? model.getId() : ApizedContext.getRequest().getPathVariables().get(StringHelper.uncapitalize(type.getTypeString(true))));
     Optional<ModelService> service = appContext.findBean(new DefaultArgument<>(ModelService.class, type.getAnnotationMetadata(), type));
     if (service.isPresent() && model.getId() != null) {
       model = service.get().get(model.getId());
@@ -180,7 +178,7 @@ public class ModelSerde implements Serde<Model> {
     if (introspection.getBeanProperties().stream().anyMatch(p -> p.getName().equals("owner"))) {
       BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
       if (wrapper.getProperty("owner", UUID.class).isEmpty()) {
-        wrapper.setProperty("owner", SecurityContext.getInstance().getUser().getId());
+        wrapper.setProperty("owner", ApizedContext.getSecurity().getUser().getId());
 //        touched.add(introspection.getProperty("owner").get());
       }
     }
@@ -197,9 +195,9 @@ public class ModelSerde implements Serde<Model> {
     BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(value);
 
     String path = encoder.currentPath().replaceAll("^/", "").replaceAll("/\\d+", "");
-    Map<String, Object> fields = RequestContext.getInstance().getFields();
-    Map<String, Object> search = RequestContext.getInstance().getSearch();
-    Map<String, Object> sort = RequestContext.getInstance().getSort();
+    Map<String, Object> fields = ApizedContext.getRequest().getFields();
+    Map<String, Object> search = ApizedContext.getRequest().getSearch();
+    Map<String, Object> sort = ApizedContext.getRequest().getSort();
     if (!path.isBlank()) {
       for (String it : path.split("/")) {
         fields = (Map<String, Object>) fields.getOrDefault(it, new HashMap<>());

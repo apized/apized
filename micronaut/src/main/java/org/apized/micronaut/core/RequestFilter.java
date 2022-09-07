@@ -23,11 +23,8 @@ import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import lombok.extern.slf4j.Slf4j;
-import org.apized.core.ContextHelper;
-import org.apized.core.serde.RequestContext;
+import org.apized.core.context.ApizedContext;
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 @Slf4j
 @Filter("/**")
@@ -36,11 +33,11 @@ public class RequestFilter implements HttpServerFilter {
   public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
     if (!request.getPath().startsWith("/health")) {
       long start = System.currentTimeMillis();
-      ContextHelper.reset();
-      log.info("Request {} started: {}", RequestContext.getInstance().getId(), request.getPath());
+      ApizedContext.destroy();
+      log.info("Request {} started: {}", ApizedContext.getRequest().getId(), request.getPath());
       return Publishers.then(
         chain.proceed(request),
-        response -> log.info("Request {} took {}ms", RequestContext.getInstance().getId(), System.currentTimeMillis() - start)
+        response -> log.info("Request {} took {}ms", ApizedContext.getRequest().getId(), System.currentTimeMillis() - start)
       );
     } else {
       return chain.proceed(request);

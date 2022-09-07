@@ -8,8 +8,4 @@ import io.micronaut.data.repository.CrudRepository;
 import java.util.UUID;
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
-public interface AuditEntryRepository extends CrudRepository<AuditEntry, UUID> {
-  Iterable<AuditEntry> findByTypeAndTargetOrderByTimestampAsc(String type, UUID id);
-
-  Iterable<AuditEntry> findByTypeOrderByTimestampAsc(String type);
-}
+public interface MicronautAuditEntryRepository extends AuditEntryRepository {}

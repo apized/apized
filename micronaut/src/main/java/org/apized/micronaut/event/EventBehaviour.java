@@ -14,32 +14,21 @@
  * limitations under the License.
  */
 
-package org.apized.core.serde;
+package org.apized.micronaut.event;
 
+import io.micronaut.context.annotation.Context;
+import org.apized.core.behaviour.BehaviourManager;
+import org.apized.core.event.AbstractEventBehaviour;
+import org.apized.core.model.Action;
+import org.apized.core.model.Layer;
 import org.apized.core.model.Model;
-import io.micronaut.core.beans.BeanProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
+import org.apized.core.model.When;
 
-import java.util.Stack;
+import java.util.List;
 
-@Getter
-public class SerdeContext extends Stack<SerdeContext.SerdeStackEntry> {
-  static ThreadLocal<SerdeContext> threadLocalValue = ThreadLocal.withInitial(SerdeContext::new);
-
-  public static SerdeContext getInstance() {
-    return threadLocalValue.get();
-  }
-
-  public static void destroy() {
-    threadLocalValue.remove();
-  }
-
-  @AllArgsConstructor
-  @Data
-  public static class SerdeStackEntry {
-    Model value;
-    BeanProperty property;
+@Context
+public class EventBehaviour extends AbstractEventBehaviour {
+  public EventBehaviour(BehaviourManager manager) {
+    manager.registerBehaviour(Model.class, Layer.SERVICE, List.of(When.AFTER), List.of(Action.CREATE, Action.UPDATE, Action.DELETE), 1000, this);
   }
 }

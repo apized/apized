@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apized.core.event;
+package org.apized.core.context;
 
 import org.apized.core.event.model.Event;
 import lombok.Getter;
@@ -26,19 +26,9 @@ import java.util.Map;
 
 @Getter
 public class EventContext {
-  static ThreadLocal<EventContext> threadLocalValue = ThreadLocal.withInitial(EventContext::new);
-
-  public static EventContext getInstance() {
-    return threadLocalValue.get();
-  }
-
 
   private final Map<String, Object> headers = new HashMap<>();
   private final Map<String, Event> events = new HashMap<>();
-
-  public static void destroy() {
-    threadLocalValue.remove();
-  }
 
   public void add(Event entry) {
     events.put(entry.getTopic(), entry);

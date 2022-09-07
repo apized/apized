@@ -1,8 +1,0 @@
-package ${module};
-
-import org.apized.core.audit.AbstractAuditBehaviour;
-import org.apized.core.behaviour.BehaviourManager;
-import jakarta.inject.Singleton;
-
-@Singleton
-public class AuditBehaviour extends AbstractAuditBehaviour { }

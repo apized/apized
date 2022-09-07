@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package org.apized.core;
+package org.apized.core.context;
 
-import org.apized.core.audit.AuditContext;
-import org.apized.core.event.EventContext;
-import org.apized.core.federation.FederationContext;
-import org.apized.core.security.SecurityContext;
-import org.apized.core.serde.RequestContext;
-import org.apized.core.serde.SerdeContext;
+import org.apized.core.security.model.User;
+import lombok.Getter;
+import lombok.Setter;
 
-public class ContextHelper {
+import java.util.UUID;
 
-  public static void reset(){
-    RequestContext.destroy();
-    SecurityContext.destroy();
-    SerdeContext.destroy();
-    FederationContext.destroy();
-    AuditContext.destroy();
-    EventContext.destroy();
+@Getter
+@Setter
+public class SecurityContext {
+  private User user;
+  private String token;
+
+  public User getUser() {
+    if (user == null) {
+      user = new User();
+      user.setId(UUID.randomUUID());
+      user.setName("Anonymous");
+      user.setUsername("anonymous@apized.com");
+    }
+    return user;
   }
 }

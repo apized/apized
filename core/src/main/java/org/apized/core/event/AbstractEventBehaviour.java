@@ -19,15 +19,14 @@ package org.apized.core.event;
 import org.apized.core.ModelMapper;
 import org.apized.core.ScopeHelper;
 import org.apized.core.behaviour.BehaviourHandler;
-import org.apized.core.behaviour.BehaviourManager;
+import org.apized.core.context.ApizedContext;
 import org.apized.core.event.annotation.EventField;
 import org.apized.core.event.annotation.EventIgnore;
 import org.apized.core.event.model.Event;
 import org.apized.core.execution.Execution;
-import org.apized.core.model.*;
-import org.apized.core.serde.RequestContext;
-
-import java.util.List;
+import org.apized.core.model.Action;
+import org.apized.core.model.Model;
+import org.apized.core.model.When;
 
 public abstract class AbstractEventBehaviour implements BehaviourHandler<Model> {
   private final ModelMapper modelMapper = new ModelMapper(EventField.class, EventIgnore.class);
@@ -38,8 +37,8 @@ public abstract class AbstractEventBehaviour implements BehaviourHandler<Model> 
     ScopeHelper.scopeUpUntil(
       model,
       a -> a.booleanValue("event").orElse(true),
-      i -> EventContext.getInstance().add(new Event(
-        RequestContext.getInstance().getId(),
+      i -> ApizedContext.getEvent().add(new Event(
+        ApizedContext.getRequest().getId(),
         String.format("%s.%s.%s", "micronaut", type.getSimpleName().toLowerCase(), type.equals(i.getClass()) ? action.getType() : Action.UPDATE),
         modelMapper.createMapOf(model)
       ))

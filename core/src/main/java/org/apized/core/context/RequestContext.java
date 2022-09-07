@@ -14,37 +14,27 @@
  * limitations under the License.
  */
 
-package org.apized.core.security;
+package org.apized.core.context;
 
-import org.apized.core.security.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class SecurityContext {
-  static ThreadLocal<SecurityContext> threadLocalValue = ThreadLocal.withInitial(SecurityContext::new);
-
-  public static SecurityContext getInstance() {
-    return threadLocalValue.get();
-  }
-
-  private User user;
-  private String token;
-
-  public static void destroy() {
-    threadLocalValue.remove();
-  }
-
-  public User getUser() {
-    if (user == null) {
-      user = new User();
-      user.setId(UUID.randomUUID());
-      user.setName("Anonymous");
-      user.setUsername("anonymous@apized.com");
-    }
-    return user;
-  }
+public class RequestContext {
+  private final UUID id = UUID.randomUUID();
+  private final Date timestamp = Timestamp.valueOf(LocalDateTime.now(ZoneId.of("UTC")));
+  private String reason;
+  private Map<String, Object> fields = new HashMap<>();
+  private Map<String, UUID> pathVariables = new HashMap<>();
+  private Map<String, Object> search = new HashMap<>();
+  private Map<String, Object> sort = new HashMap<>();
 }

@@ -16,7 +16,8 @@
 
 package org.apized.micronaut.security;
 
-import org.apized.core.security.SecurityContext;
+import org.apized.core.context.ApizedContext;
+import org.apized.core.context.SecurityContext;
 import org.apized.core.security.UserResolver;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpRequest;
@@ -48,10 +49,10 @@ public class SecurityFilter implements HttpServerFilter {
         } else {
           token = request.getCookies().findCookie("token").orElse(new SimpleCookie("token", null)).getValue();
         }
-        SecurityContext.getInstance().setToken(token);
+        ApizedContext.getSecurity().setToken(token);
         long start = System.currentTimeMillis();
-        SecurityContext.getInstance().setUser(resolver.getUser(token));
-        log.info("User {} resolved in {} ms for {}", SecurityContext.getInstance().getUser() != null ? SecurityContext.getInstance().getUser().getUsername() : null, System.currentTimeMillis() - start, request.getPath());
+        ApizedContext.getSecurity().setUser(resolver.getUser(token));
+        log.info("User {} resolved in {} ms for {}", ApizedContext.getSecurity().getUser() != null ? ApizedContext.getSecurity().getUser().getUsername() : null, System.currentTimeMillis() - start, request.getPath());
       } catch (Exception ignored) {
         log.error(ignored.getMessage(), ignored);
       }

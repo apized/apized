@@ -134,17 +134,12 @@ public class AnnotationProcessor extends AbstractProcessor {
   }
 
   private void processApis(RoundEnvironment roundEnv) {
-    AtomicBoolean generateAudit = new AtomicBoolean(false);
-    AtomicBoolean generateEvent = new AtomicBoolean(false);
-
     List<? extends Element> generated = roundEnv.getElementsAnnotatedWith(Apized.class).stream().filter(it -> {
       if (it.getKind() != ElementKind.CLASS) {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Not a class", it);
         return false;
       } else {
         Apized annotation = it.getAnnotation(Apized.class);
-        generateAudit.set(generateAudit.get() || annotation.audit());
-        generateEvent.set(generateEvent.get() || annotation.event());
 
         Map<String, Object> bindings = getDefaultBindings();
         bindings.put("module", ((PackageElement) it.getEnclosingElement()).getQualifiedName().toString());
@@ -266,22 +261,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     if (generated.size() > 0) {
       processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Generated %d APIs", generated.size()));
-    }
-
-
-    Map<String, Object> bindings = getDefaultBindings();
-    bindings.put("module", "org.apized.micronaut.audit");
-
-    if (generateAudit.get()) {
-      generateClassFor(bindings.get("module") + "." + "AuditBehaviour", "audit/AuditBehaviour", bindings);
-      generateClassFor(bindings.get("module") + "." + "AuditController", "audit/AuditController", bindings);
-      generateClassFor(bindings.get("module") + "." + "AuditEntryRepository", "audit/AuditEntryRepository", bindings);
-      generateClassFor(bindings.get("module") + "." + "PersistAuditsOnCommit", "audit/PersistAuditsOnCommit", bindings);
-    }
-
-    if (generateEvent.get()) {
-      generateClassFor(bindings.get("module") + "." + "EventBehaviour", "event/EventBehaviour", bindings);
-      generateClassFor(bindings.get("module") + "." + "SendEventsOnCommit", "event/SendEventsOnCommit", bindings);
+      generateClassFor("org.apized.micronaut.audit.MicronautAuditEntryRepository", "audit/Repository", Map.of("module", "org.apized.micronaut.audit"));
     }
   }
 

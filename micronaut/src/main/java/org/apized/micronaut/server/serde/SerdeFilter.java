@@ -17,7 +17,8 @@
 package org.apized.micronaut.server.serde;
 
 import org.apized.core.StringHelper;
-import org.apized.core.serde.RequestContext;
+import org.apized.core.context.ApizedContext;
+import org.apized.core.context.RequestContext;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
@@ -36,11 +37,11 @@ public class SerdeFilter implements HttpServerFilter {
   @Override
   public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
     if (!request.getPath().startsWith("/health")) {
-      RequestContext.getInstance().setPathVariables(getPathVariables(request));
-      RequestContext.getInstance().setFields(getParameters(request, "fields"));
-      RequestContext.getInstance().setSearch(getParameters(request, "search"));
-      RequestContext.getInstance().setSort(getParameters(request, "sort"));
-      RequestContext.getInstance().setReason(request.getHeaders().get("X-Reason"));
+      ApizedContext.getRequest().setPathVariables(getPathVariables(request));
+      ApizedContext.getRequest().setFields(getParameters(request, "fields"));
+      ApizedContext.getRequest().setSearch(getParameters(request, "search"));
+      ApizedContext.getRequest().setSort(getParameters(request, "sort"));
+      ApizedContext.getRequest().setReason(request.getHeaders().get("X-Reason"));
     }
 
     return chain.proceed(request);

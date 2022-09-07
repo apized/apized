@@ -20,6 +20,8 @@ import org.apized.core.MapHelper;
 import org.apized.core.StringHelper;
 import org.apized.core.behaviour.BehaviourHandler;
 import org.apized.core.behaviour.BehaviourManager;
+import org.apized.core.context.ApizedContext;
+import org.apized.core.context.SecurityContext;
 import org.apized.core.error.exception.ForbiddenException;
 import org.apized.core.execution.Execution;
 import org.apized.core.model.Action;
@@ -60,7 +62,7 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
     String entityName = StringHelper.uncapitalize(type.getSimpleName());
 
     String fullPerm = slug + "." + entityName + "." + action.getType() + (modelId != null ? "." + modelId : "");
-    boolean allowed = SecurityContext.getInstance().getUser().isAllowed(fullPerm);
+    boolean allowed = ApizedContext.getSecurity().getUser().isAllowed(fullPerm);
 
     log.debug("Permissions check for '" + fullPerm + "' " + (allowed ? "passed" : "failed"));
 
@@ -80,7 +82,7 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
           }
         } else if (isJsonb) {
           String fieldPerm = slug + "." + entityName + "." + action.getType() + (modelId != null ? "." + modelId : "") + "." + field;
-          if (!SecurityContext.getInstance().getUser().isAllowed(fieldPerm)) {
+          if (!ApizedContext.getSecurity().getUser().isAllowed(fieldPerm)) {
             Map<String, Object> originalFlatMap = MapHelper.flatten(BeanWrapper.getWrapper(model._getModelMetadata().getOriginal()).getProperty(field, Map.class).orElse(Map.of()), List.of(field));
             Map<String, Object> flatMap = MapHelper.flatten((Map<String, Object>) value, List.of(field));
 
@@ -106,7 +108,7 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
 
   private void verifyPermissionForFieldAndValue(String entityName, Action action, Model model, String field, Object value) {
     String perm = slug + "." + entityName + "." + action.getType() + (model.getId() != null ? "." + model.getId() : "") + "." + field + "." + value;
-    if (!SecurityContext.getInstance().getUser().isAllowed(perm)) {
+    if (!ApizedContext.getSecurity().getUser().isAllowed(perm)) {
       throw new ForbiddenException("Not allowed to " + action.getType() + " " + StringHelper.capitalize(entityName) + (model.getId() != null ? " with id " + model.getId() : "") + " with `" + field + "` set to " + value, perm);
     }
   }

@@ -23,8 +23,8 @@ import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.DataType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apized.core.context.ApizedContext;
 import org.apized.core.federation.Federation;
-import org.apized.core.security.SecurityContext;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -81,16 +81,16 @@ public abstract class BaseModel implements Model {
   public void beforeCreate() {
     id = id != null ? id : UUID.randomUUID();
     createdAt = LocalDateTime.now(ZoneId.of("UTC"));
-    createdBy = SecurityContext.getInstance().getUser().getId();
+    createdBy = ApizedContext.getSecurity().getUser().getId();
     lastUpdatedAt = LocalDateTime.now(ZoneId.of("UTC"));
-    lastUpdatedBy = SecurityContext.getInstance().getUser().getId();
+    lastUpdatedBy = ApizedContext.getSecurity().getUser().getId();
     _getModelMetadata().setSaved(true);
   }
 
   @PreUpdate
   public void beforeUpdate() {
     lastUpdatedAt = LocalDateTime.now(ZoneId.of("UTC"));
-    lastUpdatedBy = SecurityContext.getInstance().getUser().getId();
+    lastUpdatedBy = ApizedContext.getSecurity().getUser().getId();
     _getModelMetadata().setSaved(true);
   }
 }

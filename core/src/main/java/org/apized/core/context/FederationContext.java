@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-package org.apized.core.audit;
+package org.apized.core.context;
 
-import org.apized.core.audit.model.AuditEntry;
 import lombok.Getter;
 
-import java.util.*;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
-public class AuditContext {
-  static ThreadLocal<AuditContext> threadLocalValue = ThreadLocal.withInitial(AuditContext::new);
-
-  public static AuditContext getInstance() {
-    return threadLocalValue.get();
-  }
-
-  private final Map<UUID, AuditEntry> auditEntries = new HashMap<>();
-
-  public static void destroy() {
-    threadLocalValue.remove();
-  }
-
-  public void add(AuditEntry entry) {
-    auditEntries.put(entry.getTarget(), entry);
-  }
+public class FederationContext {
+  private final Map<URI, Object>  cache = new HashMap<>();
 }

@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package org.apized.core.federation;
+package org.apized.micronaut.audit;
 
-import lombok.Getter;
+import io.micronaut.data.repository.CrudRepository;
+import org.apized.core.audit.model.AuditEntry;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 
-@Getter
-public class FederationContext {
-  static ThreadLocal<FederationContext> threadLocalValue = ThreadLocal.withInitial(FederationContext::new);
+public interface AuditEntryRepository  extends CrudRepository<AuditEntry, UUID> {
+  Iterable<AuditEntry> findByTypeAndTargetOrderByTimestampAsc(String type, UUID id);
 
-  public static FederationContext getInstance() {
-    return threadLocalValue.get();
-  }
-
-  private final Map<URI, Object>  cache = new HashMap<>();
-
-  public static void destroy() {
-    threadLocalValue.remove();
-  }
+  Iterable<AuditEntry> findByTypeOrderByTimestampAsc(String type);
 }
