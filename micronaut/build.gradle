@@ -1,5 +1,5 @@
 plugins {
-  id "io.micronaut.library" version "${micronautVersion}"
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
 }
 
 dependencies {
@@ -7,7 +7,7 @@ dependencies {
   annotationProcessor("io.micronaut:micronaut-inject-java")
 
   api(project(":core"))
-  api("jakarta.persistence:jakarta.persistence-api:3.0.0")
+  api('jakarta.persistence:jakarta.persistence-api:3.1.0')
   api("io.micronaut.serde:micronaut-serde-jackson")
   api("io.micronaut:micronaut-http-client")
   api("io.micronaut:micronaut-validation")

@@ -17,24 +17,22 @@
 package org.apized.micronaut.server.error;
 
 import io.micronaut.context.annotation.Replaces;
-import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
-import org.apized.core.error.ExceptionNotifier;
-import org.apized.core.error.exception.ServerException;
-import org.apized.micronaut.server.error.model.MicronautErrorEntry;
-import org.apized.micronaut.server.error.model.MicronautErrorResponse;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpResponseFactory;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.server.exceptions.ExceptionHandler;
+import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.error.ExceptionNotifier;
+import org.apized.micronaut.server.error.model.MicronautErrorEntry;
+import org.apized.micronaut.server.error.model.MicronautErrorResponse;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import java.util.List;
-import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 

@@ -1,5 +1,5 @@
 plugins {
-  id "io.micronaut.library" version "${micronautVersion}"
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
 }
 
 dependencies {

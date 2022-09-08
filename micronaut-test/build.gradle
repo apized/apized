@@ -1,5 +1,5 @@
 plugins {
-  id "io.micronaut.library" version "${micronautVersion}"
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
 }
 
 dependencies {
@@ -8,7 +8,7 @@ dependencies {
 
   api "io.micronaut:micronaut-inject-groovy"
   api "org.junit.jupiter:junit-jupiter-api"
-  api "io.micronaut:micronaut-context:"
+  api "io.micronaut:micronaut-context"
   api "io.micronaut.test:micronaut-test-junit5"
   api "io.micronaut:micronaut-http-server-netty"
 }
