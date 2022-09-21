@@ -1,5 +1,5 @@
 plugins {
-  id 'org.apized.micronaut' version '0.0.13-SNAPSHOT'
+  id 'org.apized.micronaut' version '0.0.16-SNAPSHOT'
 }
 
 repositories {

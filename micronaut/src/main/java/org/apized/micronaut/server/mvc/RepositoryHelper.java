@@ -53,7 +53,7 @@ public abstract class RepositoryHelper {
       //todo this probably needs to be recursive
       Arrays.stream(apized.classValues("scope")).forEach(s -> {
         String uncapitalize = StringHelper.uncapitalize(s.getSimpleName());
-        if (pathVariables.get(uncapitalize) != null || !ApizedContext.getSecurity().getUser().isAllowed(config.getSlug())) {
+        if (pathVariables.get(uncapitalize) != null || !ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + uncapitalize + ".get")) {
           search.add(new SearchTerm(uncapitalize, SearchOperation.eq, pathVariables.get(uncapitalize)));
 
           BeanIntrospection.getIntrospection(s).getBeanProperties().stream()
