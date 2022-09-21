@@ -17,6 +17,7 @@
 package org.apized.micronaut.server.serde;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.NonNull;
@@ -101,7 +102,7 @@ public class ModelSerde implements Serde<Model> {
           //noinspection ConstantConditions
           String property = p.getAnnotation(ApiContext.class).getRequiredValue("property", String.class);
           return (peekedPropertyType.equals(p.getType())
-            || peekedValue.getClass().equals(p.getType())) && (property.isEmpty() || peekedProperty.getName().equals(property));
+                  || peekedValue.getClass().equals(p.getType())) && (property.isEmpty() || peekedProperty.getName().equals(property));
         })
         .forEach(p -> deserializationWrapper.setProperty(p.getName(), peekedValue));
     }
@@ -132,7 +133,17 @@ public class ModelSerde implements Serde<Model> {
     String key;
     while ((key = decoder.decodeKey()) != null) {
       Optional<? extends BeanProperty<? super Model, Object>> propOpt = introspection.getProperty(key);
-      if (propOpt.isPresent()) {
+      if (
+        propOpt.isPresent()
+        && propOpt.get().getAnnotation(JsonIgnore.class) == null
+        && (
+          propOpt.get().getAnnotation(JsonProperty.class) == null
+          || !propOpt.get().getAnnotation(JsonProperty.class)
+            .enumValue("access", JsonProperty.Access.class)
+            .get()
+            .equals(JsonProperty.Access.READ_ONLY)
+        )
+      ) {
         BeanProperty<? super Model, Object> property = propOpt.get();
         touched.add(property);
         ApizedContext.getSerde().push(new SerdeContext.SerdeStackEntry(model, property));
@@ -211,6 +222,13 @@ public class ModelSerde implements Serde<Model> {
     Map<String, Object> finalFields = fields;
     Collection<BeanProperty<Model, Object>> properties = wrapper.getBeanProperties().stream()
       .filter(p -> !p.getAnnotationMetadata().hasAnnotation(JsonIgnore.class))
+      .filter(p->
+        !p.getAnnotationMetadata().hasAnnotation(JsonProperty.class)
+        || !p.getAnnotationMetadata().getAnnotation(JsonProperty.class)
+          .enumValue("access", JsonProperty.Access.class)
+          .get()
+          .equals(JsonProperty.Access.WRITE_ONLY)
+      )
       .filter(p -> p.getName().equals("id") || finalFields.isEmpty() || finalFields.containsKey("*") || finalFields.containsKey(p.getName()))
       .toList();
 
