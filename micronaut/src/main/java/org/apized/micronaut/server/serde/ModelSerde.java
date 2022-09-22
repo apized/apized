@@ -222,7 +222,7 @@ public class ModelSerde implements Serde<Model> {
     Map<String, Object> finalFields = fields;
     Collection<BeanProperty<Model, Object>> properties = wrapper.getBeanProperties().stream()
       .filter(p -> !p.getAnnotationMetadata().hasAnnotation(JsonIgnore.class))
-      .filter(p->
+      .filter(p ->
         !p.getAnnotationMetadata().hasAnnotation(JsonProperty.class)
         || !p.getAnnotationMetadata().getAnnotation(JsonProperty.class)
           .enumValue("access", JsonProperty.Access.class)
@@ -288,40 +288,44 @@ public class ModelSerde implements Serde<Model> {
     List<SearchTerm> terms = ((Map<String, Object>) search.getOrDefault(property.getName(), new HashMap<String, Object>())).keySet().stream().map(SearchHelper::convertTerm).filter(Objects::nonNull).collect(Collectors.toList());
     List<SortTerm> subSort = ((Map<String, Object>) sort.getOrDefault(property.getName(), new HashMap<String, Object>())).keySet().stream().map(SearchHelper::convertSort).filter(Objects::nonNull).collect(Collectors.toList());
     AnnotationValue<Federation> federation = property.getAnnotation(Federation.class);
-    ModelService<?> service = federation == null ? appContext.getBean(new DefaultArgument<>(ModelService.class, subType.getAnnotationMetadata(), subType)) : null;
+    Optional<ModelService> service = appContext.findBean(new DefaultArgument<>(ModelService.class, subType.getAnnotationMetadata(), subType));
 
-    if (isCollection) {
-      //todo get limits from the request properties
-      Optional<AnnotationValue<ManyToMany>> manyToMany = property.getAnnotationMetadata().findAnnotation(ManyToMany.class);
-      Optional<AnnotationValue<OneToMany>> oneToMany = property.getAnnotationMetadata().findAnnotation(OneToMany.class);
-      if (oneToMany.isPresent()) {
-        Optional<String> mappedBy = oneToMany.flatMap(annotation -> annotation.stringValue("mappedBy"));
-        terms.add(new SearchTerm(mappedBy.isEmpty() ? property.getName() : mappedBy.get(), SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
-      } else if (manyToMany.isPresent()) {
-        terms.add(new SearchTerm(property.getName() + ".id", SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
-      } else {
-        terms.add(new SearchTerm(StringHelper.uncapitalize(StringHelper.pluralize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, List.of(wrapper.getProperty("id", UUID.class).orElse(UUID.randomUUID()))));
-      }
-      return service.list(terms, subSort).getContent();
-    } else {
-      if (federation != null) {
-        return resolver.resolve(
-          federation.stringValue("value").orElse(null),
-          federation.stringValue("type").orElse(null),
-          federation.stringValue("uri").orElse(null),
-          wrapper.getProperty(property.getName(), Object.class).orElse(null),
-          fields
-        );
-      } else {
-        Optional<String> mappedBy = property.getAnnotationMetadata().findAnnotation(OneToOne.class).flatMap(annotation -> annotation.stringValue("mappedBy"));
-        if (mappedBy.isEmpty()) {
-          Model model = wrapper.getProperty(property.getName(), Model.class).orElse(null);
-          return model == null ? null : service.get(model.getId());
+    if (federation != null || service.isPresent() && property.getAnnotationNames().size() > 0) {
+      if (isCollection) {
+        //todo get limits from the request properties
+        Optional<AnnotationValue<ManyToMany>> manyToMany = property.getAnnotationMetadata().findAnnotation(ManyToMany.class);
+        Optional<AnnotationValue<OneToMany>> oneToMany = property.getAnnotationMetadata().findAnnotation(OneToMany.class);
+        if (oneToMany.isPresent()) {
+          Optional<String> mappedBy = oneToMany.flatMap(annotation -> annotation.stringValue("mappedBy"));
+          terms.add(new SearchTerm(mappedBy.isEmpty() ? property.getName() : mappedBy.get(), SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
+        } else if (manyToMany.isPresent()) {
+          terms.add(new SearchTerm(property.getName() + ".id", SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
         } else {
-          terms.add(new SearchTerm(mappedBy.get(), SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
-          return service.list(terms, subSort).getContent().stream().findFirst().orElse(null);
+          terms.add(new SearchTerm(StringHelper.uncapitalize(StringHelper.pluralize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, List.of(wrapper.getProperty("id", UUID.class).orElse(UUID.randomUUID()))));
+        }
+        return service.get().list(terms, subSort).getContent();
+      } else {
+        if (federation != null) {
+          return resolver.resolve(
+            federation.stringValue("value").orElse(null),
+            federation.stringValue("type").orElse(null),
+            federation.stringValue("uri").orElse(null),
+            wrapper.getProperty(property.getName(), Object.class).orElse(null),
+            fields
+          );
+        } else {
+          Optional<String> mappedBy = property.getAnnotationMetadata().findAnnotation(OneToOne.class).flatMap(annotation -> annotation.stringValue("mappedBy"));
+          if (mappedBy.isEmpty()) {
+            Model model = wrapper.getProperty(property.getName(), Model.class).orElse(null);
+            return model == null ? null : service.get().get(model.getId());
+          } else {
+            terms.add(new SearchTerm(mappedBy.get(), SearchOperation.eq, wrapper.getProperty("id", UUID.class).orElse(null)));
+            return service.get().list(terms, subSort).getContent().stream().findFirst().orElse(null);
+          }
         }
       }
+    } else {
+      return wrapper.getProperty(property.getName(), property.getType()).orElse(null);
     }
   }
 
