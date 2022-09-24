@@ -29,7 +29,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @Introspected
-public class Page<T> implements Model {
+public class Page<T extends Model> implements Model {
   @JsonIgnore
   UUID id;
 

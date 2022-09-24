@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  compileOnly project(":micronaut")
+  compileOnly project(":micronaut-core")
   api project(":test")
 
   api "io.micronaut:micronaut-inject-groovy"

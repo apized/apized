@@ -1,0 +1,59 @@
+plugins {
+  id 'groovy'
+  id 'io.micronaut.application' version '3.5.3'
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  annotationProcessor('org.projectlombok:lombok')
+  compileOnly('org.projectlombok:lombok')
+
+  project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
+  project.getDependencies().add("annotationProcessor", "io.micronaut.data:micronaut-data-processor");
+  project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor");
+
+
+  annotationProcessor(project(":micronaut-core"))
+  implementation(project(":micronaut-core"))
+
+
+  implementation('io.micronaut.data:micronaut-data-jdbc')
+  runtimeOnly "org.postgresql:postgresql"
+  runtimeOnly "io.micronaut.sql:micronaut-jdbc-hikari"
+
+  testImplementation(project(':micronaut-test'))
+
+//  ----------------------------
+  annotationProcessor("io.micronaut.openapi:micronaut-openapi")
+
+  runtimeOnly("io.micronaut.flyway:micronaut-flyway")
+  runtimeOnly("ch.qos.logback:logback-classic")
+}
+
+application {
+  mainClass.set("org.apized.micronaut.server.Application")
+}
+
+java {
+  sourceCompatibility = JavaVersion.toVersion("17")
+  targetCompatibility = JavaVersion.toVersion("17")
+}
+
+graalvmNative {
+  toolchainDetection = false
+  binaries {
+    main {
+//      imageName.set($project.name)
+      buildArgs.add('--verbose')
+    }
+  }
+}
+
+tasks.named("dockerfile") {
+  args("-Xms64m -Xmx128m")
+  instruction """HEALTHCHECK CMD curl -s localhost:8080/health | grep '"status":"UP"' """
+}

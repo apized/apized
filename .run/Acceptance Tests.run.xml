@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Acceptance Tests" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java">
     <option name="CUCUMBER_CORE_VERSION" value="5" />
-    <option name="FILE_PATH" value="$PROJECT_DIR$/samples/server-micronaut/src/test/resources/features" />
+    <option name="FILE_PATH" value="$PROJECT_DIR$/micronaut-sample-server/src/test/resources/features" />
     <option name="GLUE" value="org.apized" />
     <option name="MAIN_CLASS_NAME" value="io.cucumber.core.cli.Main" />
-    <module name="samples.server-micronaut.test" />
+    <module name="apized.micronaut-sample-server.test" />
     <option name="PROGRAM_PARAMETERS" value=" --plugin org.jetbrains.plugins.cucumber.java.run.CucumberJvm5SMFormatter" />
     <shortenClasspath name="NONE" />
     <option name="SUGGESTED_NAME" value="Feature: department-create" />

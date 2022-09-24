@@ -1,0 +1,57 @@
+#set ( $d = "$")
+package ${module};
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.beans.BeanWrapper;
+import org.apized.micronaut.server.ModelResolver;
+
+import java.util.*;
+
+@Introspected
+public class ${type}${d}Proxy extends ${type} {
+  private Map<String, Object> resolutions = new HashMap<>();
+
+  public ${type}${d}Proxy($type it) {
+    BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
+    BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);
+    wrapper.getBeanProperties().stream().forEach(prop ->
+      self.setProperty(prop.getName(), wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null))
+    );
+  }
+
+#foreach( $it in $subModels )
+#if($it.isCollection)
+  @Override
+  public $it.type<${it.typeParam}> get${it.Name}() {
+    if (!resolutions.containsKey("${it.name}")) {
+      resolutions.put(
+        "${it.name}",
+        ModelResolver.getModelValue(
+          ${type}.class,
+          "${it.name}",
+          getId()
+        )
+      );
+    }
+    return ($it.type<${it.typeParam}>) resolutions.get("${it.name}");
+  }
+#else
+  @Override
+  public $it.type get${it.Name}(){
+    if (!resolutions.containsKey("${it.name}")) {
+      resolutions.put(
+        "${it.name}",
+        ModelResolver.getModelValue(
+          ${type}.class,
+          "${it.name}",
+          getId(),
+          Optional.ofNullable(super.get${it.Name}()).orElse(new ${it.type}()).getId()
+        )
+      );
+    }
+    return ($it.type) resolutions.get("${it.name}");
+  }
+#end
+
+#end
+}

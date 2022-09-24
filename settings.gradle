@@ -6,4 +6,4 @@ pluginManagement {
   }
 }
 rootProject.name = "apized"
-include 'core', 'test', 'micronaut', 'micronaut-test', 'gradle-micronaut'
+include 'core', 'test', 'micronaut-core', 'micronaut-test', 'micronaut-gradle', 'micronaut-sample-server'
