@@ -58,6 +58,11 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
   }
 
   @Override
+  public T find(UUID id) {
+    return getRepository().get(id).orElseThrow(NotFoundException::new);
+  }
+
+  @Override
   public T get(UUID id) {
     return getRepository().get(id).orElseThrow(NotFoundException::new);
   }

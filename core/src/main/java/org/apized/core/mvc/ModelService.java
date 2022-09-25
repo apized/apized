@@ -28,10 +28,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ModelService<T extends Model> {
-  default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
-    throw new NotImplementedException();
-  }
-
   default List<T> searchAll(SearchTerm... search) {
     return searchAll(Arrays.asList(search));
   }
@@ -49,6 +45,15 @@ public interface ModelService<T extends Model> {
   }
 
   default Optional<T> searchOne(List<SearchTerm> search) {
+    throw new NotImplementedException();
+  }
+
+  default T find(UUID id) {
+    throw new NotImplementedException();
+  }
+
+  // Behaviour wrapped methods
+  default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
     throw new NotImplementedException();
   }
 

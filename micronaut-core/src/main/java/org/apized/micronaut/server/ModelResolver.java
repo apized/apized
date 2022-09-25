@@ -53,7 +53,7 @@ public class ModelResolver {
       }
       return service.list(terms, subSort).getContent();
     } else if (otherId != null) {
-      return service.get(otherId);
+      return service.find(otherId);
     } else {
       return null;
     }
