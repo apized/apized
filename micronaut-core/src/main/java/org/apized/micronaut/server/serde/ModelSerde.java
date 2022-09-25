@@ -247,7 +247,7 @@ public class ModelSerde implements Serde<Model> {
           wrapper.getProperty(property.getName(), Object.class).orElse(null),
           MapHelper.flatten(subFields).keySet()
         );
-      } else {
+      } else { //todo filter, sort & sizes
         val = wrapper.getProperty(property.getName(), Object.class).orElse(null);
       }
 
