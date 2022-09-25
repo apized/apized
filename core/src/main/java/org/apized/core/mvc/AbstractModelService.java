@@ -23,7 +23,6 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.DefaultArgument;
 import jakarta.persistence.*;
 import org.apized.core.error.exception.NotFoundException;
-import org.apized.core.federation.Federated;
 import org.apized.core.federation.Federation;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
@@ -153,7 +152,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .filter(p -> Model.class.isAssignableFrom(p.getType()) || (Collection.class.isAssignableFrom(p.getType()) && Model.class.isAssignableFrom(p.asArgument().getTypeParameters()[0].getType())))
       .filter(p -> isBefore == (
           (p.hasAnnotation(OneToOne.class) && p.getAnnotation(OneToOne.class).stringValue("mappedBy").isEmpty())
-            || p.hasAnnotation(ManyToOne.class)
+          || p.hasAnnotation(ManyToOne.class)
         )
       )
       .forEach(p -> {
@@ -170,7 +169,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
             values.add((Model) value.get());
           }
 
-          ModelService service = appContext.getBean(
+          Optional<ModelService> service = appContext.findBean(
             new DefaultArgument<>(
               ModelService.class,
               introspection,
@@ -178,16 +177,19 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
             )
           );
 
-          values.stream()
-            .filter(m -> m._getModelMetadata().isDirty())
-            .forEach(subModel -> {
-              UUID subModelId = subModel.getId();
-              switch (subModel._getModelMetadata().getAction()) {
-                case CREATE -> service.create(subModel);
-                case UPDATE -> service.update(subModelId, subModel);
-                case DELETE -> service.delete(subModelId);//todo should this have the reverse order of create/update?
-              }
-            });
+          if (service.isPresent()) {
+            values.stream()
+              .filter(m -> m._getModelMetadata().isDirty())
+              .forEach(subModel -> {
+                UUID subModelId = subModel.getId();
+                switch (subModel._getModelMetadata().getAction()) {
+                  case CREATE -> service.get().create(subModel);
+                  case UPDATE -> service.get().update(subModelId, subModel);
+                  case DELETE ->
+                    service.get().delete(subModelId);//todo should this have the reverse order of create/update?
+                }
+              });
+          }
         }
       });
   }

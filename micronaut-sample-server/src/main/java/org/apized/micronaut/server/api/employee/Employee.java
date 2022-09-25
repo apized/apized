@@ -38,7 +38,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @Entity
 @Serdeable
-@Apized(scope = {Organization.class, Department.class})
+@Apized(scope = {Organization.class, Department.class}, extensions = EmployeeRepositoryExtension.class)
 public class Employee extends BaseModel {
   @NotNull
   @JsonIgnore

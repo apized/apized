@@ -11,6 +11,10 @@ import java.util.*;
 public class ${type}${d}Proxy extends ${type} {
   private Map<String, Object> resolutions = new HashMap<>();
 
+  public ${type}${d}Proxy() {
+    super();
+  }
+
   public ${type}${d}Proxy($type it) {
     BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
     BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);

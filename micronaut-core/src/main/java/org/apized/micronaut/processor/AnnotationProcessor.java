@@ -37,10 +37,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.MirroredTypesException;
 import javax.lang.model.type.TypeMirror;
@@ -159,12 +156,13 @@ public class AnnotationProcessor extends AbstractProcessor {
 
         TypeMirror baseModelType = processingEnv.getElementUtils().getTypeElement(BaseModel.class.getName()).asType();
         TypeMirror collectionType = processingEnv.getTypeUtils().getDeclaredType(processingEnv.getElementUtils().getTypeElement(Collection.class.getName()), processingEnv.getTypeUtils().getWildcardType(baseModelType, null));
+        TypeMirror optionalType = processingEnv.getTypeUtils().getDeclaredType(processingEnv.getElementUtils().getTypeElement(Optional.class.getName()), processingEnv.getTypeUtils().getWildcardType(baseModelType, null));
         it.getEnclosedElements().stream().filter(el -> el.getKind().equals(ElementKind.FIELD))
           .filter(el ->
             {
               TypeMirror elementType = el.asType();
               return processingEnv.getTypeUtils().isAssignable(elementType, baseModelType) ||
-                processingEnv.getTypeUtils().isAssignable(elementType, collectionType);
+                     processingEnv.getTypeUtils().isAssignable(elementType, collectionType);
             }
           )
           .forEach(el ->
@@ -175,7 +173,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                 "type", ((TypeElement) processingEnv.getTypeUtils().asElement(el.asType())).getQualifiedName().toString(),
                 "isCollection", processingEnv.getTypeUtils().isAssignable(el.asType(), collectionType),
                 "typeParam", processingEnv.getTypeUtils().isAssignable(el.asType(), collectionType)
-                  ? el.asType().toString().replaceAll(".*<(.*?)>.*","$1")
+                  ? el.asType().toString().replaceAll(".*<(.*?)>.*", "$1")
                   : ""
               )
             )
@@ -195,13 +193,10 @@ public class AnnotationProcessor extends AbstractProcessor {
             .map(e -> (TypeElement) processingEnv.getTypeUtils().asElement(e))
             .forEach(extension -> {
               Apized.Extension extensionAnnotation = extension.getAnnotation(Apized.Extension.class);
-              ClassTree classTree = Trees.instance(processingEnv).getTree(extension);
-
-              List<MethodTree> methodTrees = classTree.getMembers()
+              List<ExecutableElement> methods = extension.getEnclosedElements()
                 .stream()
-                .filter(m -> m.getKind().equals(Tree.Kind.METHOD))
-                .map(e -> (MethodTree) e)
-                .filter(e -> !e.getName().toString().equals("<init>") && !Arrays.asList(extensionAnnotation.exclude()).contains(e.getName().toString()))
+                .filter(e -> e.getKind().equals(ElementKind.METHOD))
+                .map(e -> (ExecutableElement) e)
                 .toList();
 
               switch (extensionAnnotation.layer()) {
@@ -209,23 +204,18 @@ public class AnnotationProcessor extends AbstractProcessor {
                   String injectName = StringHelper.uncapitalize(extension.getSimpleName().toString());
                   extensionBindings.get("service").get("injects").add(String.format("%s %s", extension.getQualifiedName().toString(), injectName));
                   extensionBindings.get("service").get("methods").addAll(
-                    methodTrees.stream().map(m ->
-                      {
-                        extensionBindings.get("service").get("imports").addAll(m.getParameters()
-                          .stream()
-                          .map(p -> p.getType().toString())
-                          .filter(rootElements::containsKey)
-                          .map(rootElements::get)
-                          .toList()
-                        );
-                        return Map.of(
-                          "returnType", m.getReturnType().toString(),
-                          "name", m.getName().toString(),
-                          "parameters", m.getParameters().stream().map(Object::toString).collect(Collectors.joining(", ")),
-                          "callee", injectName,
-                          "arguments", m.getParameters().stream().map(p -> p.getName().toString()).collect(Collectors.joining(", "))
-                        );
-                      }
+                    methods.stream().map(m ->
+                      Map.of(
+                        "returnType", m.getReturnType().toString(),
+                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),baseModelType),
+                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),collectionType),
+                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),optionalType),
+                        "returnTypeWrappedParameter", m.getReturnType().toString().replaceAll(".*<(.*?)>.*", "$1"),
+                        "name", m.getSimpleName().toString(),
+                        "parameters", m.getParameters().stream().map(p -> p.asType().toString() + " " + p.getSimpleName()).collect(Collectors.joining(", ")),
+                        "callee", injectName,
+                        "arguments", m.getParameters().stream().map(p -> p.getSimpleName().toString()).collect(Collectors.joining(", "))
+                      )
                     ).toList()
                   );
                 }
@@ -233,23 +223,18 @@ public class AnnotationProcessor extends AbstractProcessor {
                   extensionBindings.get("repository").get("imports").add(extension.getQualifiedName().toString());
                   extensionBindings.get("repository").get("implements").add(extension.getSimpleName().toString());
                   extensionBindings.get("service").get("methods").addAll(
-                    methodTrees.stream().map(m ->
-                      {
-                        extensionBindings.get("service").get("imports").addAll(m.getParameters()
-                          .stream()
-                          .map(p -> p.getType().toString())
-                          .filter(rootElements::containsKey)
-                          .map(rootElements::get)
-                          .toList()
-                        );
-                        return Map.of(
-                          "returnType", m.getReturnType().toString(),
-                          "name", m.getName().toString(),
-                          "parameters", m.getParameters().stream().map(Object::toString).collect(Collectors.joining(", ")),
-                          "callee", "repository",
-                          "arguments", m.getParameters().stream().map(p -> p.getName().toString()).collect(Collectors.joining(", "))
-                        );
-                      }
+                    methods.stream().map(m ->
+                      Map.of(
+                        "returnType", m.getReturnType().toString(),
+                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),baseModelType),
+                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),collectionType),
+                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),optionalType),
+                        "returnTypeWrappedParameter", m.getReturnType().toString().replaceAll(".*<(.*?)>.*", "$1"),
+                        "name", m.getSimpleName().toString(),
+                        "parameters", m.getParameters().stream().map(p -> p.asType().toString() + " " + p.getSimpleName()).collect(Collectors.joining(", ")),
+                        "callee", "repository",
+                        "arguments", m.getParameters().stream().map(p -> p.getSimpleName().toString()).collect(Collectors.joining(", "))
+                      )
                     ).toList()
                   );
                 }

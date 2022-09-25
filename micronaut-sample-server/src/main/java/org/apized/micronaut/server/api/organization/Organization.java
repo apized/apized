@@ -36,7 +36,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Serdeable
-@Apized
+@Apized(extensions = OrganizationRepositoryExtension.class)
 public class Organization extends BaseModel {
   @NotBlank
   private String name;

@@ -117,7 +117,22 @@ public class ${type}Service extends AbstractModelService<${type}> {
 
   public ${it.returnType} ${it.name}(${it.parameters}){
 #if($it.returnType != "void")
+#if($it.isModel)
     return new ${it.returnType}${d}Proxy(${it.callee}.${it.name}(${it.arguments}));
+#elseif($it.isCollection)
+    return ${it.callee}.${it.name}(${it.arguments})
+      .stream()
+      .map(it -> (${it.returnTypeWrappedParameter}) new ${it.returnTypeWrappedParameter}${d}Proxy(it))
+      .toList();
+#elseif($it.isOptional)
+    ${it.returnType} result = ${it.callee}.${it.name}(${it.arguments});
+    if(result.isPresent()){
+      result = Optional.ofNullable(new ${it.returnTypeWrappedParameter}${d}Proxy(result.get()));
+    }
+    return result;
+#else
+    return ${it.callee}.${it.name}(${it.arguments});
+#end
 #else
     ${it.callee}.${it.name}(${it.arguments});
 #end
