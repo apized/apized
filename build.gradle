@@ -23,7 +23,7 @@ subprojects {
     withSourcesJar()
   }
 
-  if (it.name != 'gradle-micronaut') {
+  if (it.name != 'micronaut-gradle-plugin') {
     apply plugin: 'maven-publish'
 
     publishing {
