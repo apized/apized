@@ -20,6 +20,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.Trees;
+import jakarta.persistence.Transient;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -161,8 +162,10 @@ public class AnnotationProcessor extends AbstractProcessor {
           .filter(el ->
             {
               TypeMirror elementType = el.asType();
-              return processingEnv.getTypeUtils().isAssignable(elementType, baseModelType) ||
-                     processingEnv.getTypeUtils().isAssignable(elementType, collectionType);
+              return el.getAnnotation(Transient.class) == null && (
+                processingEnv.getTypeUtils().isAssignable(elementType, baseModelType) ||
+                processingEnv.getTypeUtils().isAssignable(elementType, collectionType)
+              );
             }
           )
           .forEach(el ->
@@ -207,9 +210,9 @@ public class AnnotationProcessor extends AbstractProcessor {
                     methods.stream().map(m ->
                       Map.of(
                         "returnType", m.getReturnType().toString(),
-                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),baseModelType),
-                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),collectionType),
-                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),optionalType),
+                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
+                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), collectionType),
+                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), optionalType),
                         "returnTypeWrappedParameter", m.getReturnType().toString().replaceAll(".*<(.*?)>.*", "$1"),
                         "name", m.getSimpleName().toString(),
                         "parameters", m.getParameters().stream().map(p -> p.asType().toString() + " " + p.getSimpleName()).collect(Collectors.joining(", ")),
@@ -226,9 +229,9 @@ public class AnnotationProcessor extends AbstractProcessor {
                     methods.stream().map(m ->
                       Map.of(
                         "returnType", m.getReturnType().toString(),
-                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),baseModelType),
-                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),collectionType),
-                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(),optionalType),
+                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
+                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), collectionType),
+                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), optionalType),
                         "returnTypeWrappedParameter", m.getReturnType().toString().replaceAll(".*<(.*?)>.*", "$1"),
                         "name", m.getSimpleName().toString(),
                         "parameters", m.getParameters().stream().map(p -> p.asType().toString() + " " + p.getSimpleName()).collect(Collectors.joining(", ")),

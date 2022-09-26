@@ -9,6 +9,7 @@ import java.util.*;
 
 @Introspected
 public class ${type}${d}Proxy extends ${type} {
+  private boolean built = false;
   private Map<String, Object> resolutions = new HashMap<>();
 
   public ${type}${d}Proxy() {
@@ -18,12 +19,31 @@ public class ${type}${d}Proxy extends ${type} {
   public ${type}${d}Proxy($type it) {
     BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
     BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);
+
     wrapper.getBeanProperties().stream().forEach(prop ->
       self.setProperty(prop.getName(), wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null))
     );
+
+    built = true;
   }
 
 #foreach( $it in $subModels )
+  @Override
+#if($it.isCollection)
+  public void set${it.Name}($it.type<${it.typeParam}> it) {
+#else
+  public void set${it.Name}($it.type it) {
+#end
+    if(built) {
+      resolutions.put(
+        "${it.name}",
+        it
+      );
+    } else {
+      super.set${it.Name}(it);
+    }
+  }
+
 #if($it.isCollection)
   @Override
   public $it.type<${it.typeParam}> get${it.Name}() {
