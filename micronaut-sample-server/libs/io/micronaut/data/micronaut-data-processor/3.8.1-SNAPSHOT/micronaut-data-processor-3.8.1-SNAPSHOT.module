@@ -1,0 +1,164 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.micronaut.data",
+    "module": "micronaut-data-processor",
+    "version": "3.8.1-SNAPSHOT",
+    "attributes": {
+      "org.gradle.status": "integration"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.5.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "io.micronaut",
+          "module": "micronaut-inject",
+          "version": {
+            "requires": "3.5.0"
+          }
+        },
+        {
+          "group": "io.micronaut.data",
+          "module": "micronaut-data-model",
+          "version": {
+            "requires": "3.8.1-SNAPSHOT"
+          }
+        },
+        {
+          "group": "jakarta.persistence",
+          "module": "jakarta.persistence-api",
+          "version": {
+            "requires": "3.0.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "micronaut-data-processor-3.8.1-SNAPSHOT.jar",
+          "url": "micronaut-data-processor-3.8.1-SNAPSHOT.jar",
+          "size": 312523,
+          "sha512": "a264a25f1ca38f8ccd07b36c6c9904db256d2525208d542de02be97df5bf20e6f8637b6f67eb90a33e2e948afc772f55b82fe80f7cea0a5854ed61d45201e4cb",
+          "sha256": "bf790a1de0e6b35bec0239c39f97ccd8b0b0022e3ee33fa6d6d34fa4229eeba7",
+          "sha1": "866730d06001e1dd6b907a0092c6e3542a9b0761",
+          "md5": "14dc178ce8af9eb2780839e7e69b7bfa"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains",
+          "module": "annotations",
+          "version": {
+            "requires": "23.0.0"
+          }
+        },
+        {
+          "group": "io.micronaut",
+          "module": "micronaut-bom",
+          "version": {
+            "requires": "3.5.0"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          },
+          "endorseStrictVersions": true
+        },
+        {
+          "group": "io.micronaut",
+          "module": "micronaut-inject",
+          "version": {
+            "requires": "3.5.0"
+          }
+        },
+        {
+          "group": "io.micronaut.data",
+          "module": "micronaut-data-model",
+          "version": {
+            "requires": "3.8.1-SNAPSHOT"
+          }
+        },
+        {
+          "group": "jakarta.persistence",
+          "module": "jakarta.persistence-api",
+          "version": {
+            "requires": "3.0.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "micronaut-data-processor-3.8.1-SNAPSHOT.jar",
+          "url": "micronaut-data-processor-3.8.1-SNAPSHOT.jar",
+          "size": 312523,
+          "sha512": "a264a25f1ca38f8ccd07b36c6c9904db256d2525208d542de02be97df5bf20e6f8637b6f67eb90a33e2e948afc772f55b82fe80f7cea0a5854ed61d45201e4cb",
+          "sha256": "bf790a1de0e6b35bec0239c39f97ccd8b0b0022e3ee33fa6d6d34fa4229eeba7",
+          "sha1": "866730d06001e1dd6b907a0092c6e3542a9b0761",
+          "md5": "14dc178ce8af9eb2780839e7e69b7bfa"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "micronaut-data-processor-3.8.1-SNAPSHOT-sources.jar",
+          "url": "micronaut-data-processor-3.8.1-SNAPSHOT-sources.jar",
+          "size": 181249,
+          "sha512": "68d9cd96bb8ad426c0fee964260d83a8fca642ad0e0805282fc45a115e2dc185cec05ba194ab92b488ec008707365f5e5cd6fd5c0a6f0da175d45db1e07baf4b",
+          "sha256": "52945f90de96fe4769347b873c8f85516c8e644f688e8efea5a36d9c7f7e3bcc",
+          "sha1": "39e49bc1007e09554e475f836e607bc7943b0b12",
+          "md5": "b1b79b0b7e6904853ae114b80c43c67a"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "micronaut-data-processor-3.8.1-SNAPSHOT-javadoc.jar",
+          "url": "micronaut-data-processor-3.8.1-SNAPSHOT-javadoc.jar",
+          "size": 706310,
+          "sha512": "90cc80d53d40ee77a245d9299ee1aab36fd604d1db07e4707dd5e3502ed436164682c1070f2c9793a8b3c1099d75a19d1c483926c6b5eb97c832de4eefa0545f",
+          "sha256": "b89fb6eee14d42dbc7544a98852afa92aba66f25eb6cf97dfb542e15720e7b24",
+          "sha1": "66f675fd12c31231111c174400ea44dc8b9cfb66",
+          "md5": "460ecb70ea62f4e3dcb58d26757f6a50"
+        }
+      ]
+    }
+  ]
+}

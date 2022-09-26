@@ -48,6 +48,7 @@ public class ${type}Service extends AbstractModelService<${type}> {
     return repository;
   }
 
+  @Override
   public Page<${type}> list(List<SearchTerm> search, List<SortTerm> sort) {
     Page<${type}> list = super.list(search, sort);
     list.setContent(
@@ -57,7 +58,13 @@ public class ${type}Service extends AbstractModelService<${type}> {
     );
     return list;
   }
-#if($actions.contains('LIST'))
+
+  @Override
+  public ${type} find(UUID id) {
+    return new ${type}${d}Proxy(super.find(id));
+  }
+
+  #if($actions.contains('LIST'))
 
   @Override
   @MicronautBehaviourExecution(execution =

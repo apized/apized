@@ -47,7 +47,20 @@ public class ModelResolver {
         Optional<String> mappedBy = oneToMany.flatMap(annotation -> annotation.stringValue("mappedBy"));
         terms.add(new SearchTerm(mappedBy.isEmpty() ? field : mappedBy.get(), SearchOperation.eq, selfId));
       } else if (manyToMany.isPresent()) {
-        terms.add(new SearchTerm(field + ".id", SearchOperation.eq, selfId));
+        BeanIntrospection<?> inverseModel = BeanIntrospection.getIntrospection(property.asArgument().getFirstTypeVariable().get().getType());
+        Optional<? extends BeanProperty<?, Object>> inverseField = inverseModel
+          .getBeanProperties()
+          .stream()
+          .filter(p ->
+            p.getAnnotationMetadata().hasAnnotation(ManyToMany.class)
+          )
+          .filter(p ->
+            Objects.requireNonNull(p.getAnnotation(ManyToMany.class)).stringValue("mappedBy").orElse("").equals(field) ||
+            p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
+          )
+          .findFirst();
+        service = applicationContext.getBean(new DefaultArgument<>(ModelService.class, null, new DefaultArgument<>(inverseModel.getBeanType(), inverseModel.getAnnotationMetadata())));
+        terms.add(new SearchTerm(inverseField.get().getName() + ".id", SearchOperation.eq, selfId));
       } else {
         terms.add(new SearchTerm(StringHelper.uncapitalize(StringHelper.pluralize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, List.of(selfId)));
       }
