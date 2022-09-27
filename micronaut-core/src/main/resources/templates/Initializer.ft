@@ -6,6 +6,7 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.runtime.server.event.ServerStartupEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apized.core.ApizedConfig;
 import org.apized.core.behaviour.BehaviourManager;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.model.Action;
@@ -13,7 +14,6 @@ import org.apized.core.model.Layer;
 import org.apized.core.model.Model;
 import org.apized.core.model.When;
 import org.apized.micronaut.context.MicronautContextProvider;
-import org.apized.micronaut.core.ApizedConfig;
 import org.apized.micronaut.server.ModelResolver;
 import org.apized.micronaut.server.mvc.RepositoryHelper;
 
@@ -42,7 +42,7 @@ public class Initializer {
   @EventListener
   void onStartup(ServerStartupEvent event) {
     ApizedContext.provider = new MicronautContextProvider();
-    RepositoryHelper.config = config;
+    ApizedConfig.setInstance(config);
     ModelResolver.applicationContext = applicationContext;
 
     #foreach( $it in $behaviours )

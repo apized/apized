@@ -17,7 +17,7 @@
 package org.apized.micronaut.core;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
-import lombok.Data;
+import org.apized.core.ApizedConfig;
 
 import java.util.Map;
 
@@ -25,9 +25,8 @@ import java.util.Map;
 /**
  * Properties to configure apized.
  */
-@Data
 @ConfigurationProperties(value = "apized")
-public class ApizedConfig {
+public class MicronautApizedConfig extends ApizedConfig {
 
   /**
    * The slug for this application. This will be used as the base for permissions.

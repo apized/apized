@@ -16,6 +16,7 @@
 
 package org.apized.micronaut.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.transaction.annotation.TransactionalEventListener;
 import jakarta.inject.Inject;
@@ -24,10 +25,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.event.ESBAdapter;
 
+import java.io.IOException;
+
 @Slf4j
 @Singleton
 @Requires(bean = ESBAdapter.class)
 class SendEventsOnCommit {
+  @Inject
+  ObjectMapper mapper;
+
   @Inject
   ESBAdapter esb;
 
@@ -35,5 +41,14 @@ class SendEventsOnCommit {
   public void afterCommit(String event) {
     log.info("Sending {} events triggered by {}.", ApizedContext.getEvent().getEvents().size(), event);
     ApizedContext.getEvent().getEvents().values().forEach(esb::send);
+    if (log.isDebugEnabled()) {
+      ApizedContext.getEvent().getEvents().values().forEach(it -> {
+        try {
+          log.debug("{}: {}", it.getTopic(), mapper.writerWithDefaultPrettyPrinter().writeValueAsString(it.getPayload()));
+        } catch (IOException e) {
+          //Do nothing
+        }
+      });
+    }
   }
 }

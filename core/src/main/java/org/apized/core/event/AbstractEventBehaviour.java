@@ -16,6 +16,7 @@
 
 package org.apized.core.event;
 
+import org.apized.core.ApizedConfig;
 import org.apized.core.ModelMapper;
 import org.apized.core.ScopeHelper;
 import org.apized.core.behaviour.BehaviourHandler;
@@ -33,15 +34,17 @@ public abstract class AbstractEventBehaviour implements BehaviourHandler<Model> 
 
   @Override
   public void process(Class<Model> type, When when, Action action, Execution<Model> execution) {
-    Model model = execution.getInput();
+    Model model = execution.getOutput();
     ScopeHelper.scopeUpUntil(
       model,
       a -> a.booleanValue("event").orElse(true),
-      i -> ApizedContext.getEvent().add(new Event(
-        ApizedContext.getRequest().getId(),
-        String.format("%s.%s.%s", "micronaut", type.getSimpleName().toLowerCase(), type.equals(i.getClass()) ? action.getType() : Action.UPDATE),
-        modelMapper.createMapOf(model)
-      ))
+      i -> ApizedContext.getEvent().add(
+        new Event(
+          ApizedContext.getRequest().getId(),
+          String.format("%s.%s.%sd", ApizedConfig.getInstance().getSlug(), type.getSimpleName().toLowerCase(), (type.equals(i.getClass()) ? action.getType() : Action.UPDATE)).toLowerCase(),
+          modelMapper.createMapOf(model)
+        )
+      )
     );
   }
 }

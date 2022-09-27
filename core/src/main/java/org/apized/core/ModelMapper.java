@@ -80,13 +80,25 @@ public class ModelMapper {
   }
 
   private Map<String, Object> getObjectMap(List<String> included, Object it) {
-    Map<String, Object> subResult = new HashMap<>();
+    Map<String, Object> result = new HashMap<>();
     for (String subFieldName : included) {
       BeanWrapper<Object> subWrapper = BeanWrapper.getWrapper(it);
       BeanIntrospection<Object> subIntrospection = subWrapper.getIntrospection();
-      subResult.put(subFieldName, subWrapper.getProperty(subFieldName, subIntrospection.getProperty(subFieldName).get().getType()).orElse(null));
+      if (subFieldName.contains(".")) {
+        List<String> split = List.of(subFieldName.split("\\."));
+        String directSubField = split.get(0);
+        String subSubField = String.join(".", split.subList(1, split.size()));
+        Map<String, Object> subResult = getObjectMap(List.of(subSubField), subWrapper.getProperty(directSubField, subIntrospection.getProperty(directSubField).get().getType()).orElse(null));
+        if (result.containsKey(directSubField)) {
+          ((Map<String, Object>) result.get(directSubField)).putAll(subResult);
+        } else {
+          result.put(directSubField, subResult);
+        }
+      } else {
+        result.put(subFieldName, subWrapper.getProperty(subFieldName, subIntrospection.getProperty(subFieldName).get().getType()).orElse(null));
+      }
     }
-    return subResult;
+    return result;
   }
 
   private Object retrieveValueFrom(Object it) {

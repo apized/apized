@@ -207,7 +207,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                   String injectName = StringHelper.uncapitalize(extension.getSimpleName().toString());
                   extensionBindings.get("service").get("injects").add(String.format("%s %s", extension.getQualifiedName().toString(), injectName));
                   extensionBindings.get("service").get("methods").addAll(
-                    methods.stream().map(m ->
+                    methods.stream().filter(m->m.getModifiers().contains(Modifier.PUBLIC)).map(m ->
                       Map.of(
                         "returnType", m.getReturnType().toString(),
                         "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
@@ -226,7 +226,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                   extensionBindings.get("repository").get("imports").add(extension.getQualifiedName().toString());
                   extensionBindings.get("repository").get("implements").add(extension.getSimpleName().toString());
                   extensionBindings.get("service").get("methods").addAll(
-                    methods.stream().map(m ->
+                    methods.stream().filter(m->m.getModifiers().contains(Modifier.PUBLIC)).map(m ->
                       Map.of(
                         "returnType", m.getReturnType().toString(),
                         "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),

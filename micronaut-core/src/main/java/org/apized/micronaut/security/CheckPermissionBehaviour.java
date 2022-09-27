@@ -16,10 +16,10 @@
 
 package org.apized.micronaut.security;
 
+import org.apized.core.ApizedConfig;
 import org.apized.core.behaviour.BehaviourManager;
 import org.apized.core.security.AbstractCheckPermissionBehaviour;
 import org.apized.core.security.UserResolver;
-import org.apized.micronaut.core.ApizedConfig;
 import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Singleton;
 

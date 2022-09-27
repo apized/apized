@@ -23,7 +23,9 @@ import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.DataType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apized.core.audit.annotation.AuditIgnore;
 import org.apized.core.context.ApizedContext;
+import org.apized.core.event.annotation.EventIgnore;
 import org.apized.core.federation.Federation;
 
 import java.time.LocalDateTime;
@@ -44,6 +46,8 @@ public abstract class BaseModel implements Model {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private UUID id;
 
+  @AuditIgnore
+  @EventIgnore
   @Version
   private Long version = 0L;
 

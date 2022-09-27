@@ -19,10 +19,10 @@ package org.apized.micronaut.federation;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apized.core.ApizedConfig;
 import org.apized.core.federation.AbstractFederationResolver;
 import org.apized.core.model.Model;
 import org.apized.core.mvc.AbstractModelService;
-import org.apized.micronaut.core.ApizedConfig;
 
 import java.net.URI;
 import java.net.http.HttpClient;

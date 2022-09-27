@@ -33,7 +33,9 @@ public class ScopeHelper {
     }
 
     BeanWrapper<T> wrapper = BeanWrapper.getWrapper(instance);
-    BeanIntrospection<T> introspection = wrapper.getIntrospection();
+    BeanIntrospection<T> introspection = instance.getClass().getSimpleName().endsWith("$Proxy")
+      ? BeanIntrospection.getIntrospection((Class<T>) instance.getClass().getSuperclass())
+      : wrapper.getIntrospection();
     AnnotationValue<Apized> annotation = introspection.getAnnotation(Apized.class);
 
     if (annotation == null) {

@@ -37,7 +37,7 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
 
   @Override
   public void process(Class<Model> type, When when, Action action, Execution<Model> execution) {
-    Model model = execution.getInput();
+    Model model = execution.getOutput();
     ScopeHelper.scopeUpUntil(
       model,
       a -> a.booleanValue("audit").orElse(true),
