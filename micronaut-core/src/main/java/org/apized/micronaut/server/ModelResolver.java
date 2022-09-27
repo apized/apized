@@ -16,6 +16,7 @@ import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,7 +65,7 @@ public class ModelResolver {
       } else {
         terms.add(new SearchTerm(StringHelper.uncapitalize(StringHelper.pluralize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, List.of(selfId)));
       }
-      return service.list(terms, subSort).getContent();
+      return service.list(terms, subSort, true).getContent();
     } else if (otherId != null) {
       return service.find(otherId);
     } else {

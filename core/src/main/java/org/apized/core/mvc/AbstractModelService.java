@@ -53,8 +53,8 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
   }
 
   @Override
-  public Page<T> list(List<SearchTerm> search, List<SortTerm> sort) {
-    return getRepository().search(search, sort);
+  public Page<T> list(List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
+    return getRepository().search(search, sort, skipAutoFilters);
   }
 
   @Override

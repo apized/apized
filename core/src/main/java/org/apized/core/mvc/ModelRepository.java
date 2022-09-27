@@ -30,7 +30,7 @@ public interface ModelRepository<T extends Model> {
 
   Optional<T> searchOne(List<SearchTerm> search);
 
-  Page<T> search(List<SearchTerm> search, List<SortTerm> sort);
+  Page<T> search(List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters);
 
   Optional<T> get(UUID id);
 

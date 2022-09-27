@@ -29,14 +29,18 @@ import java.util.UUID;
 
 public interface ModelService<T extends Model> {
   default List<T> searchAll(SearchTerm... search) {
-    return searchAll(Arrays.asList(search));
+    return searchAll(Arrays.asList(search), false);
   }
 
-  default List<T> searchAll(List<SearchTerm> search) {
-    return list(search, List.of()).getContent();
+ default List<T> searchAll(boolean skipAutoFilters, SearchTerm... search) {
+    return searchAll(Arrays.asList(search), skipAutoFilters);
   }
 
-  default Page<T> list(List<SearchTerm> search, List<SortTerm> sort) {
+  default List<T> searchAll(List<SearchTerm> search, boolean skipAutoFilters) {
+    return list(search, List.of(), skipAutoFilters).getContent();
+  }
+
+  default Page<T> list(List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
     throw new NotImplementedException();
   }
 

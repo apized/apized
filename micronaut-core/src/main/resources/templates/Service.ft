@@ -49,8 +49,8 @@ public class ${type}Service extends AbstractModelService<${type}> {
   }
 
   @Override
-  public Page<${type}> list(List<SearchTerm> search, List<SortTerm> sort) {
-    Page<${type}> list = super.list(search, sort);
+  public Page<${type}> list(List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
+    Page<${type}> list = super.list(search, sort, skipAutoFilters);
     list.setContent(
       list.getContent().stream().map(it->
         (${type}) new ${type}${d}Proxy(it)

@@ -43,6 +43,10 @@ public abstract class RepositoryHelper {
   public static ApizedConfig config;
 
   public static <T extends Model> QuerySpecification<T> getQuerySpecification(List<SearchTerm> search) {
+    return getQuerySpecification(search, false);
+  }
+
+  public static <T extends Model> QuerySpecification<T> getQuerySpecification(List<SearchTerm> search, boolean skipAutoFilters) {
     QuerySpecification<T> spec = (root, query, builder) -> {
       List<Predicate> criteria = new ArrayList<>();
 
@@ -50,30 +54,32 @@ public abstract class RepositoryHelper {
       AnnotationValue<Apized> apized = introspection.getAnnotation(Apized.class);
       Map<String, UUID> pathVariables = ApizedContext.getRequest().getPathVariables();
 
-      //todo this probably needs to be recursive
-      Arrays.stream(apized.classValues("scope")).forEach(s -> {
-        String uncapitalize = StringHelper.uncapitalize(s.getSimpleName());
-        if (pathVariables.get(uncapitalize) != null || !ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + uncapitalize + ".get")) {
-          search.add(new SearchTerm(uncapitalize, SearchOperation.eq, pathVariables.get(uncapitalize)));
+      if (!skipAutoFilters) {
+        //todo this probably needs to be recursive
+        Arrays.stream(apized.classValues("scope")).forEach(s -> {
+          String uncapitalize = StringHelper.uncapitalize(s.getSimpleName());
+          if (pathVariables.get(uncapitalize) != null || !ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + uncapitalize + ".get")) {
+            search.add(new SearchTerm(uncapitalize, SearchOperation.eq, pathVariables.get(uncapitalize)));
 
-          BeanIntrospection.getIntrospection(s).getBeanProperties().stream()
-            .filter(p -> p.getAnnotation(Owner.class) != null)
-            .forEach(p -> {
-              if (!ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
-                search.add(new SearchTerm(uncapitalize + "." + p.getName(), SearchOperation.eq, ApizedContext.getSecurity().getUser().getId()));
-              }
-            });
-        }
-      });
-
-      introspection.getBeanProperties()
-        .stream()
-        .filter(p -> p.getAnnotation(Owner.class) != null)
-        .forEach(p -> {
-          if (!ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
-            search.add(new SearchTerm(p.getName(), SearchOperation.eq, ApizedContext.getSecurity().getUser().getId()));
+            BeanIntrospection.getIntrospection(s).getBeanProperties().stream()
+              .filter(p -> p.getAnnotation(Owner.class) != null)
+              .forEach(p -> {
+                if (!ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
+                  search.add(new SearchTerm(uncapitalize + "." + p.getName(), SearchOperation.eq, ApizedContext.getSecurity().getUser().getId()));
+                }
+              });
           }
         });
+
+        introspection.getBeanProperties()
+          .stream()
+          .filter(p -> p.getAnnotation(Owner.class) != null)
+          .forEach(p -> {
+            if (!ApizedContext.getSecurity().getUser().isAllowed(config.getSlug() + "." + StringHelper.uncapitalize(introspection.getBeanType().getSimpleName()) + ".get")) {
+              search.add(new SearchTerm(p.getName(), SearchOperation.eq, ApizedContext.getSecurity().getUser().getId()));
+            }
+          });
+      }
 
       for (SearchTerm searchTerm : search) {
         String field = searchTerm.getField();
