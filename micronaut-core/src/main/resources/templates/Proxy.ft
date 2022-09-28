@@ -12,10 +12,6 @@ public class ${type}${d}Proxy extends ${type} {
   private boolean built = false;
   private Map<String, Object> resolutions = new HashMap<>();
 
-  public ${type}${d}Proxy() {
-    super();
-  }
-
   public ${type}${d}Proxy($type it) {
     BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
     BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);

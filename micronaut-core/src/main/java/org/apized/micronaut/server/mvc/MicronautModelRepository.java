@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Proxied
 public interface MicronautModelRepository<T extends Model> extends ModelRepository<T>, PageableRepository<T, UUID>, JpaSpecificationExecutor<T> {
   @Override
   default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {

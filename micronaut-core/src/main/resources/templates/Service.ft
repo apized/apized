@@ -50,18 +50,12 @@ public class ${type}Service extends AbstractModelService<${type}> {
 
   @Override
   public Page<${type}> list(List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
-    Page<${type}> list = super.list(search, sort, skipAutoFilters);
-    list.setContent(
-      list.getContent().stream().map(it->
-        (${type}) new ${type}${d}Proxy(it)
-      ).toList()
-    );
-    return list;
+    return super.list(search, sort, skipAutoFilters);
   }
 
   @Override
   public ${type} find(UUID id) {
-    return new ${type}${d}Proxy(super.find(id));
+    return super.find(id);
   }
 
   #if($actions.contains('LIST'))
@@ -71,13 +65,7 @@ public class ${type}Service extends AbstractModelService<${type}> {
     @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.LIST)
   )
   public Page<${type}> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
-    Page<${type}> list = super.list(page, pageSize, search, sort);
-    list.setContent(
-      list.getContent().stream().map(it->
-        (${type}) new ${type}${d}Proxy(it)
-      ).toList()
-    );
-    return list;
+    return super.list(page, pageSize, search, sort);
   }
 #end
 #if($actions.contains('GET'))
@@ -87,7 +75,7 @@ public class ${type}Service extends AbstractModelService<${type}> {
     @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.GET)
   )
   public ${type} get(UUID id) {
-    return new ${type}${d}Proxy(super.get(id));
+    return super.get(id);
   }
 #end
 #if($actions.contains('CREATE'))
@@ -97,7 +85,7 @@ public class ${type}Service extends AbstractModelService<${type}> {
     @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.CREATE)
   )
   public ${type} create(${type} it) {
-    return new ${type}${d}Proxy(super.create(it));
+    return super.create(it);
   }
 #end
 #if($actions.contains('UPDATE'))
@@ -107,7 +95,7 @@ public class ${type}Service extends AbstractModelService<${type}> {
     @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.UPDATE)
   )
   public ${type} update(UUID id, ${type} it) {
-    return new ${type}${d}Proxy(super.update(id, it));
+    return super.update(id, it);
   }
 #end
 #if($actions.contains('DELETE'))
@@ -117,29 +105,14 @@ public class ${type}Service extends AbstractModelService<${type}> {
     @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.DELETE)
   )
   public ${type} delete(UUID id) {
-    return new ${type}${d}Proxy(super.delete(id));
+    return super.delete(id);
   }
 #end
 #foreach( $it in $extension.service.methods )
 
   public ${it.returnType} ${it.name}(${it.parameters}){
 #if($it.returnType != "void")
-#if($it.isModel)
-    return new ${it.returnType}${d}Proxy(${it.callee}.${it.name}(${it.arguments}));
-#elseif($it.isCollection)
-    return ${it.callee}.${it.name}(${it.arguments})
-      .stream()
-      .map(it -> (${it.returnTypeWrappedParameter}) new ${it.returnTypeWrappedParameter}${d}Proxy(it))
-      .toList();
-#elseif($it.isOptional)
-    ${it.returnType} result = ${it.callee}.${it.name}(${it.arguments});
-    if(result.isPresent()){
-      result = Optional.ofNullable(new ${it.returnTypeWrappedParameter}${d}Proxy(result.get()));
-    }
-    return result;
-#else
     return ${it.callee}.${it.name}(${it.arguments});
-#end
 #else
     ${it.callee}.${it.name}(${it.arguments});
 #end

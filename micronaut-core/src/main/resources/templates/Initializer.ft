@@ -1,3 +1,4 @@
+#set ( $d = "$")
 package org.apized.core.init;
 
 import io.micronaut.context.ApplicationContext;
@@ -15,7 +16,7 @@ import org.apized.core.model.Model;
 import org.apized.core.model.When;
 import org.apized.micronaut.context.MicronautContextProvider;
 import org.apized.micronaut.server.ModelResolver;
-import org.apized.micronaut.server.mvc.RepositoryHelper;
+import org.apized.micronaut.server.mvc.ApizedProxiedInterceptor;
 
 import java.util.List;
 
@@ -31,6 +32,9 @@ public class Initializer {
   @Inject
   BehaviourManager manager;
 
+  @Inject
+  ApizedProxiedInterceptor interceptor;
+
 #foreach( $it in $behaviours )
   @Inject
   ${it.module}.${it.type} ${it.name};
@@ -44,6 +48,10 @@ public class Initializer {
     ApizedContext.provider = new MicronautContextProvider();
     ApizedConfig.setInstance(config);
     ModelResolver.applicationContext = applicationContext;
+
+    #foreach( $it in $entities )
+    interceptor.addProxyMapping(${it}.class, ${it}${d}Proxy.class);
+    #end
 
     #foreach( $it in $behaviours )
     manager.registerBehaviour(${it.annotation.module}.${it.annotation.model}.class, Layer.${it.annotation.layer}, List.of(#expandEnumList('When', ${it.annotation.when})), List.of(#expandEnumList('Action', ${it.annotation.actions})), ${it.annotation.order}, ${it.name});

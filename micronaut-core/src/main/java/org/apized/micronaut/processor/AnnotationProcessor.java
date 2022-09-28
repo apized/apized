@@ -16,10 +16,6 @@
 
 package org.apized.micronaut.processor;
 
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.Trees;
 import jakarta.persistence.Transient;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -72,15 +68,15 @@ public class AnnotationProcessor extends AbstractProcessor {
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     if (isInitialized()) {
-      processApis(roundEnv);
+      List<? extends Element> entities = processApis(roundEnv);
       processFederations(roundEnv);
-      processBehaviours(roundEnv);
+      processInitializer(roundEnv, entities);
     }
 
     return false;
   }
 
-  private void processBehaviours(RoundEnvironment roundEnv) {
+  private void processInitializer(RoundEnvironment roundEnv, List<? extends Element> entities) {
     ProcessingEnvironment env = processingEnv;
     List<Map<String, Object>> behaviours = roundEnv.getElementsAnnotatedWith(Behaviour.class).stream().map(it -> {
         if (it.getKind() != ElementKind.CLASS) {
@@ -107,12 +103,13 @@ public class AnnotationProcessor extends AbstractProcessor {
       .filter(Objects::nonNull)
       .toList();
 
-    if (behaviours.size() > 0) {
+    if (behaviours.size() > 0 || entities.size() > 0) {
       generateClassFor(
         "org.apized.core.init.Initializer",
         "Initializer",
         new HashMap<>(
           Map.of(
+            "entities", entities.stream().map(e -> ((TypeElement)e).getQualifiedName().toString()).toList(),
             "behaviours", behaviours
           )
         )
@@ -130,7 +127,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     return null;
   }
 
-  private void processApis(RoundEnvironment roundEnv) {
+  private List<? extends Element> processApis(RoundEnvironment roundEnv) {
     List<? extends Element> generated = roundEnv.getElementsAnnotatedWith(Apized.class).stream().filter(it -> {
       if (it.getKind() != ElementKind.CLASS) {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Not a class", it);
@@ -207,7 +204,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                   String injectName = StringHelper.uncapitalize(extension.getSimpleName().toString());
                   extensionBindings.get("service").get("injects").add(String.format("%s %s", extension.getQualifiedName().toString(), injectName));
                   extensionBindings.get("service").get("methods").addAll(
-                    methods.stream().filter(m->m.getModifiers().contains(Modifier.PUBLIC)).map(m ->
+                    methods.stream().filter(m -> m.getModifiers().contains(Modifier.PUBLIC)).map(m ->
                       Map.of(
                         "returnType", m.getReturnType().toString(),
                         "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
@@ -226,7 +223,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                   extensionBindings.get("repository").get("imports").add(extension.getQualifiedName().toString());
                   extensionBindings.get("repository").get("implements").add(extension.getSimpleName().toString());
                   extensionBindings.get("service").get("methods").addAll(
-                    methods.stream().filter(m->m.getModifiers().contains(Modifier.PUBLIC)).map(m ->
+                    methods.stream().filter(m -> m.getModifiers().contains(Modifier.PUBLIC)).map(m ->
                       Map.of(
                         "returnType", m.getReturnType().toString(),
                         "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
@@ -277,6 +274,7 @@ public class AnnotationProcessor extends AbstractProcessor {
       processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Generated %d APIs", generated.size()));
       generateClassFor("org.apized.micronaut.audit.MicronautAuditEntryRepository", "audit/Repository", Map.of("module", "org.apized.micronaut.audit"));
     }
+    return generated;
   }
 
   private void processFederations(RoundEnvironment roundEnv) {
