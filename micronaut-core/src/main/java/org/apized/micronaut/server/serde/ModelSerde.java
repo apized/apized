@@ -30,10 +30,7 @@ import io.micronaut.core.type.DefaultArgument;
 import io.micronaut.serde.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import org.apized.core.MapHelper;
 import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
@@ -41,16 +38,12 @@ import org.apized.core.context.SerdeContext;
 import org.apized.core.federation.Federation;
 import org.apized.core.model.*;
 import org.apized.core.mvc.ModelService;
-import org.apized.core.search.SearchHelper;
-import org.apized.core.search.SearchOperation;
-import org.apized.core.search.SearchTerm;
-import org.apized.core.search.SortTerm;
 import org.apized.core.security.annotation.Owner;
 import org.apized.micronaut.federation.FederationResolver;
+import org.apized.micronaut.server.ModelResolver;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Singleton
 public class ModelSerde implements Serde<Model> {
@@ -247,7 +240,19 @@ public class ModelSerde implements Serde<Model> {
           wrapper.getProperty(property.getName(), Object.class).orElse(null),
           MapHelper.flatten(subFields).keySet()
         );
-      } else { //todo filter, sort & sizes
+      } else if (!Page.class.isAssignableFrom(type.getType()) && isModel && (search.containsKey(property.getName()) || sort.containsKey(property.getName()))) {
+        //noinspection RedundantCast
+        val = ModelResolver.getModelValue(
+          (Class<? extends BaseModel>) (Class<?>) wrapper.getIntrospection().getBeanType(),
+          property.getName(),
+          value.getId(),
+          Collection.class.isAssignableFrom(property.getType())
+            ? null
+            : wrapper.getProperty("id", UUID.class).orElse(null),
+          search,
+          sort
+        );
+      } else {
         val = wrapper.getProperty(property.getName(), Object.class).orElse(null);
       }
 
