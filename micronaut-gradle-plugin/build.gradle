@@ -41,7 +41,7 @@ gradlePlugin {
 
 task generateResources {
   ext {
-    propFile = file("$buildDir/generated/gradle.properties")
+    propFile = file("$buildDir/generated/apized.properties")
   }
   outputs.file propFile
   doLast {

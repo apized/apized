@@ -39,7 +39,7 @@ public class ApizedPlugin implements Plugin<Project> {
     try {
       Properties myProperties = new Properties();
       Properties apizedProperties = new Properties();
-      myProperties.load(getClass().getClassLoader().getResourceAsStream("gradle.properties"));
+      myProperties.load(getClass().getClassLoader().getResourceAsStream("apized.properties"));
       String apizedVersion = myProperties.getProperty("version");
       String micronautVersion = myProperties.getProperty("micronautVersion");
 
