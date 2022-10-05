@@ -3,6 +3,7 @@ package org.apized.micronaut.server.mvc;
 import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
 import io.micronaut.core.beans.BeanIntrospection;
+import io.micronaut.data.model.Page;
 import jakarta.inject.Singleton;
 
 import java.util.Collection;
@@ -22,7 +23,18 @@ public class ApizedProxiedInterceptor implements MethodInterceptor<Object, Objec
   public Object intercept(MethodInvocationContext<Object, Object> context) {
     Object result = context.proceed();
     if (result != null) {
-      if (
+      if(Page.class.isAssignableFrom(result.getClass())){
+        Page<?> page = (Page<?>) result;
+        result = Page.of(
+          page.getContent().stream().map(it ->
+            BeanIntrospection.getIntrospection(
+              entities.get(context.getReturnType().asArgument().getFirstTypeVariable().get().getType())
+            ).instantiate(it)
+          ).toList(),
+          page.getPageable(),
+          page.getTotalSize()
+        );
+      }else if (
         Optional.class.isAssignableFrom(result.getClass()) &&
         entities.containsKey(context.getReturnType().asArgument().getFirstTypeVariable().get().getType()) &&
         ((Optional<?>) result).isPresent()
