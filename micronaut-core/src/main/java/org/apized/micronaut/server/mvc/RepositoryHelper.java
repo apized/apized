@@ -24,6 +24,7 @@ import io.micronaut.data.model.Sort;
 import io.micronaut.data.model.jpa.criteria.PersistentEntityFrom;
 import io.micronaut.data.model.runtime.RuntimePersistentEntity;
 import io.micronaut.data.repository.jpa.criteria.QuerySpecification;
+import io.micronaut.data.runtime.criteria.RuntimeCriteriaBuilder;
 import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Predicate;
 import org.apized.core.ApizedConfig;
@@ -117,7 +118,10 @@ public abstract class RepositoryHelper {
               criteria.add(builder.notEqual(from.get(field), value));
             }
           }
-          case like -> criteria.add(builder.like(from.get(field), "%" + value.toString() + "%"));
+          case like -> criteria.add(((RuntimeCriteriaBuilder) builder).ilikeString(
+            from.get(field),
+            builder.literal("%" + value.toString() + "%"))
+          );
           case gt -> criteria.add(builder.greaterThan(from.get(field), (Comparable) value));
           case gte -> criteria.add(builder.greaterThanOrEqualTo(from.get(field), (Comparable) value));
           case lt -> criteria.add(builder.lessThan(from.get(field), (Comparable) value));
