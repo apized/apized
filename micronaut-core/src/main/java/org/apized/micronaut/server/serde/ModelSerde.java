@@ -92,7 +92,7 @@ public class ModelSerde implements Serde<Model> {
           //noinspection ConstantConditions
           String property = p.getAnnotation(ApiContext.class).getRequiredValue("property", String.class);
           return (peekedPropertyType.equals(p.getType())
-                  || peekedValue.getClass().equals(p.getType())) && (property.isEmpty() || peekedProperty.getName().equals(property));
+            || peekedValue.getClass().equals(p.getType())) && (property.isEmpty() || peekedProperty.getName().equals(property));
         })
         .forEach(p -> deserializationWrapper.setProperty(p.getName(), peekedValue));
     }
@@ -125,10 +125,10 @@ public class ModelSerde implements Serde<Model> {
       Optional<? extends BeanProperty<? super Model, Object>> propOpt = introspection.getProperty(key);
       if (
         propOpt.isPresent()
-        && propOpt.get().getAnnotation(JsonIgnore.class) == null
-        && (
+          && propOpt.get().getAnnotation(JsonIgnore.class) == null
+          && (
           propOpt.get().getAnnotation(JsonProperty.class) == null
-          || !propOpt.get().getAnnotation(JsonProperty.class)
+            || !propOpt.get().getAnnotation(JsonProperty.class)
             .enumValue("access", JsonProperty.Access.class)
             .get()
             .equals(JsonProperty.Access.READ_ONLY)
@@ -214,7 +214,7 @@ public class ModelSerde implements Serde<Model> {
       .filter(p -> !p.getAnnotationMetadata().hasAnnotation(JsonIgnore.class))
       .filter(p ->
         !p.getAnnotationMetadata().hasAnnotation(JsonProperty.class)
-        || !p.getAnnotationMetadata().getAnnotation(JsonProperty.class)
+          || !p.getAnnotationMetadata().getAnnotation(JsonProperty.class)
           .enumValue("access", JsonProperty.Access.class)
           .get()
           .equals(JsonProperty.Access.WRITE_ONLY)
@@ -248,7 +248,7 @@ public class ModelSerde implements Serde<Model> {
           value.getId(),
           Collection.class.isAssignableFrom(property.getType())
             ? null
-            : wrapper.getProperty("id", UUID.class).orElse(null),
+            : wrapper.getProperty(property.getName(), Model.class).orElseThrow().getId(),
           search,
           sort
         );
