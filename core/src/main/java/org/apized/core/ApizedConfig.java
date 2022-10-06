@@ -43,6 +43,11 @@ public class ApizedConfig {
   private String slug;
 
   /**
+   * The cookie name to look for a security token.
+   */
+  private String cookie = "token";
+
+  /**
    * The token for this application to use. Only needed if security is enabled (by providing an implementation of UserResolver)
    */
   private String token;

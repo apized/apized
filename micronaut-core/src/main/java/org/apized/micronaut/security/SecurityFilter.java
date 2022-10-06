@@ -16,6 +16,7 @@
 
 package org.apized.micronaut.security;
 
+import org.apized.core.ApizedConfig;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.context.SecurityContext;
 import org.apized.core.security.UserResolver;
@@ -35,6 +36,9 @@ import org.reactivestreams.Publisher;
 @Requires(bean = UserResolver.class)
 public class SecurityFilter implements HttpServerFilter {
   @Inject
+  ApizedConfig config;
+
+  @Inject
   UserResolver resolver;
 
   @Override
@@ -47,7 +51,7 @@ public class SecurityFilter implements HttpServerFilter {
         if (authorization != null) {
           token = authorization.replaceAll("Bearer (.*)", "$1");
         } else {
-          token = request.getCookies().findCookie("token").orElse(new SimpleCookie("token", null)).getValue();
+          token = request.getCookies().findCookie(config.getCookie()).orElse(new SimpleCookie(config.getCookie(), null)).getValue();
         }
         ApizedContext.getSecurity().setToken(token);
         long start = System.currentTimeMillis();
