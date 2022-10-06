@@ -18,6 +18,7 @@ package org.apized.micronaut.server.mvc;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanIntrospection;
+import io.micronaut.core.beans.BeanProperty;
 import io.micronaut.data.annotation.Join;
 import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.Sort;
@@ -88,7 +89,11 @@ public abstract class RepositoryHelper {
 
         if (field.contains(".")) {
           List<String> split = List.of(searchTerm.getField().split("\\."));
-          AnnotationValue<TypeDef> json = introspection.getProperty(split.get(0)).get().getAnnotation(TypeDef.class);
+          Optional<BeanProperty<Model, Object>> property = introspection.getProperty(split.get(0));
+
+          if(property.isEmpty()) continue;
+
+          AnnotationValue<TypeDef> json = property.get().getAnnotation(TypeDef.class);
           if (json == null) {
             from = ((PersistentEntityFrom<?, ?>) root).join(split.get(0), Join.Type.INNER);
             field = split.get(1);

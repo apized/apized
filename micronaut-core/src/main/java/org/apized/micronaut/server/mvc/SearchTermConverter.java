@@ -29,10 +29,6 @@ class SearchTermConverter implements TypeConverter<String, SearchTerm> {
 
   @Override
   public Optional<SearchTerm> convert(String term, Class<SearchTerm> targetType, ConversionContext context) {
-    SearchTerm convert = SearchHelper.convertTerm(term);
-    if (convert != null && convert.getField().contains(".")) {
-      convert = null;
-    }
-    return Optional.ofNullable(convert);
+    return Optional.ofNullable(SearchHelper.convertTerm(term));
   }
 }
