@@ -1,6 +1,7 @@
 #set ( $d = "$")
 package $module;
 
+import lombok.Generated;
 import org.apized.core.behaviour.annotation.BehaviourExecution;
 import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Generated
 @Introspected
 @Singleton
 public class ${type}Service extends AbstractModelService<${type}> {

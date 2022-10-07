@@ -3,10 +3,12 @@ package ${module};
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.beans.BeanWrapper;
+import lombok.Generated;
 import org.apized.micronaut.server.ModelResolver;
 
 import java.util.*;
 
+@Generated
 @Introspected
 public class ${type}${d}Proxy extends ${type} {
   private boolean built = false;

@@ -7,6 +7,7 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.runtime.server.event.ServerStartupEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.Generated;
 import org.apized.core.ApizedConfig;
 import org.apized.core.behaviour.BehaviourManager;
 import org.apized.core.context.ApizedContext;
@@ -20,6 +21,7 @@ import org.apized.micronaut.server.mvc.ApizedProxiedInterceptor;
 
 import java.util.List;
 
+@Generated
 @Singleton
 @Requires(classes = BehaviourManager.class)
 public class Initializer {

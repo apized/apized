@@ -1,5 +1,6 @@
 package ${module};
 
+import lombok.Generated;
 import org.apized.core.model.Model;
 import org.apized.micronaut.server.serde.ModelSerde;
 import io.micronaut.core.type.Argument;
@@ -9,6 +10,7 @@ import jakarta.inject.Inject;
 
 import java.io.IOException;
 
+@Generated
 public class ${type}Deserializer implements Deserializer<${type}> {
   @Inject
   ModelSerde serde;
