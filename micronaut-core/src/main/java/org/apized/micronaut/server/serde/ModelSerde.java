@@ -233,13 +233,29 @@ public class ModelSerde implements Serde<Model> {
       AnnotationValue<Federation> federation = property.getAnnotation(Federation.class);
       if (federation != null) {
         Map<String, Object> subFields = (Map<String, Object>) Optional.ofNullable(fields.get(property.getName())).orElse(Map.of());
-        val = resolver.resolve(
-          federation.stringValue("value").orElse(null),
-          federation.stringValue("type").orElse(null),
-          federation.stringValue("uri").orElse(null),
-          wrapper.getProperty(property.getName(), Object.class).orElse(null),
-          MapHelper.flatten(subFields).keySet()
-        );
+        if (isCollection) {
+          subType = Argument.of(Map.class, String.class, Object.class);
+          val = ((Collection<Model>) wrapper.getProperty(property.getName(), Object.class).orElse(List.of()))
+            .stream()
+            .map(it ->
+              resolver.resolve(
+                federation.stringValue("value").orElse(null),
+                federation.stringValue("type").orElse(null),
+                federation.stringValue("uri").orElse(null),
+                it,
+                MapHelper.flatten(subFields).keySet()
+              )
+            )
+            .toList();
+        } else {
+          val = resolver.resolve(
+            federation.stringValue("value").orElse(null),
+            federation.stringValue("type").orElse(null),
+            federation.stringValue("uri").orElse(null),
+            wrapper.getProperty(property.getName(), Object.class).orElse(null),
+            MapHelper.flatten(subFields).keySet()
+          );
+        }
       } else if (!Page.class.isAssignableFrom(type.getType()) && isModel && (search.containsKey(property.getName()) || sort.containsKey(property.getName()))) {
         //noinspection RedundantCast
         val = ModelResolver.getModelValue(
