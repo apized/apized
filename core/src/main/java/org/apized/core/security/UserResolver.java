@@ -26,4 +26,6 @@ public interface UserResolver {
   User getUser(UUID userId);
 
   User ensureUser(User user);
+
+  String generateToken(User user, boolean expiring);
 }
