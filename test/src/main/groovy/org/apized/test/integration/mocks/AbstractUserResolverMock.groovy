@@ -59,4 +59,9 @@ abstract class AbstractUserResolverMock implements UserResolver {
     }
     resolved ?: user
   }
+
+  @Override
+  String generateToken(User user, boolean expiring) {
+    ''
+  }
 }
