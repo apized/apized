@@ -48,4 +48,9 @@ public class MemoryUserResolver implements UserResolver {
   public User ensureUser(User user) {
     return user;
   }
+
+  @Override
+  public String generateToken(User user, boolean expiring) {
+    return "";
+  }
 }
