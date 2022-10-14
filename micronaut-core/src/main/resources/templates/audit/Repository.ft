@@ -7,5 +7,5 @@ import io.micronaut.data.repository.CrudRepository;
 
 import java.util.UUID;
 
-@JdbcRepository(dialect = Dialect.POSTGRES)
+@JdbcRepository(dialect = Dialect.${dialect})
 public interface MicronautAuditEntryRepository extends AuditEntryRepository {}

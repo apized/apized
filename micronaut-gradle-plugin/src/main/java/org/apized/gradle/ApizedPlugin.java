@@ -18,6 +18,7 @@ package org.apized.gradle;
 
 import io.micronaut.gradle.MicronautApplicationPlugin;
 import io.micronaut.gradle.MicronautExtension;
+import org.apized.core.Dialect;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -38,7 +39,6 @@ public class ApizedPlugin implements Plugin<Project> {
   public void apply(Project project) {
     try {
       Properties myProperties = new Properties();
-      Properties apizedProperties = new Properties();
       myProperties.load(getClass().getClassLoader().getResourceAsStream("apized.properties"));
       String apizedVersion = myProperties.getProperty("version");
       String micronautVersion = myProperties.getProperty("micronautVersion");
@@ -74,20 +74,39 @@ public class ApizedPlugin implements Plugin<Project> {
 
       project.getDependencies().add("annotationProcessor", String.format("org.apized:micronaut-core:%s", apizedVersion));
       project.getDependencies().add("implementation", String.format("org.apized:micronaut-core:%s", apizedVersion));
+
+      project.getDependencies().add("runtimeOnly", "ch.qos.logback:logback-classic");
+      //todo ideally we don't want this and the above is sufficient but right now the tests require a slf4j 2.0 compatible lib
+      project.getDependencies().add("testRuntimeOnly", "ch.qos.logback:logback-classic:1.4.4");
       project.getDependencies().add("testImplementation", String.format("org.apized:micronaut-test:%s", apizedVersion));
 
+      Properties apizedProperties = new Properties();
       File file = project.file("apized.properties");
-      if (!file.exists()) {
-        throw new GradleException("Missing file apized.properties on the project root folder");
+      if (file.exists()) {
+        apizedProperties.load(new FileInputStream(file));
+      } else {
+        System.out.println("Missing file apized.properties. Using ANSI as default dialect");
       }
-      apizedProperties.load(new FileInputStream(file));
-      switch (Dialect.valueOf(apizedProperties.getProperty("dialect"))) {
-        case POSTGRES -> {
-          project.getDependencies().add("implementation", "io.micronaut.data:micronaut-data-jdbc");
-          project.getDependencies().add("runtimeOnly", "org.postgresql:postgresql");
-          project.getDependencies().add("runtimeOnly", "io.micronaut.sql:micronaut-jdbc-hikari");
+
+      project.getDependencies().add("implementation", "io.micronaut.data:micronaut-data-jdbc");
+      project.getDependencies().add("runtimeOnly", "io.micronaut.sql:micronaut-jdbc-hikari");
+      project.getDependencies().add("runtimeOnly", "io.micronaut.flyway:micronaut-flyway");
+
+      switch (Dialect.valueOf(apizedProperties.getProperty("dialect", "ANSI"))) {
+        case H2 -> project.getDependencies().add("runtimeOnly", "com.h2database:h2");
+        case MYSQL -> {
+          project.getDependencies().add("runtimeOnly", "mysql:mysql-connector-java");
+          project.getDependencies().add("runtimeOnly", "org.flywaydb:flyway-mysql");
         }
-        default -> throw new IOException("Invalid Dialect: " + apizedProperties.getProperty("dialect"));
+        case POSTGRES -> project.getDependencies().add("runtimeOnly", "org.postgresql:postgresql");
+        case ORACLE -> {
+          project.getDependencies().add("runtimeOnly", "com.oracle.database.jdbc:ojdbc8");
+
+        }
+        case SQL_SERVER -> {
+          project.getDependencies().add("implementation", "com.microsoft.sqlserver:mssql-jdbc");
+          project.getDependencies().add("runtimeOnly", "org.flywaydb:flyway-sqlserver");
+        }
       }
     } catch (IOException e) {
       throw new GradleException(e.getMessage());

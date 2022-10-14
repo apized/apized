@@ -9,7 +9,7 @@ create table audit_trail
     timestamp      timestamp    not null,
     epoch          bigint       not null,
     payload        jsonb,
-    by             uuid         not null
+    author         uuid         not null
 );
 
 create table if not exists organization

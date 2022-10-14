@@ -18,6 +18,7 @@ package org.apized.core;
 
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -38,6 +39,11 @@ public class ApizedConfig {
   }
 
   /**
+   * The SQL dialect for this application.
+   */
+  private Dialect dialect;
+
+  /**
    * The slug for this application. This will be used as the base for permissions.
    */
   private String slug;
@@ -55,5 +61,5 @@ public class ApizedConfig {
   /**
    * Known apis that can be used for federation.
    */
-  private Map<String, String> federation;
+  private Map<String, String> federation = new HashMap<>();
 }

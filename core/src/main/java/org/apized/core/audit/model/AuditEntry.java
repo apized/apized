@@ -52,7 +52,7 @@ public class AuditEntry implements Model {
 
   @JsonIdentityReference(alwaysAsId = true)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private UUID by;
+  private UUID author;
 
   private String reason;
 

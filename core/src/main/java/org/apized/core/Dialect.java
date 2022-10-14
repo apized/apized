@@ -14,20 +14,34 @@
  * limitations under the License.
  */
 
-package org.apized.gradle;
+package org.apized.core;
 
 /**
  * Enumeration of the possible supported database dialects
  */
 public enum Dialect {
-  //        todo add the remaining DBs
-//  H2,
-//  MYSQL,
+  /**
+   * H2 database.
+   */
+  H2,
+  /**
+   * MySQL 5.5 or above.
+   */
+  MYSQL,
   /**
    * Postgres 9.5 or later.
    */
   POSTGRES,
-//  SQL_SERVER,
-//  ORACLE,
-//  ANSI
+  /**
+   * SQL server 2012 or above.
+   */
+  SQL_SERVER,
+  /**
+   * Oracle 12c or above.
+   */
+  ORACLE,
+  /**
+   * Ansi compliant SQL.
+   */
+  ANSI
 }

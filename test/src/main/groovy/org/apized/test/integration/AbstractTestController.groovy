@@ -16,14 +16,19 @@
 
 package org.apized.test.integration
 
+import groovy.util.logging.Slf4j
+import jakarta.inject.Inject
+import org.apized.core.ApizedConfig
+import org.apized.core.Dialect
+import org.apized.core.error.exception.BadRequestException
 import org.apized.test.integration.mocks.AbstractUserResolverMock
 import org.apized.test.integration.service.ServiceIntegrationMock
-import jakarta.inject.Inject
 
 import javax.sql.DataSource
 import java.sql.Connection
 import java.sql.ResultSet
 
+@Slf4j
 abstract class AbstractTestController {
   @Inject
   abstract List<ServiceIntegrationMock> mocks
@@ -32,23 +37,134 @@ abstract class AbstractTestController {
   DataSource dataSource
 
   @Inject
+  ApizedConfig config
+
+  @Inject
   AbstractUserResolverMock userResolverMock
 
   void clear() {
+    clearDB()
+    mocks.each {
+      it.clear()
+    }
+  }
+
+  void clearDB() {
+    switch (config.dialect) {
+      case Dialect.H2:
+        clearH2DB()
+        break
+      case Dialect.MYSQL:
+        clearMySQLDB()
+        break
+      case Dialect.POSTGRES:
+        clearPostgresDB()
+        break
+      case Dialect.ORACLE:
+        clearOracleDB()
+        break
+      case Dialect.SQL_SERVER:
+        clearSqlServerDB()
+        break
+      default: throw new BadRequestException("Please provide the implementation for clearDB")
+    }
+  }
+
+  void clearSqlServerDB() {
+    List<String> tables = [ ]
+    Connection connection = dataSource.getConnection()
+    ResultSet resultSet = connection.prepareStatement("select table_name from information_schema.tables where table_type = 'BASE TABLE'").executeQuery()
+    while (resultSet.next()) {
+      String table = resultSet.getString(resultSet.findColumn('table_name'))
+      if (!table.toLowerCase().startsWith('flyway')) {
+        tables.add(table)
+      }
+    }
+
+    tables.each {
+      connection.prepareStatement("alter table $it NOCHECK CONSTRAINT ALL").execute()
+    }
+    tables.each {
+      connection.prepareStatement("delete from $it").execute()
+    }
+    tables.each {
+      connection.prepareStatement("alter table $it CHECK CONSTRAINT ALL").execute()
+    }
+
+    connection.close()
+  }
+
+  void clearOracleDB() {
+    Connection connection = dataSource.getConnection()
+
+    Map<String, String> constraints = [ : ]
+    ResultSet constraintSet = connection.prepareStatement("select constraint_name, table_name from user_constraints where constraint_type='R'").executeQuery();
+    while (constraintSet.next()) {
+      constraints.put(
+        constraintSet.getString(constraintSet.findColumn('constraint_name')),
+        constraintSet.getString(constraintSet.findColumn('table_name'))
+      )
+    }
+
+    constraints.each {
+      connection.prepareStatement("alter table $it.value disable constraint $it.key").execute()
+    }
+
+    ResultSet resultSet = connection.prepareStatement("select table_name from user_tables").executeQuery()
+    while (resultSet.next()) {
+      String table = resultSet.getString(resultSet.findColumn('table_name'))
+      if (!table.toLowerCase().startsWith('flyway')) {
+
+
+        connection.prepareStatement("truncate table $table cascade").execute()
+      }
+    }
+
+    constraints.each {
+      connection.prepareStatement("alter table $it.value enable constraint $it.key").execute()
+    }
+
+    connection.close()
+  }
+
+  void clearMySQLDB() {
+    Connection connection = dataSource.getConnection()
+    connection.prepareStatement("SET foreign_key_checks = 0").execute()
+    ResultSet resultSet = connection.prepareStatement("SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' and table_schema = 'test'").executeQuery()
+    while (resultSet.next()) {
+      String table = resultSet.getString(resultSet.findColumn('table_name'))
+      if (!table.toLowerCase().startsWith('flyway')) {
+        connection.prepareStatement("truncate table $table").execute()
+      }
+    }
+    connection.prepareStatement("SET foreign_key_checks = 1").execute()
+    connection.close()
+  }
+
+  void clearH2DB() {
+    Connection connection = dataSource.getConnection()
+    connection.prepareStatement("SET REFERENTIAL_INTEGRITY FALSE").execute()
+    ResultSet resultSet = connection.prepareStatement("show tables").executeQuery()
+    while (resultSet.next()) {
+      String table = resultSet.getString(resultSet.findColumn('table_name'))
+      if (!table.toLowerCase().startsWith('flyway')) {
+        connection.prepareStatement("truncate table $table").execute()
+      }
+    }
+    connection.prepareStatement("SET REFERENTIAL_INTEGRITY TRUE").execute()
+    connection.close()
+  }
+
+  void clearPostgresDB() {
     Connection connection = dataSource.getConnection()
     ResultSet resultSet = connection.prepareStatement("select tablename from pg_tables where schemaname='public'").executeQuery()
     while (resultSet.next()) {
       String table = resultSet.getString(resultSet.findColumn('tablename'))
       if (!table.toLowerCase().startsWith('flyway')) {
-        Connection subConnection = dataSource.getConnection()
-        subConnection.prepareStatement("truncate table $table cascade").execute()
-        subConnection.close()
+        connection.prepareStatement("truncate table $table cascade").execute()
       }
     }
     connection.close()
-    mocks.each {
-      it.clear()
-    }
   }
 
   String getTokenFor(String alias) {

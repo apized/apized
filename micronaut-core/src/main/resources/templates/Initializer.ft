@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.Generated;
 import org.apized.core.ApizedConfig;
+import org.apized.core.Dialect;
 import org.apized.core.behaviour.BehaviourManager;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.model.Action;
@@ -48,6 +49,7 @@ public class Initializer {
   @EventListener
   void onStartup(ServerStartupEvent event) {
     ApizedContext.provider = new MicronautContextProvider();
+    config.setDialect(Dialect.${dialect});
     ApizedConfig.setInstance(config);
     ModelResolver.applicationContext = applicationContext;
 

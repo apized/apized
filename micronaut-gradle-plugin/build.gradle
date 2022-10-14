@@ -8,6 +8,7 @@ repositories {
 }
 
 dependencies {
+  implementation project(":core")
   api "io.micronaut.gradle:micronaut-gradle-plugin:${project.micronautGradlePluginVersion}"
 }
 

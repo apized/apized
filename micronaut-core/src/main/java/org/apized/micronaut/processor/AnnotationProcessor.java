@@ -104,15 +104,15 @@ public class AnnotationProcessor extends AbstractProcessor {
       .toList();
 
     if (behaviours.size() > 0 || entities.size() > 0) {
+      Map<String, Object> bindings = getDefaultBindings();
+      bindings.putAll(Map.of(
+        "entities", entities.stream().map(e -> ((TypeElement) e).getQualifiedName().toString()).toList(),
+        "behaviours", behaviours
+      ));
       generateClassFor(
         "org.apized.core.init.Initializer",
         "Initializer",
-        new HashMap<>(
-          Map.of(
-            "entities", entities.stream().map(e -> ((TypeElement)e).getQualifiedName().toString()).toList(),
-            "behaviours", behaviours
-          )
-        )
+        bindings
       );
       env.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Registered %d Behaviours", behaviours.size()));
     }
@@ -272,7 +272,9 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     if (generated.size() > 0) {
       processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Generated %d APIs", generated.size()));
-      generateClassFor("org.apized.micronaut.audit.MicronautAuditEntryRepository", "audit/Repository", Map.of("module", "org.apized.micronaut.audit"));
+      Map<String, Object> bindings = getDefaultBindings();
+      bindings.putAll(Map.of("module", "org.apized.micronaut.audit"));
+      generateClassFor("org.apized.micronaut.audit.MicronautAuditEntryRepository", "audit/Repository", bindings);
     }
     return generated;
   }
@@ -343,15 +345,15 @@ public class AnnotationProcessor extends AbstractProcessor {
 
   private Map<String, Object> getDefaultBindings() {
     Map<String, Object> bindings = new HashMap<>();
+    Properties prop = new Properties();
     try {
-      Properties prop = new Properties();
       prop.load(new FileInputStream(Paths.get(
         processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", "apized.properties").toUri()
       ).toString().replace("/build/classes/java/main", "")));
-      prop.entrySet().stream().forEach(e -> bindings.put(e.getKey().toString(), e.getValue()));
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      prop.setProperty("dialect", "ANSI");
     }
+    prop.entrySet().stream().forEach(e -> bindings.put(e.getKey().toString(), e.getValue()));
     return bindings;
   }
 }

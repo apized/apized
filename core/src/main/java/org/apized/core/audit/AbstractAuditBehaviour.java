@@ -45,7 +45,7 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
         .transactionId(ApizedContext.getRequest().getId())
         .action(type.equals(i.getClass()) ? action : Action.UPDATE)
         .type(type.getSimpleName())
-        .by(ApizedContext.getSecurity().getUser().getId())
+        .author(ApizedContext.getSecurity().getUser().getId())
         .reason(ApizedContext.getRequest().getReason())
         .target(model.getId())
         .payload((type.equals(i.getClass()) ? action : Action.UPDATE) != Action.DELETE ? modelMapper.createMapOf(model) : Map.of())
