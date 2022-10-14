@@ -52,17 +52,6 @@ public class ApizedPlugin implements Plugin<Project> {
         project.getDependencies().add("compileOnly", "org.projectlombok:lombok");
       });
 
-      project.getBuildscript().getRepositories().maven(r -> {
-        r.setName("Apized GitHub Repository");
-        r.setUrl("https://maven.pkg.github.com/apized/apized");
-        r.credentials(c -> {
-          c.setUsername("apized-bot");
-          c.setPassword(new String(
-            Base64.getDecoder().decode("Z2hwX0V5b29sTmkwTW5xaTh4Zmp1SDYwRDBob1dHRlR1WTRPTE1XSg==")
-          ));
-        });
-      });
-
       project.getRepositories().maven(r -> {
         r.setName("Apized GitHub Repository");
         r.setUrl("https://maven.pkg.github.com/apized/apized");
