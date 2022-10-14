@@ -18,7 +18,6 @@ package org.apized.gradle;
 
 import io.micronaut.gradle.MicronautApplicationPlugin;
 import io.micronaut.gradle.MicronautExtension;
-import org.apized.core.Dialect;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
