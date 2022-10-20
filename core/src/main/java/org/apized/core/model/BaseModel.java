@@ -42,7 +42,6 @@ import java.util.UUID;
 @Introspected
 public abstract class BaseModel implements Model {
   @Id
-//  @GeneratedValue(strategy = GenerationType.AUTO)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private UUID id;
 
@@ -51,18 +50,22 @@ public abstract class BaseModel implements Model {
   @Version
   private Long version = 0L;
 
+  @AuditIgnore
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @Federation(value = "auth", type = "User", uri = "/auth/users/{id}")
   private UUID createdBy;
 
+  @AuditIgnore
   @Temporal(TemporalType.TIMESTAMP)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime createdAt;
 
+  @AuditIgnore
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @Federation(value = "auth", type = "User", uri = "/auth/users/{id}")
   private UUID lastUpdatedBy;
 
+  @AuditIgnore
   @Temporal(TemporalType.TIMESTAMP)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime lastUpdatedAt;
