@@ -38,16 +38,16 @@ public class FederationResolver extends AbstractFederationResolver {
   private final ApizedConfig config;
   HttpClient client = HttpClient.newHttpClient();
 
-  @Inject
   ObjectMapper mapper;
 
-  public FederationResolver(ApizedConfig config, List<AbstractModelService<? extends Model>> services) {
+  public FederationResolver(ApizedConfig config, ObjectMapper mapper, List<AbstractModelService<? extends Model>> services) {
     super(
       config.getSlug(),
       config.getFederation(),
       services
     );
     this.config = config;
+    this.mapper = mapper;
   }
 
   @SuppressWarnings("unchecked")
