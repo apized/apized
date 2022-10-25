@@ -18,7 +18,7 @@ import org.apized.core.model.Model;
 import org.apized.core.model.When;
 import org.apized.micronaut.context.MicronautContextProvider;
 import org.apized.micronaut.server.ModelResolver;
-import org.apized.micronaut.server.mvc.ApizedProxiedInterceptor;
+import org.apized.micronaut.server.mvc.ApizedRepositoryProxyInterceptor;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class Initializer {
   BehaviourManager manager;
 
   @Inject
-  ApizedProxiedInterceptor interceptor;
+  ApizedRepositoryProxyInterceptor interceptor;
 
 #foreach( $it in $behaviours )
   @Inject

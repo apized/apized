@@ -1,5 +1,6 @@
 package org.apized.micronaut.server.mvc;
 
+import io.micronaut.aop.InterceptorBean;
 import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
 import io.micronaut.core.beans.BeanIntrospection;
@@ -12,7 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 
 @Singleton
-public class ApizedProxiedInterceptor implements MethodInterceptor<Object, Object> {
+@InterceptorBean(ApizedRepository.class)
+public class ApizedRepositoryProxyInterceptor implements MethodInterceptor<Object, Object> {
   private Map<Class<?>, Class<?>> entities = new HashMap<>();
 
   public void addProxyMapping(Class<?> entity, Class<?> proxy) {

@@ -15,11 +15,33 @@
  */
 
 package org.apized.gradle;
+
+/**
+ * Database dialect
+ */
 public enum Dialect {
+  /**
+   * H2
+   */
   H2,
+  /**
+   * MYSQL
+   */
   MYSQL,
+  /**
+   * POSTGRES
+   */
   POSTGRES,
+  /**
+   * SQL_SERVER
+   */
   SQL_SERVER,
+  /**
+   * ORACLE
+   */
   ORACLE,
+  /**
+   * ANSI - the default
+   */
   ANSI
 }

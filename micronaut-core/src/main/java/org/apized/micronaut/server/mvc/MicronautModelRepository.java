@@ -16,24 +16,22 @@
 
 package org.apized.micronaut.server.mvc;
 
-import org.apized.core.model.Model;
-import org.apized.core.model.Page;
-import org.apized.core.search.SearchTerm;
-import org.apized.core.search.SortDirection;
-import org.apized.core.search.SortTerm;
-import org.apized.core.mvc.ModelRepository;
 import io.micronaut.data.model.Pageable;
-import io.micronaut.data.model.Sort;
 import io.micronaut.data.repository.PageableRepository;
 import io.micronaut.data.repository.jpa.JpaSpecificationExecutor;
 import io.micronaut.data.repository.jpa.criteria.QuerySpecification;
+import org.apized.core.model.Model;
+import org.apized.core.model.Page;
+import org.apized.core.mvc.ModelRepository;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Proxied
+@ApizedRepository
 public interface MicronautModelRepository<T extends Model> extends ModelRepository<T>, PageableRepository<T, UUID>, JpaSpecificationExecutor<T> {
   @Override
   default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
