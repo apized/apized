@@ -39,8 +39,8 @@ public class ApizedRepositoryInterceptor implements MethodInterceptor<Object, Ob
           page.getPageable(),
           page.getTotalSize()
         );
-      } else if (Optional.class.isAssignableFrom(result.getClass()) && ((Optional<?>) result).isPresent()) {
-        result = Optional.of(
+      } else if (Optional.class.isAssignableFrom(result.getClass())) {
+        result = Optional.ofNullable(
           instantiate(introspection, ((Optional<?>) result).orElse(null))
         );
       } else if (Collection.class.isAssignableFrom(result.getClass())) {
@@ -55,8 +55,11 @@ public class ApizedRepositoryInterceptor implements MethodInterceptor<Object, Ob
   }
 
   private BaseModel instantiate(BeanIntrospection<?> introspection, Object obj) {
-    BaseModel model = (BaseModel) introspection.instantiate(obj);
-    model._getModelMetadata().setOriginal((Model) introspection.instantiate(obj));
+    BaseModel model = null;
+    if (obj != null) {
+      model = (BaseModel) introspection.instantiate(obj);
+      model._getModelMetadata().setOriginal((Model) introspection.instantiate(obj));
+    }
     return model;
   }
 }
