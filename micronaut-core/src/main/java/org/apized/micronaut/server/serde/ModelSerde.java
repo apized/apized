@@ -168,7 +168,6 @@ public class ModelSerde implements Serde<Model> {
     Optional<ModelService> service = appContext.findBean(new DefaultArgument<>(ModelService.class, type.getAnnotationMetadata(), type));
     if (service.isPresent() && model.getId() != null) {
       model = service.get().get(model.getId());
-      model._getModelMetadata().setOriginal(service.get().get(model.getId()));
       BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
       touched.forEach(p ->
         wrapper.setProperty(p.getName(), deserializationWrapper.getProperty(p.getName(), p.getType()).orElse(null))
