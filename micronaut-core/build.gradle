@@ -19,6 +19,7 @@ dependencies {
   compileOnly("org.projectlombok:lombok")
   compileOnly("io.micronaut.data:micronaut-data-model")
   compileOnly("io.micronaut.data:micronaut-data-runtime")
+  compileOnly("io.micronaut.data:micronaut-data-jdbc")
   compileOnly("io.micronaut.serde:micronaut-serde-jackson:1.1.0")
   compileOnly("io.micronaut:micronaut-http-server")
 

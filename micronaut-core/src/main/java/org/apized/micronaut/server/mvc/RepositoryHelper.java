@@ -21,16 +21,20 @@ import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanProperty;
 import io.micronaut.data.annotation.Join;
 import io.micronaut.data.annotation.TypeDef;
+import io.micronaut.data.jdbc.runtime.JdbcOperations;
 import io.micronaut.data.model.Sort;
 import io.micronaut.data.model.jpa.criteria.PersistentEntityFrom;
 import io.micronaut.data.model.runtime.RuntimePersistentEntity;
 import io.micronaut.data.repository.jpa.criteria.QuerySpecification;
 import io.micronaut.data.runtime.criteria.RuntimeCriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.apized.core.ApizedConfig;
 import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
+import org.apized.core.error.exception.NotImplementedException;
 import org.apized.core.model.Apized;
 import org.apized.core.model.Model;
 import org.apized.core.search.SearchOperation;
@@ -38,7 +42,10 @@ import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortDirection;
 import org.apized.core.search.SortTerm;
 import org.apized.core.security.annotation.Owner;
+import org.apized.micronaut.server.ModelResolver;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public abstract class RepositoryHelper {
@@ -91,21 +98,22 @@ public abstract class RepositoryHelper {
           List<String> split = List.of(searchTerm.getField().split("\\."));
           Optional<BeanProperty<Model, Object>> property = introspection.getProperty(split.get(0));
 
-          if(property.isEmpty()) continue;
-
-          AnnotationValue<TypeDef> json = property.get().getAnnotation(TypeDef.class);
-          if (json == null) {
-            from = ((PersistentEntityFrom<?, ?>) root).join(split.get(0), Join.Type.INNER);
-            field = split.get(1);
-          } else {
-            //todo figure out a way to query metadata fields
-//            field = split.stream().collect(Collectors.joining("->>"));
-//            criteria.add(
-//              new ExpressionBinaryPredicate(((PersistentEntityFrom<?, ?>) root).getPersistentEntity().get.literal(split.get(0) + " ->> '" + split.get(1) + "'"), builder.literal(value), PredicateBinaryOp.EQUALS)
-////              builder.literal(String.join("->", split) + "=" +value).in()
-//            );
+          if (property.isEmpty()) {
             continue;
           }
+
+          from = ((PersistentEntityFrom<?, ?>) root).join(split.get(0), Join.Type.INNER);
+          field = split.get(1);
+        } else if (introspection.getProperty(field).get().getAnnotationMetadata().hasAnnotation(TypeDef.class)) {
+          switch (ApizedConfig.getInstance().getDialect()) {
+            case ANSI -> ansiMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+            case H2 -> h2MetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+            case MYSQL -> mysqlMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+            case ORACLE -> oracleMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+            case POSTGRES -> postgresMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+            case SQL_SERVER -> sqlServerMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+          }
+          continue;
         }
 
         switch (searchTerm.getOp()) {
@@ -136,6 +144,44 @@ public abstract class RepositoryHelper {
       return builder.and(criteria.toArray(new Predicate[0]));
     };
     return spec;
+  }
+
+  private static <T extends Model> void ansiMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+    throw new NotImplementedException();
+  }
+
+  private static <T extends Model> void h2MetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+    throw new NotImplementedException();
+  }
+
+  private static <T extends Model> void mysqlMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+    throw new NotImplementedException();
+  }
+
+  private static <T extends Model> void oracleMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+    throw new NotImplementedException();
+  }
+
+  private static <T extends Model> void postgresMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+    CriteriaBuilder.In in = builder.in(from.get("id"));
+    String field = split.get(0);
+
+    try {
+      ResultSet resultSet = ModelResolver.applicationContext.findBean(JdbcOperations.class).get().prepareStatement(
+        "select id from " + StringHelper.uncapitalize(root.getJavaType().getSimpleName()) + " where " + field + " @> '" + value + "'",
+        statement -> statement.executeQuery()
+      );
+      while (resultSet.next()) {
+        in.value(resultSet.getObject("id", UUID.class));
+      }
+    } catch (SQLException e) {
+
+    }
+    criteria.add(in);
+  }
+
+  private static <T extends Model> void sqlServerMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+    throw new NotImplementedException();
   }
 
   public static <T extends Model> Sort generateSort(List<SortTerm> sort) {
