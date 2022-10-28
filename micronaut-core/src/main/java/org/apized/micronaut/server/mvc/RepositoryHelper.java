@@ -163,6 +163,7 @@ public abstract class RepositoryHelper {
   }
 
   private static <T extends Model> void postgresMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+    boolean valid = false;
     CriteriaBuilder.In in = builder.in(from.get("id"));
     String field = split.get(0);
 
@@ -172,10 +173,15 @@ public abstract class RepositoryHelper {
         statement -> statement.executeQuery()
       );
       while (resultSet.next()) {
+        valid = true;
         in.value(resultSet.getObject("id", UUID.class));
       }
     } catch (SQLException e) {
 
+    }
+    if (!valid) {
+      //ensure we have at least one element otherwise the resulting sql expression will be invalid `in ()`
+      in.value(UUID.randomUUID());
     }
     criteria.add(in);
   }
