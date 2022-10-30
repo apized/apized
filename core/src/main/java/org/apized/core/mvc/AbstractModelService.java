@@ -22,6 +22,8 @@ import io.micronaut.core.beans.BeanWrapper;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.DefaultArgument;
 import jakarta.persistence.*;
+import org.apized.core.StringHelper;
+import org.apized.core.context.ApizedContext;
 import org.apized.core.error.exception.NotFoundException;
 import org.apized.core.federation.Federation;
 import org.apized.core.model.Model;
@@ -80,6 +82,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .ifPresent(prePersist -> prePersist.invoke(it));
 
     T create = getRepository().create(it);
+    ApizedContext.getRequest().getPathVariables().put(StringHelper.uncapitalize(getType().getSimpleName()), create.getId());
 
     BeanIntrospection
       .getIntrospection(getType())

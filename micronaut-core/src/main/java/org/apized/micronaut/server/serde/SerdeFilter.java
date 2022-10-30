@@ -50,11 +50,11 @@ public class SerdeFilter implements HttpServerFilter {
   private Map<String, UUID> getPathVariables(HttpRequest<?> request) {
     Map<String, UUID> variables = new HashMap<>();
 
-    Matcher matcher1 = urlPattern.matcher(request.getPath());
-    while (matcher1.find()) {
+    Matcher matcher = urlPattern.matcher(request.getPath());
+    while (matcher.find()) {
       variables.put(
-        StringHelper.singularize(matcher1.group(1)),
-        StringHelper.convertStringToUUID(matcher1.group(3))
+        StringHelper.singularize(matcher.group(1)),
+        StringHelper.convertStringToUUID(matcher.group(3))
       );
     }
 

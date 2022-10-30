@@ -41,7 +41,7 @@ public abstract class AbstractEventBehaviour implements BehaviourHandler<Model> 
       i -> ApizedContext.getEvent().add(
         new Event(
           ApizedContext.getRequest().getId(),
-          String.format("%s.%s.%sd", ApizedConfig.getInstance().getSlug(), type.getSimpleName().toLowerCase(), (type.equals(i.getClass()) ? action.getType() : Action.UPDATE)).toLowerCase(),
+          String.format("%s.%s.%sd", ApizedConfig.getInstance().getSlug(), type.getSimpleName().toLowerCase(), (type.isAssignableFrom(i.getClass()) ? action.getType() : Action.UPDATE)).toLowerCase(),
           modelMapper.createMapOf(model)
         )
       )
