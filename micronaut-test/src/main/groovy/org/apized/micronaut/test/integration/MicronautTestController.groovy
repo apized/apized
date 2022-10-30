@@ -44,4 +44,10 @@ class MicronautTestController extends AbstractTestController {
   HttpResponse<List<Map>> getMockExecutions(@PathVariable("mock") String mock, @PathVariable("method") String method) {
     HttpResponse.status(HttpStatus.OK).body(getExecutions(mock, method))
   }
+
+  @Delete('/mocks/{mock}/executions')
+  HttpResponse clearMockExecutions(@PathVariable("mock") String mock) {
+    clearExecutions(mock)
+    HttpResponse.status(HttpStatus.OK)
+  }
 }

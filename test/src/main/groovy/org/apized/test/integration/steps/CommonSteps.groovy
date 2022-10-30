@@ -155,6 +155,11 @@ class CommonSteps extends AbstractSteps {
   def getExecutions(String method, String mock, String alias) {
     testRunner.getExecutions(context, mock, method, alias)
   }
+
+  @Given('^I clear the executions of service ([^\\s]+)$')
+  def clearExecutions(String mock, String alias) {
+    testRunner.clearExecutions(context, mock, alias)
+  }
   //</editor-fold>
 
   //<editor-fold desc="Response Code">

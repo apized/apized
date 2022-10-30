@@ -182,4 +182,10 @@ abstract class AbstractTestController {
       .find { it.mockedServiceName == mock }
       .getExecutions(method)
   }
+
+  void clearExecutions(String mock) {
+    mocks
+      .find { it.mockedServiceName == mock }
+      .clear()
+  }
 }
