@@ -37,7 +37,7 @@ interface TestRunner {
 
   void getExecutions(IntegrationContext context, String mock, String method, String alias)
 
-  void clearExecutions(IntegrationContext context, String mock, String alias)
+  void clearExecutions(IntegrationContext context, String mock)
 
   void get(IntegrationContext context, String type, String id, String alias)
 

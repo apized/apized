@@ -52,9 +52,9 @@ abstract class AbstractIntegrationTest implements TestRunner {
   }
 
   @Override
-  void clearExecutions(IntegrationContext context, String mock, String alias) {
+  void clearExecutions(IntegrationContext context, String mock) {
     Response response = getClient().delete("/integration/mocks/${mock}/executions")
-    context.addResponse('execution', response.statusCode() == 200, response.asString(), alias)
+    context.addResponse('execution', response.statusCode() == 200, response.asString(), null)
   }
 
   @Override

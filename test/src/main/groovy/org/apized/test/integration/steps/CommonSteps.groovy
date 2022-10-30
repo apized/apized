@@ -157,8 +157,8 @@ class CommonSteps extends AbstractSteps {
   }
 
   @Given('^I clear the executions of service ([^\\s]+)$')
-  def clearExecutions(String mock, String alias) {
-    testRunner.clearExecutions(context, mock, alias)
+  def clearExecutions(String mock) {
+    testRunner.clearExecutions(context, mock)
   }
   //</editor-fold>
 
