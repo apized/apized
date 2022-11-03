@@ -19,9 +19,6 @@ package org.apized.core.event;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.event.model.Event;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
 public interface ESBAdapter {
@@ -29,11 +26,12 @@ public interface ESBAdapter {
     Date timestamp = Optional.ofNullable(
       ApizedContext.getRequest().getTimestamp()
     ).orElse(
-      Timestamp.valueOf(LocalDateTime.now(ZoneId.of("UTC")))
+      new Date()
     );
 
     Map<String, Object> headers = new HashMap<>();
     headers.put("timestamp", timestamp);
+    headers.put("token", ApizedContext.getSecurity().getToken());
 
     ApizedContext.getRequest().getPathVariables().entrySet().forEach(e ->
       headers.put(e.getKey(), e.getValue() != null ? e.getValue().toString() : null)
