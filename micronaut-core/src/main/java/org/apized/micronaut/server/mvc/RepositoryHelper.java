@@ -117,8 +117,8 @@ public abstract class RepositoryHelper {
               case POSTGRES -> postgresMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
               case SQL_SERVER -> sqlServerMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
             }
+            continue;
           }
-          continue;
         }
 
         switch (searchTerm.getOp()) {
