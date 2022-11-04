@@ -22,6 +22,7 @@ import io.micronaut.core.beans.BeanProperty;
 import io.micronaut.data.annotation.Join;
 import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.jdbc.runtime.JdbcOperations;
+import io.micronaut.data.model.DataType;
 import io.micronaut.data.model.Sort;
 import io.micronaut.data.model.jpa.criteria.PersistentEntityFrom;
 import io.micronaut.data.model.runtime.RuntimePersistentEntity;
@@ -105,13 +106,17 @@ public abstract class RepositoryHelper {
           from = ((PersistentEntityFrom<?, ?>) root).join(split.get(0), Join.Type.INNER);
           field = split.get(1);
         } else if (introspection.getProperty(field).get().getAnnotationMetadata().hasAnnotation(TypeDef.class)) {
-          switch (ApizedConfig.getInstance().getDialect()) {
-            case ANSI -> ansiMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-            case H2 -> h2MetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-            case MYSQL -> mysqlMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-            case ORACLE -> oracleMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-            case POSTGRES -> postgresMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-            case SQL_SERVER -> sqlServerMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+          BeanProperty<Model, Object> property = introspection.getProperty(field).get();
+          AnnotationValue<TypeDef> typeDef = property.getAnnotation(TypeDef.class);
+          if (Objects.requireNonNull(typeDef).enumValue("type", DataType.class).orElse(DataType.STRING).equals(DataType.JSON)) {
+            switch (ApizedConfig.getInstance().getDialect()) {
+              case ANSI -> ansiMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+              case H2 -> h2MetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+              case MYSQL -> mysqlMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+              case ORACLE -> oracleMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+              case POSTGRES -> postgresMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+              case SQL_SERVER -> sqlServerMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+            }
           }
           continue;
         }
