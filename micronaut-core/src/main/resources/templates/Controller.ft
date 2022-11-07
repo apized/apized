@@ -17,6 +17,7 @@ import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.inject.Inject;
 
+import javax.annotation.Nullable;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +49,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.LIST)
   )
-  public Page<${type}> list(@Bindable(defaultValue = "1") Integer page, @Bindable(defaultValue = "50") Integer pageSize, @Bindable(defaultValue = "") List<SearchTerm> search, @Bindable(defaultValue = "") List<SortTerm> sort) {
+  public Page<${type}> list(@Nullable @Bindable(defaultValue = "1") Integer page, @Nullable @Bindable(defaultValue = "50") Integer pageSize, @Nullable @Bindable(defaultValue = "") List<SearchTerm> search, @Nullable @Bindable(defaultValue = "") List<SortTerm> sort) {
     Page<$type> result = super.list(page, pageSize, search, sort);
     eventPublisher.publishEvent("${type}Controller::list");
     return result;
