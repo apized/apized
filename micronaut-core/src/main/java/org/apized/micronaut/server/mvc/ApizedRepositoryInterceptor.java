@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Singleton
 @InterceptorBean(ApizedRepository.class)
@@ -47,6 +48,8 @@ public class ApizedRepositoryInterceptor implements MethodInterceptor<Object, Ob
         result = ((Collection<?>) result).stream().map(e ->
           instantiate(introspection, e)
         ).toList();
+      } else if (Stream.class.isAssignableFrom(result.getClass())) {
+        result = ((Stream) result).map(it -> instantiate(introspection, it));
       } else {
         result = instantiate(introspection, result);
       }
