@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.apized.micronaut.server.apized;
+package org.apized.core.security;
 
-import org.apized.core.security.UserResolver;
-import org.apized.core.security.model.User;
 import jakarta.inject.Singleton;
+import org.apized.core.security.model.User;
 
 import java.util.List;
 import java.util.UUID;
