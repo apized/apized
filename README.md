@@ -8,18 +8,18 @@ underlying implementations to easily create a rich REST API.
 
 By adopting apized your API will provide:
 
-- [Enhanced REST endpoints](#enhanced-rest-endpoints)
-- [Audit trail](#audit-trail)
-- [Event publishing](#event-publishing)
-- [Behaviours](#behaviours)
-- [OpenAPI documentation](#openapi-documentation) (optional)
-- [Security](#security) (optional)
-- [Federation](#federation) (optional)
+- [Enhanced REST endpoints](/apized/apized/wiki/Feature:-Enhanced-REST-endpoints)
+- [Audit trail](/apized/apized/wiki/Feature:-Audit-trail)
+- [Event publishing](/apized/apized/wiki/Feature:-Event-publishing)
+- [Behaviours](/apized/apized/wiki/Feature:-Behaviours)
+- [OpenAPI documentation](/apized/apized/wiki/Feature:-OpenAPI-documentation) (optional)
+- [Security](/apized/apized/wiki/Feature:-Security) (optional)
+- [Federation](/apized/apized/wiki/Feature:-Federation) (optional)
 
 and will run on top of:
 
-- [Micronaut](#micronaut)
-- [Spring Boot](#spring-boot) [Planned]
+- [Micronaut](/apized/apized/wiki/Engine:-Micronaut) (default)
+- [Spring Boot](/apized/apized/wiki/Engine:-Spring-Boot) (planned)
 
 <!-- For more information on using Apized see the documentation at [apized.org](https://apized.org). -->
 
@@ -81,7 +81,7 @@ GET `/organizations/3fedcab7-97b7-4f81-b49f-2a70864f7cfa/employee/e9fa40a7-3044-
 
 #### Field filtering
 
-No more over or under fetching of data.
+No more over or under fetching of data, get exactly and only what you need.
 
 GET `/organizations/3fedcab7-97b7-4f81-b49f-2a70864f7cfa?fields=name`
 
