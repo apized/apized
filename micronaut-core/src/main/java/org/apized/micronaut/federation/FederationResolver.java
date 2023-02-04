@@ -33,6 +33,7 @@ import java.util.Map;
 
 //todo eventually replace this with Services that forward the operations
 // this should simplify a bit as well as expanding the federation to more than retrieve only.
+// this will also bring potential challenges regarding distributed transactions (and determining the execution order)
 @Singleton
 public class FederationResolver extends AbstractFederationResolver {
   private final ApizedConfig config;
