@@ -58,7 +58,7 @@ public abstract class RepositoryHelper {
     QuerySpecification<T> spec = (root, query, builder) -> {
       List<Predicate> criteria = new ArrayList<>();
 
-      BeanIntrospection<Model> introspection = ((RuntimePersistentEntity) ((PersistentEntityFrom<?, ?>) root).getPersistentEntity()).getIntrospection();
+      BeanIntrospection<?> introspection = ((RuntimePersistentEntity) ((PersistentEntityFrom<?, ?>) root).getPersistentEntity()).getIntrospection();
       AnnotationValue<Apized> apized = introspection.getAnnotation(Apized.class);
       Map<String, UUID> pathVariables = ApizedContext.getRequest().getPathVariables();
 
@@ -90,14 +90,15 @@ public abstract class RepositoryHelper {
           });
       }
 
+      BeanIntrospection<Object> fieldClassIntrospection = (BeanIntrospection<Object>) introspection;
       for (SearchTerm searchTerm : search) {
         String field = searchTerm.getField();
         Object value = searchTerm.getValue();
         From from = root;
 
-        if (field.contains(".")) {
+        while (field.contains(".")) {
           List<String> split = List.of(searchTerm.getField().split("\\."));
-          Optional<BeanProperty<Model, Object>> property = introspection.getProperty(split.get(0));
+          Optional<BeanProperty<Object, Object>> property = fieldClassIntrospection.getProperty(split.get(0));
 
           if (property.isEmpty()) {
             continue;
@@ -105,17 +106,25 @@ public abstract class RepositoryHelper {
 
           from = ((PersistentEntityFrom<?, ?>) root).join(split.get(0), Join.Type.INNER);
           field = split.get(1);
-        } else if (introspection.getProperty(field).get().getAnnotationMetadata().hasAnnotation(TypeDef.class)) {
-          BeanProperty<Model, Object> property = introspection.getProperty(field).get();
+
+          if (Model.class.isAssignableFrom(property.get().getType())) {
+            fieldClassIntrospection = BeanIntrospection.getIntrospection(property.get().getType());
+          } else {
+            break;
+          }
+        }
+
+        if (fieldClassIntrospection.getProperty(field).isPresent() && fieldClassIntrospection.getProperty(field).get().getAnnotationMetadata().hasAnnotation(TypeDef.class)) {
+          BeanProperty<Object, Object> property = fieldClassIntrospection.getProperty(field).get();
           AnnotationValue<TypeDef> typeDef = property.getAnnotation(TypeDef.class);
           if (Objects.requireNonNull(typeDef).enumValue("type", DataType.class).orElse(DataType.STRING).equals(DataType.JSON)) {
             switch (ApizedConfig.getInstance().getDialect()) {
-              case ANSI -> ansiMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-              case H2 -> h2MetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-              case MYSQL -> mysqlMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-              case ORACLE -> oracleMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-              case POSTGRES -> postgresMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
-              case SQL_SERVER -> sqlServerMetadataQuery(root, builder, criteria, value, from, List.of(field), null);
+              case ANSI -> ansiMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+              case H2 -> h2MetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+              case MYSQL -> mysqlMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+              case ORACLE -> oracleMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+              case POSTGRES -> postgresMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+              case SQL_SERVER -> sqlServerMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
             }
             continue;
           }
@@ -151,30 +160,30 @@ public abstract class RepositoryHelper {
     return spec;
   }
 
-  private static <T extends Model> void ansiMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+  private static <T extends Model> void ansiMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Object, Object> property) {
     throw new NotImplementedException();
   }
 
-  private static <T extends Model> void h2MetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+  private static <T extends Model> void h2MetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Object, Object> property) {
     throw new NotImplementedException();
   }
 
-  private static <T extends Model> void mysqlMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+  private static <T extends Model> void mysqlMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Object, Object> property) {
     throw new NotImplementedException();
   }
 
-  private static <T extends Model> void oracleMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+  private static <T extends Model> void oracleMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Object, Object> property) {
     throw new NotImplementedException();
   }
 
-  private static <T extends Model> void postgresMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+  private static <T extends Model> void postgresMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Object, Object> property) {
     boolean valid = false;
     CriteriaBuilder.In in = builder.in(from.get("id"));
     String field = split.get(0);
 
     try {
       ResultSet resultSet = ModelResolver.applicationContext.findBean(JdbcOperations.class).get().prepareStatement(
-        "select id from " + StringHelper.uncapitalize(root.getJavaType().getSimpleName()) + " where " + field + " @> '" + value + "'",
+        "select id from " + StringHelper.uncapitalize(property.getDeclaringType().getSimpleName()) + " where " + field + " @> '" + value + "'",
         statement -> statement.executeQuery()
       );
       while (resultSet.next()) {
@@ -191,7 +200,7 @@ public abstract class RepositoryHelper {
     criteria.add(in);
   }
 
-  private static <T extends Model> void sqlServerMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Model, Object> property) {
+  private static <T extends Model> void sqlServerMetadataQuery(Root<T> root, CriteriaBuilder builder, List<Predicate> criteria, Object value, From from, List<String> split, BeanProperty<Object, Object> property) {
     throw new NotImplementedException();
   }
 
