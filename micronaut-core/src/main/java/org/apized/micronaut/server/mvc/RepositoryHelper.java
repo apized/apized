@@ -91,6 +91,7 @@ public abstract class RepositoryHelper {
       }
 
       BeanIntrospection<Object> fieldClassIntrospection = (BeanIntrospection<Object>) introspection;
+      termLoop:
       for (SearchTerm searchTerm : search) {
         String field = searchTerm.getField();
         Object value = searchTerm.getValue();
@@ -101,7 +102,7 @@ public abstract class RepositoryHelper {
           Optional<BeanProperty<Object, Object>> property = fieldClassIntrospection.getProperty(split.get(0));
 
           if (property.isEmpty()) {
-            continue;
+            continue termLoop;
           }
 
           from = ((PersistentEntityFrom<?, ?>) root).join(split.get(0), Join.Type.INNER);
