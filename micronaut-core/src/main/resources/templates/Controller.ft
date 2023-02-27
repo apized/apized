@@ -45,7 +45,9 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('LIST'))
 
   @Get
-  @Operation(operationId = "List $type", tags = {"$type Controller"})
+  @Operation(operationId = "List $type", summary = "List", tags = {"$type"}, description = """
+    $descriptions.get('LIST')
+  """)
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.LIST)
   )
@@ -58,7 +60,9 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('GET'))
 
   @Get(uri = "/{id}")
-  @Operation(operationId = "Get $type", tags = {"$type Controller"})
+  @Operation(operationId = "Get $type", summary = "Get", tags = {"$type"}, description = """
+    $descriptions.get('GET')
+  """)
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.GET)
   )
@@ -71,7 +75,9 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('CREATE'))
 
   @Post("/")
-  @Operation(operationId = "Create $type", tags = {"$type Controller"})
+  @Operation(operationId = "Create $type", summary = "Create", tags = {"$type"}, description = """
+    $descriptions.get('CREATE')
+  """)
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.CREATE)
   )
@@ -84,7 +90,9 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('UPDATE'))
 
   @Put("/{id}")
-  @Operation(operationId = "Update $type", tags = {"$type Controller"})
+  @Operation(operationId = "Update $type", summary = "Update", tags = {"$type"}, description = """
+    $descriptions.get('UPDATE')
+  """)
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.UPDATE)
   )
@@ -97,7 +105,9 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('DELETE'))
 
   @Delete("/{id}")
-  @Operation(operationId = "Delete $type", tags = {"$type Controller"})
+  @Operation(operationId = "Delete $type", summary = "Delete", tags = {"$type"}, description = """
+    $descriptions.get('DELETE')
+  """)
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.DELETE)
   )

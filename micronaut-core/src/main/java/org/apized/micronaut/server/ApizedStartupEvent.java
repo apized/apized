@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package org.apized.micronaut.security;
+package org.apized.micronaut.server;
 
-import io.micronaut.context.annotation.Context;
-import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.ApplicationEvent;
 import org.apized.core.ApizedConfig;
-import org.apized.core.behaviour.BehaviourManager;
-import org.apized.core.security.AbstractCheckPermissionBehaviour;
-import org.apized.core.security.UserResolver;
 
-@Context
-@Requires(bean = UserResolver.class)
-public class CheckPermissionBehaviour extends AbstractCheckPermissionBehaviour {
-
-  public CheckPermissionBehaviour(ApizedConfig config, BehaviourManager manager) {
-    super(config.getSlug(), manager);
+public class ApizedStartupEvent extends ApplicationEvent {
+  public ApizedStartupEvent(ApizedConfig source) {
+    super(source);
   }
 }

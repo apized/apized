@@ -17,11 +17,11 @@
 package org.apized.core.security.model;
 
 import io.micronaut.core.annotation.Introspected;
-import org.apized.core.model.Model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -32,4 +32,11 @@ public class Role extends Permissionable {
   protected UUID id;
   protected String name;
   protected String description;
+
+  public Role(UUID id, String name, String description, List<String> permissions) {
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.permissions = permissions;
+  }
 }

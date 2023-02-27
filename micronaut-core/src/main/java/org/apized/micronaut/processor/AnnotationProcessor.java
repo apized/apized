@@ -44,6 +44,8 @@ import javax.tools.StandardLocation;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -127,6 +129,24 @@ public class AnnotationProcessor extends AbstractProcessor {
     return null;
   }
 
+  private Map getActionDescription(Element it, List<String> actions) {
+    HashMap<String, String> result = new HashMap<>();
+    actions.stream().forEach(action -> {
+      String description = "";
+      try {
+        Path root = Path.of(processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", "a").toUri()).getParent().getParent().getParent().getParent().getParent();
+        Path source = Path.of(root.toString(), "src", "main", "resources", "docs", it.getSimpleName().toString().toLowerCase(), String.format("%s.md", action.toLowerCase()));
+        if (Files.exists(source)) {
+          description = Files.readString(source);
+        }
+      } catch (IOException e) {
+        // Do nothing
+      }
+      result.put(action, description);
+    });
+    return result;
+  }
+
   private List<? extends Element> processApis(RoundEnvironment roundEnv) {
     List<? extends Element> generated = roundEnv.getElementsAnnotatedWith(Apized.class).stream().filter(it -> {
       if (it.getKind() != ElementKind.CLASS) {
@@ -134,11 +154,11 @@ public class AnnotationProcessor extends AbstractProcessor {
         return false;
       } else {
         Apized annotation = it.getAnnotation(Apized.class);
-
         Map<String, Object> bindings = getDefaultBindings();
         bindings.put("module", ((PackageElement) it.getEnclosingElement()).getQualifiedName().toString());
         bindings.put("type", it.getSimpleName().toString());
         bindings.put("actions", Arrays.stream(annotation.operations()).map(Enum::toString).collect(Collectors.toList()));
+        bindings.put("descriptions", getActionDescription(it, Arrays.stream(annotation.operations()).map(Enum::toString).toList()));
         bindings.put("extension", Map.of(
           "repository", Map.of(
             "imports", new ArrayList<String>(),
@@ -161,7 +181,7 @@ public class AnnotationProcessor extends AbstractProcessor {
               TypeMirror elementType = el.asType();
               return el.getAnnotation(Transient.class) == null && (
                 processingEnv.getTypeUtils().isAssignable(elementType, baseModelType) ||
-                processingEnv.getTypeUtils().isAssignable(elementType, collectionType)
+                  processingEnv.getTypeUtils().isAssignable(elementType, collectionType)
               );
             }
           )

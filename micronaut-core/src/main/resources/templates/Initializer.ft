@@ -16,6 +16,7 @@ import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
 import org.apized.core.model.Model;
 import org.apized.core.model.When;
+import org.apized.micronaut.server.ApizedStartupEvent;
 import org.apized.micronaut.context.MicronautContextProvider;
 import org.apized.micronaut.server.ModelResolver;
 import org.apized.micronaut.server.mvc.ApizedRepositoryInterceptor;
@@ -60,5 +61,7 @@ public class Initializer {
     #foreach( $it in $behaviours )
     manager.registerBehaviour(${it.annotation.module}.${it.annotation.model}.class, Layer.${it.annotation.layer}, List.of(#expandEnumList('When', ${it.annotation.when})), List.of(#expandEnumList('Action', ${it.annotation.actions})), ${it.annotation.order}, ${it.name});
     #end
+
+    applicationContext.getEventPublisher(ApizedStartupEvent.class).publishEvent(new ApizedStartupEvent(config));
   }
 }
