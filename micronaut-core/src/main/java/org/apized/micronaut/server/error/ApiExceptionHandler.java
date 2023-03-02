@@ -122,7 +122,15 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
           )
           .build()
       );
-      case "UnauthorizedException" -> HttpResponse.unauthorized();
+      case "UnauthorizedException" ->
+        HttpResponse.unauthorized().body(MicronautErrorResponse.builder().errors(
+          List.of(
+            MicronautErrorEntry
+              .builder()
+              .message(exception.getMessage())
+              .build()
+          )
+        ).build());
       default -> {
         log.error(exception.getMessage(), exception);
         notifiers.forEach(n -> n.report(exception));
@@ -135,8 +143,8 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
                   .builder()
                   .message(
                     String.format(
-                      "Missing handler for [%s]: %s",
-                      exception.getClass(),
+                      "%s: %s",
+                      exception.getClass().getSimpleName(),
                       exception.getMessage()
                     )
                   ).build()

@@ -1,5 +1,5 @@
 dependencies {
-  api project(":core")
+  api project(":micronaut-core")
 
   api 'org.codehaus.groovy:groovy-all:3.0.12'
   api 'org.spockframework:spock-core:2.1-groovy-3.0'

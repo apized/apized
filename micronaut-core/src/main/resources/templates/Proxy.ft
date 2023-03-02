@@ -11,7 +11,6 @@ import java.util.*;
 @Generated
 @Introspected
 public class ${type}${d}Proxy extends ${type} {
-  private boolean built = false;
   private Map<String, Object> resolutions = new HashMap<>();
 
   public ${type}${d}Proxy($type it) {
@@ -21,8 +20,6 @@ public class ${type}${d}Proxy extends ${type} {
     wrapper.getBeanProperties().stream().forEach(prop ->
       self.setProperty(prop.getName(), wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null))
     );
-
-    built = true;
   }
 
 #foreach( $it in $subModels )
@@ -32,14 +29,10 @@ public class ${type}${d}Proxy extends ${type} {
 #else
   public void set${it.Name}($it.type it) {
 #end
-    if(built) {
-      resolutions.put(
-        "${it.name}",
-        it
-      );
-    } else {
-      super.set${it.Name}(it);
-    }
+    resolutions.put(
+      "${it.name}",
+      it
+    );
   }
 
 #if($it.isCollection)
