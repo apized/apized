@@ -26,13 +26,18 @@ public class ${type}${d}Proxy extends ${type} {
   @Override
 #if($it.isCollection)
   public void set${it.Name}($it.type<${it.typeParam}> it) {
+    if (it != null && it.size()>0 && it.get(0) instanceof ${it.typeParam}${d}Proxy){
 #else
   public void set${it.Name}($it.type it) {
+    if (it != null && it instanceof ${it.type}${d}Proxy){
 #end
-    resolutions.put(
-      "${it.name}",
-      it
-    );
+      resolutions.put(
+        "${it.name}",
+        it
+      );
+    } else {
+      super.set${it.Name}(it);
+    }
   }
 
 #if($it.isCollection)
