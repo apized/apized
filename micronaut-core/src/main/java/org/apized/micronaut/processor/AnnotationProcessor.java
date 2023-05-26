@@ -203,7 +203,6 @@ public class AnnotationProcessor extends AbstractProcessor {
           annotation.extensions();
         } catch (MirroredTypesException exc) {
           processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Extension for %s", it.getSimpleName()));
-          Map<String, String> rootElements = roundEnv.getRootElements().stream().collect(Collectors.toMap(e -> e.getSimpleName().toString(), Object::toString));
 
           //noinspection unchecked
           Map<String, Map<String, Collection<Object>>> extensionBindings = (Map<String, Map<String, Collection<Object>>>) bindings.get("extension");
