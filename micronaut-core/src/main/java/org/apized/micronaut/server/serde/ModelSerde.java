@@ -155,7 +155,7 @@ public class ModelSerde implements Serde<Model> {
           Deserializer<?> deserializer = context.findDeserializer(property.getType());
           deserializationWrapper.setProperty(key, deserializer.deserialize(decoder, context, Argument.of(property.getType())));
         } else {
-          deserializationWrapper.setProperty(key, decoder.decodeArbitrary());
+          deserializationWrapper.setProperty(key, defaultDeserialize(decoder, context, property));
         }
         ApizedContext.getSerde().pop();
       } else {
@@ -305,6 +305,12 @@ public class ModelSerde implements Serde<Model> {
       subType = beanProperty.asArgument();
     }
     return subType;
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private Object defaultDeserialize(Decoder decoder, DecoderContext context, BeanProperty property) throws IOException {
+    Deserializer deserializer = context.findDeserializer(property.getType());
+    return deserializer.deserialize(decoder, context, property.asArgument());
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
