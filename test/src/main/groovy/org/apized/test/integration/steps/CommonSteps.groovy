@@ -26,8 +26,6 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.apized.test.integration.core.IntegrationConfig
-import org.apized.test.integration.core.IntegrationContext
-import org.apized.test.integration.core.TestRunner
 import org.junit.Assume
 
 class CommonSteps extends AbstractSteps {
@@ -80,7 +78,7 @@ class CommonSteps extends AbstractSteps {
   // <editor-fold desc="Create">
   @Given('^I create an? empty ([^\\s]+)$')
   def empty(String type) {
-    testRunner.post(context, type, null, [ : ], null)
+    testRunner.post(context, type, null, [:], null)
   }
 
   @Given('^I create an? ([^\\s]+) with$')
@@ -140,7 +138,12 @@ class CommonSteps extends AbstractSteps {
   @Given('^I expect service ([^\\s]+) to respond with$')
   def addExpectation(String mock, DataTable table) {
     (table.asMap(String, String) as Map<String, String>).each {
-      testRunner.addExpectation(mock, it.key, context.eval(it.value))
+      String value = it.value
+      if (value.startsWith('classpath://')) {
+        testRunner.addExpectation(mock, it.key, new JsonSlurper().parse(getClass().getResourceAsStream("${it.value.substring('classpath://'.length())}")))
+      } else {
+        testRunner.addExpectation(mock, it.key, context.eval(value))
+      }
     }
   }
   //</editor-fold>
