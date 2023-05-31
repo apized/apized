@@ -1,5 +1,12 @@
 package ${module};
 
+import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.bind.annotation.Bindable;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.inject.Inject;
 import lombok.Generated;
 import org.apized.core.behaviour.annotation.BehaviourExecution;
 import org.apized.core.model.Action;
@@ -10,12 +17,6 @@ import org.apized.core.mvc.ModelService;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 import org.apized.micronaut.annotation.MicronautBehaviourExecution;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.core.annotation.Introspected;
-import io.micronaut.core.bind.annotation.Bindable;
-import io.micronaut.http.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.inject.Inject;
 
 import javax.annotation.Nullable;
 import javax.transaction.Transactional;
@@ -45,7 +46,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('LIST'))
 
   @Get
-  @Operation(operationId = "List $type", summary = "List", tags = {"$type"}, description = """
+  @Operation(operationId = "List $type", summary = "List", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
     $descriptions.get('LIST')
   """)
   @MicronautBehaviourExecution(execution =
@@ -60,7 +61,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('GET'))
 
   @Get(uri = "/{id}")
-  @Operation(operationId = "Get $type", summary = "Get", tags = {"$type"}, description = """
+  @Operation(operationId = "Get $type", summary = "Get", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
     $descriptions.get('GET')
   """)
   @MicronautBehaviourExecution(execution =
@@ -75,7 +76,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('CREATE'))
 
   @Post("/")
-  @Operation(operationId = "Create $type", summary = "Create", tags = {"$type"}, description = """
+  @Operation(operationId = "Create $type", summary = "Create", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
     $descriptions.get('CREATE')
   """)
   @MicronautBehaviourExecution(execution =
@@ -90,7 +91,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('UPDATE'))
 
   @Put("/{id}")
-  @Operation(operationId = "Update $type", summary = "Update", tags = {"$type"}, description = """
+  @Operation(operationId = "Update $type", summary = "Update", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
     $descriptions.get('UPDATE')
   """)
   @MicronautBehaviourExecution(execution =
@@ -105,7 +106,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 #if($actions.contains('DELETE'))
 
   @Delete("/{id}")
-  @Operation(operationId = "Delete $type", summary = "Delete", tags = {"$type"}, description = """
+  @Operation(operationId = "Delete $type", summary = "Delete", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
     $descriptions.get('DELETE')
   """)
   @MicronautBehaviourExecution(execution =

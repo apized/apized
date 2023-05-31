@@ -50,7 +50,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "rawtypes", "ResultOfMethodCallIgnored", "DataFlowIssue", "unchecked"})
 @SupportedAnnotationTypes("org.apized.*")
 public class AnnotationProcessor extends AbstractProcessor {
   @Override
@@ -131,7 +131,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
   private Map getActionDescription(Element it, List<String> actions) {
     HashMap<String, String> result = new HashMap<>();
-    actions.stream().forEach(action -> {
+    actions.forEach(action -> {
       String description = "";
       try {
         Path root = Path.of(processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", "a").toUri()).getParent().getParent().getParent().getParent().getParent();
@@ -280,6 +280,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             "/" + StringHelper.pluralize(StringHelper.uncapitalize(it.getSimpleName().toString())),
             getScopeFromApi(annotation)
           ));
+          bindings.put("security", bindings.getOrDefault("security", "bearerAuth"));
           generateClassFor(bindings.get("module") + "." + bindings.get("type") + "Controller", "Controller", bindings);
         }
 
@@ -292,14 +293,14 @@ public class AnnotationProcessor extends AbstractProcessor {
     if (generated.size() > 0) {
       processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Generated %d APIs", generated.size()));
       Map<String, Object> bindings = getDefaultBindings();
-      bindings.putAll(Map.of("module", "org.apized.micronaut.audit"));
+      bindings.put("module", "org.apized.micronaut.audit");
       generateClassFor("org.apized.micronaut.audit.MicronautAuditEntryRepository", "audit/Repository", bindings);
     }
     return generated;
   }
 
   private void processFederations(RoundEnvironment roundEnv) {
-    roundEnv.getElementsAnnotatedWith(Federated.class).stream().forEach(it -> {
+    roundEnv.getElementsAnnotatedWith(Federated.class).forEach(it -> {
       if (it.getKind() != ElementKind.CLASS) {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Not a class", it);
         return;
@@ -372,7 +373,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     } catch (IOException e) {
       prop.setProperty("dialect", "ANSI");
     }
-    prop.entrySet().stream().forEach(e -> bindings.put(e.getKey().toString(), e.getValue()));
+    prop.forEach((key, value) -> bindings.put(key.toString(), value));
     return bindings;
   }
 }
