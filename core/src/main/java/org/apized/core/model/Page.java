@@ -19,6 +19,7 @@ package org.apized.core.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,6 +29,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
 @Introspected
 public class Page<T extends Model> implements Model {
   @JsonIgnore

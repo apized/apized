@@ -37,6 +37,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@EqualsAndHashCode
 @NoArgsConstructor
 @MappedSuperclass
 @ToString
@@ -73,6 +74,7 @@ public abstract class BaseModel implements Model {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime lastUpdatedAt;
 
+  @SuppressWarnings("JpaAttributeTypeInspection")
   @Builder.Default
   @TypeDef(type = DataType.JSON)
   protected Map<String, Object> metadata = new HashMap<>();
