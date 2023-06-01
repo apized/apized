@@ -256,7 +256,7 @@ class CommonSteps extends AbstractSteps {
   @Then('^the response path "(.+)" contains$')
   def responsePathContains(String path, DataTable table) {
     def object = getInPath(context.lastestResponse, path.split(/\./) as List<String>)
-    assert verifyElementMatches(object as Map, table.asMap(String, String))
+    assert verifyElementMatches(object, table.asMap(String, String))
   }
 
   @Then('^the response path "(.+)" contains element with$')
