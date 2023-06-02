@@ -22,12 +22,14 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.tasks.testing.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Properties;
+
 
 /**
  *
@@ -64,7 +66,8 @@ public class ApizedPlugin implements Plugin<Project> {
 
       MicronautExtension micronaut = project.getExtensions().getByType(MicronautExtension.class);
       micronaut.runtime("netty");
-      micronaut.testRuntime("junit5");
+      project.getTasks().withType(Test.class).configureEach(Test::useJUnitPlatform);
+//      micronaut.testRuntime("junit5");
 
       project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
       project.getDependencies().add("annotationProcessor", "io.micronaut.data:micronaut-data-processor");
