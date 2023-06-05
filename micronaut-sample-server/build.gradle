@@ -1,6 +1,6 @@
 plugins {
   id 'groovy'
-  id 'io.micronaut.application' version '3.5.3'
+  id 'io.micronaut.application' version "${micronautGradlePluginVersion}"
 }
 
 repositories {
@@ -11,7 +11,7 @@ repositories {
   mavenCentral()
 }
 
-configurations.all {
+configurations.configureEach {
   resolutionStrategy.eachDependency { DependencyResolveDetails details ->
     if (details.requested.name == 'micronaut-inject') {
       details.useVersion '4.0.0-SNAPSHOT'
@@ -68,7 +68,7 @@ java {
 
 micronaut {
   runtime('netty')
-  testRuntime('junit5')
+//  testRuntime('junit5')
 }
 
 graalvmNative {
