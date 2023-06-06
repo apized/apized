@@ -16,19 +16,19 @@
 
 package org.apized.micronaut.security;
 
-import org.apized.core.ApizedConfig;
-import org.apized.core.context.ApizedContext;
-import org.apized.core.context.SecurityContext;
-import org.apized.core.security.UserResolver;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
+import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.http.simple.cookies.SimpleCookie;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.ApizedConfig;
+import org.apized.core.context.ApizedContext;
+import org.apized.core.security.UserResolver;
 import org.reactivestreams.Publisher;
 
 @Slf4j
@@ -67,6 +67,6 @@ public class SecurityFilter implements HttpServerFilter {
 
   @Override
   public int getOrder() {
-    return -100_000;
+    return ServerFilterPhase.SECURITY.order();
   }
 }

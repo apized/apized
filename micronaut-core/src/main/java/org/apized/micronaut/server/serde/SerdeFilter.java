@@ -16,14 +16,14 @@
 
 package org.apized.micronaut.server.serde;
 
-import org.apized.core.StringHelper;
-import org.apized.core.context.ApizedContext;
-import org.apized.core.context.RequestContext;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
+import io.micronaut.http.filter.ServerFilterPhase;
+import org.apized.core.StringHelper;
+import org.apized.core.context.ApizedContext;
 import org.reactivestreams.Publisher;
 
 import java.util.*;
@@ -79,6 +79,6 @@ public class SerdeFilter implements HttpServerFilter {
 
   @Override
   public int getOrder() {
-    return -100_000;
+    return ServerFilterPhase.FIRST.after() + 1;
   }
 }

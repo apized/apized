@@ -6,6 +6,7 @@ import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
+import io.micronaut.http.filter.ServerFilterPhase;
 import io.opentelemetry.api.trace.Span;
 import org.reactivestreams.Publisher;
 
@@ -20,5 +21,10 @@ public class TracingFilter implements HttpServerFilter {
       response.header("TraceId", Span.current().getSpanContext().getTraceId());
       return response;
     });
+  }
+
+  @Override
+  public int getOrder() {
+    return ServerFilterPhase.TRACING.order();
   }
 }
