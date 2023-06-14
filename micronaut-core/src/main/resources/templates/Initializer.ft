@@ -3,6 +3,7 @@ package org.apized.core.init;
 
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.core.annotation.Order;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.runtime.server.event.ServerStartupEvent;
 import jakarta.inject.Inject;
@@ -48,6 +49,7 @@ public class Initializer {
   #foreach( $value in $elements )${enum}.${value}#if( $foreach.hasNext ), #end#end
 #end
   @EventListener
+  @Order(-Integer.MAX_VALUE)
   void onStartup(ServerStartupEvent event) {
     ApizedContext.provider = new MicronautContextProvider();
     config.setDialect(Dialect.${dialect});
