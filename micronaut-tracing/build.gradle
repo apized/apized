@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  api project(":micronaut-core")
+  compileOnly project(":micronaut-core")
   api "io.opentelemetry:opentelemetry-exporter-otlp:1.17.0"
   api "io.opentelemetry:opentelemetry-exporter-otlp-common:1.17.0"
   api "io.opentelemetry:opentelemetry-exporter-otlp-logs:1.17.0-alpha"

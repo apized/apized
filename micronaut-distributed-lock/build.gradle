@@ -3,8 +3,10 @@ plugins {
 }
 
 dependencies {
-  api project(":micronaut-core")
-  api 'net.javacrumbs.shedlock:shedlock-provider-jdbc-micronaut:5.3.0'
+  compileOnly project(":micronaut-core")
+  api('net.javacrumbs.shedlock:shedlock-provider-jdbc-micronaut:4.42.0') {
+    exclude group: 'org.yaml', module: 'snakeyaml'
+  }
 
   compileOnly "ch.qos.logback:logback-classic"
 }
