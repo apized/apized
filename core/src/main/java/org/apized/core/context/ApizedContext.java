@@ -19,6 +19,8 @@ package org.apized.core.context;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Optional;
+
 @Getter
 @AllArgsConstructor
 public class ApizedContext {
@@ -56,6 +58,6 @@ public class ApizedContext {
   }
 
   public static void destroy() {
-    provider.destroy();
+    Optional.ofNullable(provider).ifPresent(ContextProvider::destroy);
   }
 }
