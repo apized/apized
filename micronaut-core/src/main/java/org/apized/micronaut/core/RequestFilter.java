@@ -32,7 +32,7 @@ import org.reactivestreams.Publisher;
 public class RequestFilter implements HttpServerFilter {
   @Override
   public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    if (!request.getPath().startsWith("/health")) {
+    if (!request.getPath().equals("/") && !request.getPath().startsWith("/health")) {
       long start = System.currentTimeMillis();
       ApizedContext.destroy();
       log.info("Request {} started: {}", ApizedContext.getRequest().getId(), request.getPath());

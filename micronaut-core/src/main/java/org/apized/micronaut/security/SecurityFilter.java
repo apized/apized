@@ -43,7 +43,7 @@ public class SecurityFilter implements HttpServerFilter {
 
   @Override
   public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    if (!request.getPath().startsWith("/health")) {
+    if (!request.getPath().equals("/") && !request.getPath().startsWith("/health")) {
       try {
         String authorization = request.getHeaders().get("Authorization");
         String token;

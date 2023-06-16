@@ -36,7 +36,7 @@ public class SerdeFilter implements HttpServerFilter {
 
   @Override
   public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    if (!request.getPath().startsWith("/health")) {
+    if (!request.getPath().equals("/") && !request.getPath().startsWith("/health")) {
       ApizedContext.getRequest().setPathVariables(getPathVariables(request));
       ApizedContext.getRequest().setFields(getParameters(request, "fields"));
       ApizedContext.getRequest().setSearch(getParameters(request, "search"));
