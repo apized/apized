@@ -46,7 +46,7 @@ public class ModelResolver {
       Optional<AnnotationValue<OneToMany>> oneToMany = property.getAnnotationMetadata().findAnnotation(OneToMany.class);
       if (oneToMany.isPresent()) {
         Optional<String> mappedBy = oneToMany.flatMap(annotation -> annotation.stringValue("mappedBy"));
-        terms.add(new SearchTerm(mappedBy.isEmpty() ? field : mappedBy.get(), SearchOperation.eq, selfId));
+        terms.add(new SearchTerm(mappedBy.orElseGet(() -> StringHelper.uncapitalize(clazz.getSimpleName())), SearchOperation.eq, selfId));
       } else if (manyToMany.isPresent()) {
         BeanIntrospection<?> inverseModel = BeanIntrospection.getIntrospection(property.asArgument().getFirstTypeVariable().get().getType());
         Optional<? extends BeanProperty<?, Object>> inverseField = inverseModel

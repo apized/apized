@@ -60,8 +60,6 @@ public class ${type}Service extends AbstractModelService<${type}> {
     return super.find(id);
   }
 
-  #if($actions.contains('LIST'))
-
   @Override
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.LIST)
@@ -69,8 +67,6 @@ public class ${type}Service extends AbstractModelService<${type}> {
   public Page<${type}> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
     return super.list(page, pageSize, search, sort);
   }
-#end
-#if($actions.contains('GET'))
 
   @Override
   @MicronautBehaviourExecution(execution =
@@ -79,8 +75,6 @@ public class ${type}Service extends AbstractModelService<${type}> {
   public ${type} get(UUID id) {
     return super.get(id);
   }
-#end
-#if($actions.contains('CREATE'))
 
   @Override
   @MicronautBehaviourExecution(execution =
@@ -89,8 +83,6 @@ public class ${type}Service extends AbstractModelService<${type}> {
   public ${type} create(${type} it) {
     return super.create(it);
   }
-#end
-#if($actions.contains('UPDATE'))
 
   @Override
   @MicronautBehaviourExecution(execution =
@@ -99,8 +91,6 @@ public class ${type}Service extends AbstractModelService<${type}> {
   public ${type} update(UUID id, ${type} it) {
     return super.update(id, it);
   }
-#end
-#if($actions.contains('DELETE'))
 
   @Override
   @MicronautBehaviourExecution(execution =
@@ -109,7 +99,6 @@ public class ${type}Service extends AbstractModelService<${type}> {
   public ${type} delete(UUID id) {
     return super.delete(id);
   }
-#end
 #foreach( $it in $extension.service.methods )
 
   public ${it.returnType} ${it.name}(${it.parameters}){
