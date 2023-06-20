@@ -47,6 +47,8 @@ import org.apized.micronaut.server.ModelResolver;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 public abstract class RepositoryHelper {
@@ -115,19 +117,24 @@ public abstract class RepositoryHelper {
           }
         }
 
-        if (fieldClassIntrospection.getProperty(field).isPresent() && fieldClassIntrospection.getProperty(field).get().getAnnotationMetadata().hasAnnotation(TypeDef.class)) {
-          BeanProperty<Object, Object> property = fieldClassIntrospection.getProperty(field).get();
-          AnnotationValue<TypeDef> typeDef = property.getAnnotation(TypeDef.class);
-          if (Objects.requireNonNull(typeDef).enumValue("type", DataType.class).orElse(DataType.STRING).equals(DataType.JSON)) {
-            switch (ApizedConfig.getInstance().getDialect()) {
-              case ANSI -> ansiMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
-              case H2 -> h2MetadataQuery(root, builder, criteria, value, from, List.of(field), property);
-              case MYSQL -> mysqlMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
-              case ORACLE -> oracleMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
-              case POSTGRES -> postgresMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
-              case SQL_SERVER -> sqlServerMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+        if (fieldClassIntrospection.getProperty(field).isPresent()) {
+          if (fieldClassIntrospection.getProperty(field).get().getAnnotationMetadata().hasAnnotation(TypeDef.class)) {
+            BeanProperty<Object, Object> property = fieldClassIntrospection.getProperty(field).get();
+            AnnotationValue<TypeDef> typeDef = property.getAnnotation(TypeDef.class);
+            if (Objects.requireNonNull(typeDef).enumValue("type", DataType.class).orElse(DataType.STRING).equals(DataType.JSON)) {
+              switch (ApizedConfig.getInstance().getDialect()) {
+                case ANSI -> ansiMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+                case H2 -> h2MetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+                case MYSQL -> mysqlMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+                case ORACLE -> oracleMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+                case POSTGRES -> postgresMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+                case SQL_SERVER ->
+                  sqlServerMetadataQuery(root, builder, criteria, value, from, List.of(field), property);
+              }
+              continue;
             }
-            continue;
+          } else if (LocalDateTime.class.isAssignableFrom(fieldClassIntrospection.getProperty(field).get().getType())) {
+            value = LocalDateTime.ofEpochSecond(Long.parseLong(value.toString()) / 1000, 0, ZoneOffset.UTC);
           }
         }
 
