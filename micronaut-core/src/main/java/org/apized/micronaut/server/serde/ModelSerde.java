@@ -154,6 +154,8 @@ public class ModelSerde implements Serde<Model> {
         } else if (Model.class.isAssignableFrom(property.getType())) {
           Deserializer<?> deserializer = context.findDeserializer(property.getType());
           deserializationWrapper.setProperty(key, deserializer.deserialize(decoder, context, Argument.of(property.getType())));
+        } else if (Map.class.isAssignableFrom(property.getType())) {
+          deserializationWrapper.setProperty(key, decoder.decodeArbitrary());
         } else {
           deserializationWrapper.setProperty(key, defaultDeserialize(decoder, context, property));
         }
