@@ -17,7 +17,7 @@ public class ${type}${d}Proxy extends ${type} {
     BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
     BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);
 
-    wrapper.getBeanProperties().stream().forEach(prop ->
+    wrapper.getBeanProperties().stream().filter(prop-> !prop.isReadOnly()).forEach(prop ->
       self.setProperty(prop.getName(), wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null))
     );
   }
