@@ -8,6 +8,7 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.DefaultArgument;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import org.apized.core.StringHelper;
 import org.apized.core.model.BaseModel;
 import org.apized.core.mvc.ModelService;
@@ -16,7 +17,6 @@ import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,7 +57,7 @@ public class ModelResolver {
           )
           .filter(p ->
             Objects.requireNonNull(p.getAnnotation(ManyToMany.class)).stringValue("mappedBy").orElse("").equals(field) ||
-            p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
+              p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
           )
           .findFirst();
         service = applicationContext.getBean(new DefaultArgument<>(ModelService.class, null, new DefaultArgument<>(inverseModel.getBeanType(), inverseModel.getAnnotationMetadata())));
@@ -66,10 +66,18 @@ public class ModelResolver {
         terms.add(new SearchTerm(StringHelper.uncapitalize(StringHelper.pluralize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, List.of(selfId)));
       }
       return service.list(terms, subSort, true).getContent();
-    } else if (otherId != null) {
-      return service.find(otherId);
     } else {
-      return null;
+      if (otherId != null) {
+        return service.find(otherId);
+      } else {
+        Optional<AnnotationValue<OneToOne>> oneToOne = property.getAnnotationMetadata().findAnnotation(OneToOne.class);
+        if (oneToOne.isPresent()) {
+          Optional<String> mappedBy = oneToOne.flatMap(annotation -> annotation.stringValue("mappedBy"));
+          return service.searchOne(new SearchTerm(mappedBy.orElseGet(() -> StringHelper.uncapitalize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, selfId)).orElse(null);
+        } else {
+          return null;
+        }
+      }
     }
   }
 }
