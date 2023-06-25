@@ -1,0 +1,13 @@
+plugins {
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
+}
+
+dependencies {
+  compileOnly project(":micronaut-core")
+  compileOnly project(":micronaut-tracing")
+  annotationProcessor("org.projectlombok:lombok:1.18.24")
+  compileOnly("org.projectlombok:lombok:1.18.24")
+
+  api "io.micronaut.rabbitmq:micronaut-rabbitmq"
+  implementation("org.apache.velocity:velocity-engine-core")
+}

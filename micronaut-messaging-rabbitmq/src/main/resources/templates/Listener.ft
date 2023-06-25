@@ -1,0 +1,62 @@
+#set ( $d = "$")
+package $module;
+
+import com.rabbitmq.client.BasicProperties;
+import com.rabbitmq.client.Envelope;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.rabbitmq.annotation.Queue;
+import io.micronaut.rabbitmq.annotation.RabbitListener;
+import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
+import io.micronaut.rabbitmq.connect.ChannelPool;
+import io.micronaut.serde.ObjectMapper;
+import io.opentelemetry.api.trace.Tracer;
+import jakarta.inject.Inject;
+import lombok.Generated;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apized.core.error.ExceptionNotifier;
+import org.apized.core.security.UserResolver;
+import org.apized.core.ApizedConfig;
+import org.apized.micronaut.messaging.rabbitmq.consumer.EnvelopeConsumer;
+import org.apized.micronaut.messaging.rabbitmq.consumer.QueueConfig;
+
+import javax.transaction.Transactional;
+import java.util.List;
+
+@Generated
+@Slf4j
+@RabbitListener
+@Requires(bean = ChannelPool.class)
+class ${type}${d}Listener extends EnvelopeConsumer {
+
+  @Inject
+  @Getter
+  ${type} consumer;
+
+  public ${type}${d}Listener(
+    ChannelPool pool,
+    ObjectMapper mapper,
+    UserResolver resolver,
+    ApizedConfig config,
+    ApplicationEventPublisher<String> eventPublisher,
+    List<ExceptionNotifier> notifiers
+  ) {
+    super(
+      new QueueConfig("${exchange}", "${queue}", ${bindings}),
+      pool,
+      mapper,
+      resolver,
+      config,
+      eventPublisher,
+      notifiers
+    );
+  }
+
+  @Override
+  @Transactional
+  @Queue("${queue}")
+  protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
+    super.consume(data, envelope, properties, acknowledgement);
+  }
+}

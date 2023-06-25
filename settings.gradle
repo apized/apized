@@ -6,4 +6,4 @@ pluginManagement {
   }
 }
 rootProject.name = "apized"
-include 'core', 'test', 'micronaut-core', 'micronaut-test', 'micronaut-gradle-plugin', 'micronaut-distributed-lock', 'micronaut-tracing', 'micronaut-sample-server'
+include 'core', 'test', 'micronaut-core', 'micronaut-test', 'micronaut-gradle-plugin', 'micronaut-distributed-lock', 'micronaut-messaging-rabbitmq', 'micronaut-sample-server', 'micronaut-tracing'
