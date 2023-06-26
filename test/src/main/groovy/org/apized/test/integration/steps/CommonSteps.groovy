@@ -139,8 +139,8 @@ class CommonSteps extends AbstractSteps {
   def addExpectation(String mock, DataTable table) {
     (table.asMap(String, String) as Map<String, String>).each {
       String value = it.value
-      if (value.startsWith('classpath://')) {
-        testRunner.addExpectation(mock, it.key, new JsonSlurper().parse(getClass().getResourceAsStream("${it.value.substring('classpath://'.length())}")))
+      if (value.startsWith('classpath:')) {
+        testRunner.addExpectation(mock, it.key, new JsonSlurper().parse(getClass().getResourceAsStream("${it.value.substring('classpath:'.length())}")))
       } else {
         testRunner.addExpectation(mock, it.key, context.eval(value))
       }

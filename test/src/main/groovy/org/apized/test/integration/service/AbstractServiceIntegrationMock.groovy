@@ -17,14 +17,38 @@
 package org.apized.test.integration.service
 
 import groovy.text.GStringTemplateEngine
+import io.micronaut.core.type.Argument
+import io.micronaut.serde.ObjectMapper
+
+import java.util.function.Supplier
 
 abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock {
+  ObjectMapper mapper
   Map<String, String> expectations = [ : ]
   Map<String, List<Map>> executions = [ : ]
 
+  AbstractServiceIntegrationMock(ObjectMapper mapper) {
+    this.mapper = mapper
+  }
+
+  <T> T execute(String method, Map input, Class<T> clazz, Supplier<T> defaultAction = () -> null) {
+    String expected = executeString(method, input)
+    expected != null ? mapper.readValue(expected, clazz) : defaultAction()
+  }
+
+  <T> T execute(String method, Map input, Argument<T> clazz, Supplier<T> defaultAction = () -> null) {
+    String expected = executeString(method, input)
+    expected != null ? mapper.readValue(expected, clazz) : defaultAction()
+  }
+
+  private String executeString(String method, Map input) {
+    addExecution(method, input)
+    getInterpolatedExpectation(method, input)
+  }
+
   @Override
   void setExpectation(String method, String value) {
-    expectations[method] = value
+    expectations[ method ] = value
   }
 
   @Override
@@ -33,19 +57,23 @@ abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock 
   }
 
   String getInterpolatedExpectation(String method, Map input) {
-    new GStringTemplateEngine()
-      .createTemplate(expectations.get(method, null))
-      .make(input)
-      .toString()
+    if (expectations.containsKey(method)) {
+      new GStringTemplateEngine()
+        .createTemplate(expectations.get(method, null))
+        .make(input)
+        .toString()
+    } else {
+      null
+    }
   }
 
   @Override
   void addExecution(String method, Map arguments) {
     if (!executions.containsKey(method)) {
-      executions[method] = [ ]
+      executions[ method ] = [ ]
     }
 
-    executions[method].add(arguments)
+    executions[ method ].add(arguments)
   }
 
   @Override
