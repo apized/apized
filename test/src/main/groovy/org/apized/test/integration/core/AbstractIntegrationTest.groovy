@@ -131,7 +131,7 @@ abstract class AbstractIntegrationTest implements TestRunner {
 
     client = client
       .given()
-      .filter(new TestClientLogFilter(getTag()))
+      .filter(new TestClientLogFilter())
 
     client
   }

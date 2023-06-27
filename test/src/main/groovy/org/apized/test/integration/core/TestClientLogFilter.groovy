@@ -29,17 +29,11 @@ import io.restassured.specification.FilterableRequestSpecification
 import io.restassured.specification.FilterableResponseSpecification
 import org.slf4j.Logger
 
-import static io.restassured.filter.log.LogDetail.ALL
-
 @Slf4j
 class TestClientLogFilter implements Filter {
 
-  private final String clientTag
-  private final LogDetail logDetail = ALL
   private final PrintStream requestStream
   private final PrintStream responseStream
-  private final boolean shouldPrettyPrint = true
-
   /**
    * Little utility class to convert each request/response call into
    * its own log call to ensure they go through the same buffer
@@ -47,58 +41,33 @@ class TestClientLogFilter implements Filter {
    */
   protected class LogPrintStream extends PrintStream {
     Logger log
-    String tag
 
-    LogPrintStream(Logger log, String tag) {
-      super(System.out)
+    LogPrintStream(Logger log) {
+      super(new ByteArrayOutputStream())
       this.log = log
-      this.tag = tag
     }
 
     @Override
     void print(String s) {
-
-      log.info(
-        LogUtils.formatHeaderCenter("RAW HTTP " + tag + ":") + "\n\n" +
-          LogUtils.formatHeaderCenter("RAW HTTP " + tag + " START") + "\n\n" +
-          s + "\n\n" +
-          LogUtils.formatHeaderCenter("RAW HTTP " + tag + " END"))
+      log.info("\n{}", s)
     }
   }
 
-  TestClientLogFilter(String clientTag) {
-    this.clientTag = clientTag
-    this.requestStream = new LogPrintStream(log, "REQUEST")
-    this.responseStream = new LogPrintStream(log, "RESPONSE")
+  TestClientLogFilter() {
+    requestStream = new LogPrintStream(log)
+    responseStream = new LogPrintStream(log)
   }
 
   Response filter(FilterableRequestSpecification requestSpec, FilterableResponseSpecification responseSpec, FilterContext ctx) {
-    // Print request before it heads out
-    logRequest(requestSpec)
-    String uri = requestSpec.getURI()
-    RequestPrinter.print(requestSpec, requestSpec.getMethod(), uri, logDetail, new HashSet<>(), requestStream, shouldPrettyPrint)
+    RequestPrinter.print(requestSpec, requestSpec.getMethod(), requestSpec.getURI(), LogDetail.ALL, new HashSet<>(), requestStream, true)
 
-    // Send request and collect response through filter chain
     Response response = ctx.next(requestSpec, responseSpec)
 
-    // print response as it arrived
-    logResponse(requestSpec, response)
-    ResponsePrinter.print(response, response, responseStream, logDetail, shouldPrettyPrint, new HashSet<>())
+    ResponsePrinter.print(response, response, responseStream, LogDetail.ALL, true, new HashSet<>())
 
-    // Ensure correct handling of outer filter layers
     final byte[] responseBody = response.asByteArray()
     response = cloneResponseIfNeeded(response, responseBody)
     return response
-  }
-
-  protected void logRequest(FilterableRequestSpecification requestSpec) {
-    String statusLine = clientTag + " " + requestSpec.getMethod() + " Request to:"
-    LogUtils.logHeader(log, statusLine, requestSpec.getUserDefinedPath())
-  }
-
-  protected void logResponse(FilterableRequestSpecification requestSpec, Response response) {
-    String statusLine = clientTag + " " + requestSpec.getMethod() + " Response " + response.statusCode() + " to:"
-    LogUtils.logHeader(log, statusLine, requestSpec.getUserDefinedPath())
   }
 
   private static Response cloneResponseIfNeeded(Response response, byte[] responseAsString) {
