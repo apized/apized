@@ -27,6 +27,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.error.ExceptionNotifier;
+import org.apized.core.error.exception.ServerException;
 import org.apized.micronaut.server.error.model.MicronautErrorEntry;
 import org.apized.micronaut.server.error.model.MicronautErrorResponse;
 
@@ -58,9 +59,7 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
                 .builder()
                 .field(
                   StreamSupport.stream(v.getPropertyPath().spliterator(), false)
-                    .filter(node -> {
-                      return !excludedPathKinds.contains(node.getKind());
-                    })
+                    .filter(node -> !excludedPathKinds.contains(node.getKind()))
                     .map(node -> node.getName() + ((node.getIndex() != null) ? String.format("[%d]", node.getIndex()) : ""))
                     .collect(Collectors.joining("."))
                 )
@@ -122,17 +121,20 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
           )
           .build()
       );
-      case "UnauthorizedException" ->
-        HttpResponse.unauthorized().body(MicronautErrorResponse.builder().errors(
-          List.of(
-            MicronautErrorEntry
-              .builder()
-              .message(exception.getMessage())
-              .build()
-          )
-        ).build());
+      case "UnauthorizedException" -> HttpResponse.unauthorized().body(MicronautErrorResponse.builder().errors(
+        List.of(
+          MicronautErrorEntry
+            .builder()
+            .message(exception.getMessage())
+            .build()
+        )
+      ).build());
       default -> {
-        log.error(exception.getMessage(), exception);
+        if (exception instanceof ServerException) {
+          log.info(exception.getMessage());
+        } else {
+          log.error(exception.getMessage(), exception);
+        }
         notifiers.forEach(n -> n.report(exception));
         yield HttpResponse.serverError(
           MicronautErrorResponse
