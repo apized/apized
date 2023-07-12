@@ -23,7 +23,7 @@ import lombok.Builder;
 @Serdeable
 public class MicronautErrorEntry extends ErrorEntry {
   @Builder
-  public MicronautErrorEntry(String field, String message) {
-    super(field, message);
+  public MicronautErrorEntry(String entity, String field,  String message) {
+    super(entity, field, message);
   }
 }
