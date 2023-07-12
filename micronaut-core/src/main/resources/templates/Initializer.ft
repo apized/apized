@@ -15,12 +15,11 @@ import org.apized.core.behaviour.BehaviourManager;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
-import org.apized.core.model.Model;
 import org.apized.core.model.When;
-import org.apized.micronaut.server.ApizedStartupEvent;
 import org.apized.micronaut.context.MicronautContextProvider;
+import org.apized.micronaut.server.ApizedStartupEvent;
 import org.apized.micronaut.server.ModelResolver;
-import org.apized.micronaut.server.mvc.ApizedRepositoryInterceptor;
+import org.apized.micronaut.server.mvc.ProxyRegistry;
 
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class Initializer {
   BehaviourManager manager;
 
   @Inject
-  ApizedRepositoryInterceptor interceptor;
+  ProxyRegistry proxyRegistry;
 
 #foreach( $it in $behaviours )
   @Inject
@@ -57,7 +56,7 @@ public class Initializer {
     ModelResolver.applicationContext = applicationContext;
 
     #foreach( $it in $entities )
-    interceptor.addProxyMapping(${it}.class, ${it}${d}Proxy.class);
+    proxyRegistry.addProxyMapping(${it}.class, ${it}${d}Proxy.class);
     #end
 
     #foreach( $it in $behaviours )

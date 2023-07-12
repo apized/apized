@@ -157,6 +157,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
 
     introspection.getBeanProperties().stream()
       .filter(p -> p.getAnnotation(Federation.class) == null)
+      .filter(p -> it._getModelMetadata().getTouched().contains(p.getName()))
       .filter(p -> Model.class.isAssignableFrom(p.getType()) || (Collection.class.isAssignableFrom(p.getType()) && Model.class.isAssignableFrom(p.asArgument().getTypeParameters()[0].getType())))
       .filter(p -> isBefore == (
           (p.hasAnnotation(OneToOne.class) && p.getAnnotation(OneToOne.class).stringValue("mappedBy").isEmpty())

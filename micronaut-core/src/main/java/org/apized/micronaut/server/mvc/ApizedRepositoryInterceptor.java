@@ -5,6 +5,7 @@ import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.data.model.Page;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.core.model.BaseModel;
 import org.apized.core.model.Model;
@@ -18,18 +19,16 @@ import java.util.stream.Stream;
 @Singleton
 @InterceptorBean(ApizedRepository.class)
 public class ApizedRepositoryInterceptor implements MethodInterceptor<Object, Object> {
-  private final Map<Class<?>, Class<?>> entities = new HashMap<>();
 
-  public void addProxyMapping(Class<?> entity, Class<?> proxy) {
-    entities.put(entity, proxy);
-  }
+  @Inject
+  ProxyRegistry proxyRegistry;
 
   @Override
   public Object intercept(MethodInvocationContext<Object, Object> context) {
     Object result = context.proceed();
     Class<?> type = context.getReturnType().asArgument().getFirstTypeVariable().orElse(context.getReturnType().asArgument()).getType();
-    if (result != null && entities.containsKey(type)) {
-      BeanIntrospection<?> introspection = BeanIntrospection.getIntrospection(entities.get(type));
+    if (result != null && proxyRegistry.contains(type)) {
+      BeanIntrospection<?> introspection = BeanIntrospection.getIntrospection(proxyRegistry.get(type));
 
       if (Page.class.isAssignableFrom(result.getClass())) {
         Page<?> page = (Page<?>) result;

@@ -63,7 +63,7 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
                     .map(node -> node.getName() + ((node.getIndex() != null) ? String.format("[%d]", node.getIndex()) : ""))
                     .collect(Collectors.joining("."))
                 )
-                .message(v.getMessage())
+                .message(String.format("%s: %s", v.getLeafBean().getClass().getSimpleName().replaceAll("\\$Proxy$", ""), v.getMessage()))
                 .build()
             ).toList()
           )

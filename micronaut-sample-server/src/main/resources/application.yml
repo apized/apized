@@ -68,3 +68,7 @@ apized:
   federation:
     auth: ${AUTH_API:`https://auth.apized.com`}
     catalogopolis: https://api.catalogopolis.xyz/v1
+
+logger:
+  levels:
+    io.micronaut.data.query: DEBUG
