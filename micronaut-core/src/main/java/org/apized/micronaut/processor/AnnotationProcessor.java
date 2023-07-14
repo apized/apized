@@ -16,6 +16,8 @@
 
 package org.apized.micronaut.processor;
 
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Transient;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -171,6 +173,7 @@ public class AnnotationProcessor extends AbstractProcessor {
           )
         ));
         bindings.put("subModels", new ArrayList<>());
+        bindings.put("manyToMany", new ArrayList<>());
 
         TypeMirror baseModelType = processingEnv.getElementUtils().getTypeElement(BaseModel.class.getName()).asType();
         TypeMirror collectionType = processingEnv.getTypeUtils().getDeclaredType(processingEnv.getElementUtils().getTypeElement(Collection.class.getName()), processingEnv.getTypeUtils().getWildcardType(baseModelType, null));
@@ -185,7 +188,7 @@ public class AnnotationProcessor extends AbstractProcessor {
               );
             }
           )
-          .forEach(el ->
+          .peek(el ->
             ((List<Map<String, Object>>) bindings.get("subModels")).add(
               Map.of(
                 "Name", StringHelper.capitalize(el.getSimpleName().toString()),
@@ -197,6 +200,16 @@ public class AnnotationProcessor extends AbstractProcessor {
                   : ""
               )
             )
+          )
+          .filter(el -> Arrays.stream(el.getAnnotationsByType(ManyToMany.class)).filter(a -> a.mappedBy().isBlank()).toList().size() > 0)
+          .forEach(el ->
+            ((List<Map<String, Object>>) bindings.get("manyToMany")).add(Map.of(
+              "Name", StringHelper.capitalize(el.getSimpleName().toString()),
+              "name", el.getSimpleName().toString(),
+              "table", el.getAnnotation(JoinTable.class).name(),
+              "self", el.getAnnotation(JoinTable.class).joinColumns()[0].name(),
+              "other", el.getAnnotation(JoinTable.class).inverseJoinColumns()[0].name()
+            ))
           );
 
         try {

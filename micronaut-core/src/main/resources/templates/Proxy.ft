@@ -2,6 +2,7 @@
 package ${module};
 
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanWrapper;
 import lombok.Generated;
 import org.apized.micronaut.server.ModelResolver;
@@ -11,32 +12,45 @@ import java.util.*;
 @Generated
 @Introspected
 public class ${type}${d}Proxy extends ${type} {
+  private boolean building = true;
   private Map<String, Object> resolutions = new HashMap<>();
 
-  public ${type}${d}Proxy($type it) {
-    BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
-    BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);
+  public ${type}${d}Proxy(@Nullable $type it) {
+    if (it != null) {
+      BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
+      BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);
 
-    wrapper.getBeanProperties().stream().filter(prop-> !prop.isReadOnly()).forEach(prop ->
-      self.setProperty(prop.getName(), wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null))
-    );
+      wrapper.getBeanProperties().stream().filter(prop-> !prop.isReadOnly()).forEach(prop ->
+        self.setProperty(prop.getName(), wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null))
+      );
+    }
+    building = false;
   }
 
 #foreach( $it in $subModels )
   @Override
 #if($it.isCollection)
   public void set${it.Name}($it.type<${it.typeParam}> it) {
-    if (it != null && it.size()>0 && it.get(0) instanceof ${it.typeParam}${d}Proxy){
+    if(building) {
+      if (it != null && it.size()>0 && it.get(0) instanceof ${it.typeParam}${d}Proxy){
 #else
   public void set${it.Name}($it.type it) {
-    if (it != null && it instanceof ${it.type}${d}Proxy){
+    if(building) {
+      if (it != null && it instanceof ${it.type}${d}Proxy){
 #end
+        resolutions.put(
+          "${it.name}",
+          it
+        );
+      } else {
+        super.set${it.Name}(it);
+      }
+    } else {
       resolutions.put(
         "${it.name}",
         it
       );
-    } else {
-      super.set${it.Name}(it);
+      _getModelMetadata().getTouched().add("${it.name}");
     }
   }
 

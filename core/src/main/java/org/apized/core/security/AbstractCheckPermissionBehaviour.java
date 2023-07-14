@@ -107,9 +107,10 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
   }
 
   private void verifyPermissionForFieldAndValue(String entityName, Action action, Model model, String field, Object value) {
-    String perm = slug + "." + entityName + "." + action.getType() + (model.getId() != null ? "." + model.getId() : "") + "." + field + "." + value;
+    Object val = value instanceof Model && ((Model) value).getId() != null ? ((Model) value).getId() : value;
+    String perm = slug + "." + entityName + "." + action.getType() + (model.getId() != null ? "." + model.getId() : "") + "." + field + "." + val;
     if (!ApizedContext.getSecurity().getUser().isAllowed(perm)) {
-      throw new ForbiddenException("Not allowed to " + action.getType() + " " + StringHelper.capitalize(entityName) + (model.getId() != null ? " with id " + model.getId() : "") + " with `" + field + "` set to " + value, perm);
+      throw new ForbiddenException("Not allowed to " + action.getType() + " " + StringHelper.capitalize(entityName) + (model.getId() != null ? " with id " + model.getId() : "") + " with `" + field + "` set to " + val, perm);
     }
   }
 }

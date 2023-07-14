@@ -150,7 +150,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     return it;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({"unchecked", "rawtypes", "DataFlowIssue", "OptionalGetWithoutIsPresent"})
   protected void performSubExecutions(T it, boolean isBefore) {
     BeanWrapper<T> wrapper = BeanWrapper.getWrapper(it);
     BeanIntrospection<T> introspection = BeanIntrospection.getIntrospection(getType());
@@ -161,7 +161,8 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .filter(p -> Model.class.isAssignableFrom(p.getType()) || (Collection.class.isAssignableFrom(p.getType()) && Model.class.isAssignableFrom(p.asArgument().getTypeParameters()[0].getType())))
       .filter(p -> isBefore == (
           (p.hasAnnotation(OneToOne.class) && p.getAnnotation(OneToOne.class).stringValue("mappedBy").isEmpty())
-          || p.hasAnnotation(ManyToOne.class)
+            || p.hasAnnotation(ManyToOne.class)
+            || (p.hasAnnotation(ManyToMany.class) && p.getAnnotation(ManyToMany.class).stringValue("mappedBy").isPresent())
         )
       )
       .forEach(p -> {
@@ -185,6 +186,29 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
               Argument.of(type)
             )
           );
+
+          if (p.hasAnnotation(ManyToMany.class)) {
+            String table = p.getAnnotation(JoinTable.class).stringValue("name").get();
+            String self = p.getAnnotation(JoinTable.class).getAnnotations("joinColumns").get(0).stringValue("name").get();
+            String other = p.getAnnotation(JoinTable.class).getAnnotations("inverseJoinColumns").get(0).stringValue("name").get();
+
+            Model original = it._getModelMetadata().getOriginal();
+            List<UUID> remove = new ArrayList<>();
+            List<UUID> add = new ArrayList<>(values.stream().map(Model::getId).toList());
+
+            if (original != null) {
+              BeanWrapper<?> originalWrapper = BeanWrapper.getWrapper(original);
+              ((List<Model>) originalWrapper.getProperty(p.getName(), p.getType()).get()).stream().map(Model::getId).forEach(o -> {
+                if (add.contains(o)) {
+                  add.remove(o);
+                } else {
+                  remove.add(o);
+                }
+              });
+            }
+            add.forEach(o -> getRepository().add(p.getName(), it.getId(), o));
+            remove.forEach(o -> getRepository().remove(p.getName(), it.getId(), o));
+          }
 
           if (service.isPresent()) {
             values.stream()

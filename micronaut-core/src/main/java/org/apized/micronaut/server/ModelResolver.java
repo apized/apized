@@ -66,18 +66,10 @@ public class ModelResolver {
         terms.add(new SearchTerm(StringHelper.uncapitalize(StringHelper.pluralize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, List.of(selfId)));
       }
       return service.list(terms, subSort, true).getContent();
+    } else if (otherId != null) {
+      return service.find(otherId);
     } else {
-      if (otherId != null) {
-        return service.find(otherId);
-      } else {
-        Optional<AnnotationValue<OneToOne>> oneToOne = property.getAnnotationMetadata().findAnnotation(OneToOne.class);
-        if (oneToOne.isPresent()) {
-          Optional<String> mappedBy = oneToOne.flatMap(annotation -> annotation.stringValue("mappedBy"));
-          return service.searchOne(new SearchTerm(mappedBy.orElseGet(() -> StringHelper.uncapitalize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, selfId)).orElse(null);
-        } else {
-          return null;
-        }
-      }
+      return null;
     }
   }
 }

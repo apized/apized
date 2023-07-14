@@ -41,6 +41,7 @@ import org.apized.core.mvc.ModelService;
 import org.apized.core.security.annotation.Owner;
 import org.apized.micronaut.federation.FederationResolver;
 import org.apized.micronaut.server.ModelResolver;
+import org.apized.micronaut.server.mvc.ProxyRegistry;
 
 import java.io.IOException;
 import java.util.*;
@@ -49,6 +50,9 @@ import java.util.*;
 public class ModelSerde implements Serde<Model> {
   @Inject
   ApplicationContext appContext;
+
+  @Inject
+  ProxyRegistry proxyRegistry;
 
   @Inject
   FederationResolver resolver;
@@ -65,7 +69,9 @@ public class ModelSerde implements Serde<Model> {
         .get().get(UUID.fromString(id));
       isId = true;
     } catch (IOException e) {
-      model = (Model) introspection.getConstructor().instantiate();
+      model = proxyRegistry.contains(type.getType())
+        ? (Model) BeanIntrospection.getIntrospection(proxyRegistry.get(type.getType())).getConstructor().instantiate((Model)null)
+        : (Model) introspection.getConstructor().instantiate();
     }
 
 
@@ -107,10 +113,10 @@ public class ModelSerde implements Serde<Model> {
           appContext.getBean(new DefaultArgument<>(ModelService.class, scopeIntrospection.getAnnotationMetadata(), Argument.of(scope)))
             .get(scopeId)
         );
-      } else if (ApizedContext.getSerde().stream().anyMatch(e -> StringHelper.uncapitalize(e.getValue().getClass().getSimpleName()).equals(scopeTypeName))) {
+      } else if (ApizedContext.getSerde().stream().anyMatch(e -> StringHelper.uncapitalize(e.getValue().getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName))) {
         deserializationWrapper.setProperty(
           scopeTypeName,
-          ApizedContext.getSerde().stream().map(SerdeContext.SerdeStackEntry::getValue).filter(e -> StringHelper.uncapitalize(e.getClass().getSimpleName()).equals(scopeTypeName)).findFirst().orElse(null)
+          ApizedContext.getSerde().stream().map(SerdeContext.SerdeStackEntry::getValue).filter(e -> StringHelper.uncapitalize(e.getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName)).findFirst().orElse(null)
         );
       }
     }

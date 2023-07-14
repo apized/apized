@@ -16,6 +16,7 @@
 
 package org.apized.core.mvc;
 
+import io.micronaut.data.annotation.Query;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
 import org.apized.core.search.SearchTerm;
@@ -26,6 +27,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ModelRepository<T extends Model> {
+  void add(String field, UUID self, UUID other);
+
+  void remove(String field, UUID self, UUID other);
+
   Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort);
 
   Optional<T> searchOne(List<SearchTerm> search);

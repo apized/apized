@@ -1,5 +1,8 @@
 package ${module};
 
+#if(${manyToMany})
+import io.micronaut.data.annotation.Query;
+#end
 import org.apized.micronaut.server.mvc.MicronautModelRepository;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
@@ -7,5 +10,34 @@ import io.micronaut.data.model.query.builder.sql.Dialect;
 import $it;
 #end
 
+import java.util.UUID;
+
 @JdbcRepository(dialect = Dialect.${dialect})
-public interface ${type}Repository extends MicronautModelRepository<${type}>#foreach( $it in ${extension.repository.implements}), $it #end{}
+public interface ${type}Repository extends MicronautModelRepository<${type}>#foreach( $it in ${extension.repository.implements}), $it #end{
+
+    @Override
+    default void add(String field, UUID self, UUID other){
+        switch(field) {
+#foreach( $it in ${manyToMany})
+            case "${it.name}": add${it.Name}(self, other);
+#end
+        }
+    }
+
+    @Override
+    default void remove(String field, UUID self, UUID other){
+        switch(field) {
+#foreach( $it in ${manyToMany})
+            case "${it.name}": remove${it.Name}(self, other);
+#end
+        }
+    }
+
+#foreach( $it in ${manyToMany})
+    @Query("insert into ${it.table}(${it.self},${it.other}) values(:self,:other)")
+    void add${it.Name}(UUID self, UUID other);
+
+    @Query("delete from ${it.table} where ${it.self}=:self and ${it.other}=:other")
+    void remove${it.Name}(UUID self, UUID other);
+#end
+}
