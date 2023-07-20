@@ -214,7 +214,7 @@ public abstract class RepositoryHelper {
 
   public static <T extends Model> Sort generateSort(List<SortTerm> sort) {
     if (sort.size() == 0) {
-      sort = List.of(new SortTerm("createdAt", SortDirection.desc));
+      sort = List.of(new SortTerm("createdAt", SortDirection.asc));
     }
 
     return Sort.of(

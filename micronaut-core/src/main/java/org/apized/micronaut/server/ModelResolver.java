@@ -8,7 +8,6 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.DefaultArgument;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import org.apized.core.StringHelper;
 import org.apized.core.model.BaseModel;
 import org.apized.core.mvc.ModelService;
