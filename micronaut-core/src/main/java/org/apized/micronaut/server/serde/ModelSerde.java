@@ -125,7 +125,6 @@ public class ModelSerde implements Serde<Model> {
       return model;
     }
 
-    decoder.decodeObject();
     String key;
     while ((key = decoder.decodeKey()) != null) {
       Optional<? extends BeanProperty<? super Model, Object>> propOpt = introspection.getProperty(key);

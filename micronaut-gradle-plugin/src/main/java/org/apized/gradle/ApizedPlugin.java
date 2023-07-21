@@ -78,6 +78,7 @@ public class ApizedPlugin implements Plugin<Project> {
       project.getDependencies().add("implementation", String.format("org.apized:micronaut-core:%s", apizedVersion));
 
       project.getDependencies().add("runtimeOnly", "ch.qos.logback:logback-classic");
+//todo might need this with micronaut 4.0.x      project.getDependencies().add("runtimeOnly", "org.yaml:snakeyaml");
       //todo ideally we don't want this and the above is sufficient but right now the tests require a slf4j 2.0 compatible lib
       project.getDependencies().add("testRuntimeOnly", "ch.qos.logback:logback-classic:1.4.4");
       project.getDependencies().add("testImplementation", String.format("org.apized:micronaut-test:%s", apizedVersion));

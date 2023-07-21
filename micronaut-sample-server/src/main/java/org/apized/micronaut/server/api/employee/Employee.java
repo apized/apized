@@ -32,7 +32,7 @@ import org.apized.micronaut.server.api.address.Address;
 import org.apized.micronaut.server.api.department.Department;
 import org.apized.micronaut.server.api.organization.Organization;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Getter
 @Setter

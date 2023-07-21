@@ -1,11 +1,12 @@
 dependencies {
   api project(":micronaut-core")
 
-  api 'org.codehaus.groovy:groovy-all:3.0.12'
-  api 'org.spockframework:spock-core:2.1-groovy-3.0'
-  api 'io.cucumber:cucumber-java:7.3.3'
-  api 'io.cucumber:cucumber-junit:7.3.3'
-  api 'io.rest-assured:rest-assured:4.5.0'
+  api 'org.apache.groovy:groovy'
+  api 'org.apache.groovy:groovy-templates'
+  api 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
+  api 'io.cucumber:cucumber-java:7.13.0'
+  api 'io.cucumber:cucumber-junit:7.13.0'
+  api 'io.rest-assured:rest-assured:5.3.1'
 
   api 'org.testcontainers:mysql:1.17.4'
   api 'org.testcontainers:postgresql:1.17.4'

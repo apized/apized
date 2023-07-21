@@ -4,12 +4,6 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.runtime.server.event.ServerStartupEvent;
-import io.opentelemetry.exporter.internal.retry.RetryPolicy;
-import io.opentelemetry.exporter.internal.retry.RetryUtil;
-import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogExporter;
-import io.opentelemetry.sdk.logs.LogLimits;
-import io.opentelemetry.sdk.logs.SdkLogEmitterProvider;
-import io.opentelemetry.sdk.logs.export.BatchLogProcessor;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
 import jakarta.inject.Singleton;
@@ -41,21 +35,22 @@ public class LoggingConfiguration {
       .put(ResourceAttributes.SERVICE_INSTANCE_ID, instance)
       .build();
 
-    var logExporterBuilder =
-      OtlpGrpcLogExporter.builder()
-        .setEndpoint(endpoint)
-        .setCompression("gzip")
-        .addHeader("api-key", key);
-
-    RetryUtil.setRetryPolicyOnDelegate(logExporterBuilder, RetryPolicy.getDefault());
-
-    SdkLogEmitterProvider logEmitterProvider =
-      SdkLogEmitterProvider.builder()
-        .setResource(resource)
-        .setLogLimits(() -> LogLimits.getDefault().toBuilder().setMaxAttributeValueLength(4095).build())
-        .addLogProcessor(BatchLogProcessor.builder(logExporterBuilder.build()).build())
-        .build();
-
-    OpenTelemetryAppender.setSdkLogEmitterProvider(logEmitterProvider);
+// todo broken with micronaut 4.0.x
+//    var logExporterBuilder =
+//      OtlpGrpcLogExporter.builder()
+//        .setEndpoint(endpoint)
+//        .setCompression("gzip")
+//        .addHeader("api-key", key);
+//
+//    RetryUtil.setRetryPolicyOnDelegate(logExporterBuilder, RetryPolicy.getDefault());
+//
+//    SdkLogEmitterProvider logEmitterProvider =
+//      SdkLogEmitterProvider.builder()
+//        .setResource(resource)
+//        .setLogLimits(() -> LogLimits.getDefault().toBuilder().setMaxAttributeValueLength(4095).build())
+//        .addLogProcessor(BatchLogProcessor.builder(logExporterBuilder.build()).build())
+//        .build();
+//
+//    OpenTelemetryAppender.setSdkLogEmitterProvider(logEmitterProvider);
   }
 }

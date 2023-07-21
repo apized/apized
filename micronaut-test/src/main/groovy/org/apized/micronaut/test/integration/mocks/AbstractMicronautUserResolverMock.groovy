@@ -17,7 +17,7 @@
 package org.apized.micronaut.test.integration.mocks
 
 import org.apized.test.integration.mocks.AbstractUserResolverMock
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 abstract class AbstractMicronautUserResolverMock extends AbstractUserResolverMock {
   @PostConstruct

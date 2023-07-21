@@ -23,7 +23,6 @@ import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.DataType;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.apized.core.audit.annotation.AuditIgnore;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.event.annotation.EventIgnore;
@@ -42,7 +41,6 @@ import java.util.UUID;
 @MappedSuperclass
 @ToString
 @Introspected
-@SuperBuilder
 public abstract class BaseModel implements Model {
   @Id
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -51,7 +49,6 @@ public abstract class BaseModel implements Model {
   @AuditIgnore
   @EventIgnore
   @Version
-  @Builder.Default
   private Long version = 0L;
 
   @AuditIgnore
@@ -75,17 +72,17 @@ public abstract class BaseModel implements Model {
   private LocalDateTime lastUpdatedAt;
 
   @SuppressWarnings("JpaAttributeTypeInspection")
-  @Builder.Default
   @TypeDef(type = DataType.JSON)
   protected Map<String, Object> metadata = new HashMap<>();
 
   @JsonIgnore
   @Transient
-  @Builder.Default
   @Getter(AccessLevel.NONE)
   @Setter(AccessLevel.NONE)
   ModelMetadata _modelMetadata = new ModelMetadata();
 
+  @JsonIgnore
+  @Transient
   @Override
   public ModelMetadata _getModelMetadata() {
     return _modelMetadata;

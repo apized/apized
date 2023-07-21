@@ -19,8 +19,8 @@ import org.apized.core.search.SortTerm;
 import org.apized.micronaut.annotation.MicronautBehaviourExecution;
 
 import javax.annotation.Nullable;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
