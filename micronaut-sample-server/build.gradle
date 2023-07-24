@@ -13,6 +13,7 @@ dependencies {
   compileOnly('org.projectlombok:lombok')
 
   project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
+  project.getDependencies().add("annotationProcessor", "io.micronaut.validation:micronaut-validation-processor");
   project.getDependencies().add("annotationProcessor", "io.micronaut.data:micronaut-data-processor");
   project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor");
 

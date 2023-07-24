@@ -4,10 +4,11 @@ plugins {
 
 dependencies {
   compileOnly project(":micronaut-core")
-  api "io.opentelemetry:opentelemetry-exporter-otlp:1.28.0"
-  api "io.opentelemetry:opentelemetry-exporter-otlp-common:1.28.0"
-  api "io.opentelemetry:opentelemetry-exporter-otlp-logs:1.26.0-alpha"
-  api "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:1.28.0-alpha"
+  api "io.opentelemetry:opentelemetry-exporter-otlp"
+  api "io.opentelemetry:opentelemetry-exporter-logging"
+  api "io.opentelemetry:opentelemetry-exporter-otlp-common"
+  api "io.opentelemetry:opentelemetry-exporter-otlp-logs"
+  api "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0"
   api "io.micronaut.tracing:micronaut-tracing-opentelemetry-http"
 
   compileOnly "ch.qos.logback:logback-classic"

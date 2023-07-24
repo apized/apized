@@ -21,7 +21,7 @@ import org.apized.core.ApizedConfig;
 import org.apized.micronaut.messaging.rabbitmq.consumer.EnvelopeConsumer;
 import org.apized.micronaut.messaging.rabbitmq.consumer.QueueConfig;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 
 @Generated

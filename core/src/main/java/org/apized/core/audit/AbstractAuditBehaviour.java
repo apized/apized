@@ -23,13 +23,12 @@ import org.apized.core.audit.annotation.AuditIgnore;
 import org.apized.core.audit.model.AuditEntry;
 import org.apized.core.behaviour.BehaviourHandler;
 import org.apized.core.context.ApizedContext;
-import org.apized.core.context.AuditContext;
 import org.apized.core.execution.Execution;
-import org.apized.core.model.*;
-import org.apized.core.context.SecurityContext;
-import org.apized.core.context.RequestContext;
+import org.apized.core.model.Action;
+import org.apized.core.model.Model;
+import org.apized.core.model.When;
 
-import java.util.*;
+import java.util.Map;
 
 public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> {
 
@@ -41,7 +40,7 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
     ScopeHelper.scopeUpUntil(
       model,
       a -> a.booleanValue("audit").orElse(true),
-      i -> ApizedContext.getAudit().add(AuditEntry.builder()
+      i -> save(AuditEntry.builder()
         .transactionId(ApizedContext.getRequest().getId())
         .action(action)
         .type(type.getSimpleName())
@@ -55,4 +54,6 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
       )
     );
   }
+
+  protected abstract void save(AuditEntry entry);
 }

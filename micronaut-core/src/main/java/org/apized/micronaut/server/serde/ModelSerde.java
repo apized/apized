@@ -70,7 +70,7 @@ public class ModelSerde implements Serde<Model> {
       isId = true;
     } catch (IOException e) {
       model = proxyRegistry.contains(type.getType())
-        ? (Model) BeanIntrospection.getIntrospection(proxyRegistry.get(type.getType())).getConstructor().instantiate((Model)null)
+        ? (Model) BeanIntrospection.getIntrospection(proxyRegistry.get(type.getType())).getConstructor().instantiate((Model) null)
         : (Model) introspection.getConstructor().instantiate();
     }
 
@@ -317,7 +317,7 @@ public class ModelSerde implements Serde<Model> {
   @SuppressWarnings({"unchecked", "rawtypes"})
   private Object defaultDeserialize(Decoder decoder, DecoderContext context, BeanProperty property) throws IOException {
     Deserializer deserializer = context.findDeserializer(property.asArgument());
-    return deserializer.deserialize(decoder, context, property.asArgument());
+    return deserializer.deserializeNullable(decoder, context, property.asArgument());
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})

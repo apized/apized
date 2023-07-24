@@ -17,18 +17,47 @@
 package org.apized.micronaut.audit;
 
 import io.micronaut.context.annotation.Context;
+import io.micronaut.serde.ObjectMapper;
+import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import org.apized.core.audit.AbstractAuditBehaviour;
+import org.apized.core.audit.model.AuditEntry;
 import org.apized.core.behaviour.BehaviourManager;
+import org.apized.core.context.ApizedContext;
 import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
 import org.apized.core.model.Model;
 import org.apized.core.model.When;
 
+import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Context
 public class AuditBehaviour extends AbstractAuditBehaviour {
+  @Inject
+  ObjectMapper mapper;
+
+  @Inject
+  AuditEntryRepository repository;
+
   public AuditBehaviour(BehaviourManager manager) {
     manager.registerBehaviour(Model.class, Layer.SERVICE, List.of(When.AFTER), List.of(Action.CREATE, Action.UPDATE, Action.DELETE), 1000, this);
+  }
+
+  @Override
+  protected void save(AuditEntry entry) {
+    repository.save(entry);
+    if (log.isDebugEnabled()) {
+      ApizedContext.getAudit().getAuditEntries().values().forEach((it) ->
+        {
+          try {
+            log.debug("{}[{}]: {}", it.getTarget(), it.getId(), mapper.writeValueAsString(it.getPayload()));
+          } catch (IOException e) {
+            //Do nothing
+          }
+        }
+      );
+    }
   }
 }
