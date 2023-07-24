@@ -16,9 +16,9 @@
 
 package org.apized.core.context;
 
-import org.apized.core.security.model.User;
 import lombok.Getter;
 import lombok.Setter;
+import org.apized.core.security.model.User;
 
 import java.util.UUID;
 

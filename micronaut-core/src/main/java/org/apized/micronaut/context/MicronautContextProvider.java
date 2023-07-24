@@ -32,7 +32,7 @@ public class MicronautContextProvider implements ContextProvider {
     if (request.isPresent()) {
       Optional<ApizedContext> apizedContext = request.get().getAttribute("apizedContext", ApizedContext.class);
       if (apizedContext.isEmpty()) {
-        context = getNew();
+        context = threadLocal.get();
         request.get().setAttribute("apizedContext", context);
       } else {
         context = apizedContext.get();

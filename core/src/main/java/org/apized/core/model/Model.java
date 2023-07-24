@@ -16,6 +16,9 @@
 
 package org.apized.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Transient;
+
 import java.util.UUID;
 
 public interface Model {
@@ -23,6 +26,8 @@ public interface Model {
 
   void setId(UUID id);
 
+  @JsonIgnore
+  @Transient
   default ModelMetadata _getModelMetadata(){
     return new ModelMetadata();
   }

@@ -16,8 +16,8 @@
 
 package org.apized.micronaut.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.serde.ObjectMapper;
 import io.micronaut.transaction.annotation.TransactionalEventListener;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -44,7 +44,7 @@ class SendEventsOnCommit {
     if (log.isDebugEnabled()) {
       ApizedContext.getEvent().getEvents().values().forEach(it -> {
         try {
-          log.debug("{}: {}", it.getTopic(), mapper.writerWithDefaultPrettyPrinter().writeValueAsString(it.getPayload()));
+          log.debug("{}: {}", it.getTopic(), mapper.writeValueAsString(it.getPayload()));
         } catch (IOException e) {
           //Do nothing
         }

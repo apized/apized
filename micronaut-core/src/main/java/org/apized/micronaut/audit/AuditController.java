@@ -27,7 +27,7 @@ import jakarta.inject.Inject;
 import org.apized.core.StringHelper;
 import org.apized.core.audit.model.AuditEntry;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

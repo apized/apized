@@ -4,30 +4,8 @@ plugins {
 }
 
 repositories {
-  maven {
-    url 'libs'
-  }
   mavenLocal()
   mavenCentral()
-}
-
-configurations.configureEach {
-  resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-    if (details.requested.name == 'micronaut-inject') {
-      details.useVersion '4.0.0-SNAPSHOT'
-      details.because 'Properties annotated with JPA transient should not be excluded from introspections by default'
-    }
-
-    if (details.requested.group == 'io.micronaut.data') {
-      details.useVersion '3.8.1-SNAPSHOT'
-      details.because 'Properties annotated with JPA transient should not be excluded from introspections by default'
-    }
-
-    if (['micronaut-data-tx'].contains(details.requested.name)) {
-      details.useVersion '3.4.3'
-      details.because "Properties annotated with JPA transient should not be excluded from introspections by default"
-    }
-  }
 }
 
 dependencies {
@@ -35,6 +13,7 @@ dependencies {
   compileOnly('org.projectlombok:lombok')
 
   project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
+  project.getDependencies().add("annotationProcessor", "io.micronaut.validation:micronaut-validation-processor");
   project.getDependencies().add("annotationProcessor", "io.micronaut.data:micronaut-data-processor");
   project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor");
 
@@ -46,6 +25,7 @@ dependencies {
   implementation('io.micronaut.data:micronaut-data-jdbc')
   runtimeOnly "org.postgresql:postgresql"
   runtimeOnly "io.micronaut.sql:micronaut-jdbc-hikari"
+  runtimeOnly "org.yaml:snakeyaml"
 
   testImplementation(project(':micronaut-test'))
 

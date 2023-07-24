@@ -20,7 +20,7 @@ package org.apized.micronaut.server.integration.apized
 import io.micronaut.http.annotation.Controller
 import org.apized.micronaut.test.integration.MicronautTestController
 
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @Controller('/integration')
 @Transactional

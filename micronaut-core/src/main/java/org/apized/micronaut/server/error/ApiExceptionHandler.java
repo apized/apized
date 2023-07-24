@@ -31,8 +31,8 @@ import org.apized.core.error.exception.ServerException;
 import org.apized.micronaut.server.error.model.MicronautErrorEntry;
 import org.apized.micronaut.server.error.model.MicronautErrorResponse;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.ElementKind;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ElementKind;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
