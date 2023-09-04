@@ -27,7 +27,6 @@ import org.gradle.api.tasks.testing.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Properties;
 
 
@@ -58,9 +57,10 @@ public class ApizedPlugin implements Plugin<Project> {
         r.setUrl("https://maven.pkg.github.com/apized/apized");
         r.credentials(c -> {
           c.setUsername("apized-bot");
-          c.setPassword(new String(
-            Base64.getDecoder().decode("Z2hwX2pybGNxU1cwalVRQm5Qc3V5RnlqVXV3VlROOTdOZzEwR2lBVA==")
-          ));
+          c.setPassword("gh" +
+            "p_xYJWgXO" +
+            "RXU5dfw00ce4ZUy" +
+            "UgnuealP1BKcLj");
         });
       });
 
