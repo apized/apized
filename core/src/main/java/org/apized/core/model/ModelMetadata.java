@@ -21,8 +21,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -34,9 +34,9 @@ public class ModelMetadata {
   Boolean saved = false;
 
   @Setter(value = AccessLevel.NONE)
-  List<String> touched = new ArrayList<>();
+  Set<String> touched = new HashSet<>();
 
   public boolean isDirty() {
-    return getTouched().size() > 0 && !saved;
+    return !getTouched().isEmpty() && !saved;
   }
 }

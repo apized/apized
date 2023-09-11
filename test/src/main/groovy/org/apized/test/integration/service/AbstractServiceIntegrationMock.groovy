@@ -19,6 +19,8 @@ package org.apized.test.integration.service
 import groovy.text.GStringTemplateEngine
 import io.micronaut.core.type.Argument
 import io.micronaut.serde.ObjectMapper
+import org.apized.core.context.ApizedContext
+import org.apized.core.security.model.User
 
 import java.util.function.Supplier
 
@@ -33,12 +35,32 @@ abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock 
 
   <T> T execute(String method, Map input, Class<T> clazz, Supplier<T> defaultAction = () -> null) {
     String expected = executeString(method, input)
-    expected != null ? mapper.readValue(expected, clazz) : defaultAction()
+    if (expected != null) {
+      User current = ApizedContext.security.user
+      try {
+        ApizedContext.security.user = new User(UUID.randomUUID(), 'admin@apized.org', 'administrator', [ ], [ '*' ], [ ])
+        mapper.readValue(expected, clazz)
+      } finally {
+        ApizedContext.security.user = current
+      }
+    } else {
+      defaultAction()
+    }
   }
 
   <T> T execute(String method, Map input, Argument<T> clazz, Supplier<T> defaultAction = () -> null) {
     String expected = executeString(method, input)
-    expected != null ? mapper.readValue(expected, clazz) : defaultAction()
+    if (expected != null) {
+      User current = ApizedContext.security.user
+      try {
+        ApizedContext.security.user = new User(UUID.randomUUID(), 'admin@apized.org', 'administrator', [ ], [ '*' ], [ ])
+        mapper.readValue(expected, clazz)
+      } finally {
+        ApizedContext.security.user = current
+      }
+    } else {
+      defaultAction()
+    }
   }
 
   private String executeString(String method, Map input) {
@@ -48,7 +70,7 @@ abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock 
 
   @Override
   void setExpectation(String method, String value) {
-    expectations[ method ] = value
+    expectations[method] = value
   }
 
   @Override
@@ -70,10 +92,10 @@ abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock 
   @Override
   void addExecution(String method, Map arguments) {
     if (!executions.containsKey(method)) {
-      executions[ method ] = [ ]
+      executions[method] = [ ]
     }
 
-    executions[ method ].add(arguments)
+    executions[method].add(arguments)
   }
 
   @Override

@@ -8,6 +8,7 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.DefaultArgument;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import org.apized.core.StringHelper;
 import org.apized.core.model.BaseModel;
 import org.apized.core.mvc.ModelService;
@@ -56,7 +57,7 @@ public class ModelResolver {
           )
           .filter(p ->
             Objects.requireNonNull(p.getAnnotation(ManyToMany.class)).stringValue("mappedBy").orElse("").equals(field) ||
-              p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
+            p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
           )
           .findFirst();
         service = applicationContext.getBean(new DefaultArgument<>(ModelService.class, null, new DefaultArgument<>(inverseModel.getBeanType(), inverseModel.getAnnotationMetadata())));
@@ -67,6 +68,13 @@ public class ModelResolver {
       return service.list(terms, subSort, true).getContent();
     } else if (otherId != null) {
       return service.find(otherId);
+    } else if (selfId != null) {
+      Optional<AnnotationValue<OneToOne>> oneToOne = property.getAnnotationMetadata().findAnnotation(OneToOne.class);
+      if (oneToOne.isEmpty()) {
+        return null;
+      }
+      Optional<String> mappedBy = oneToOne.flatMap(annotation -> annotation.stringValue("mappedBy"));
+      return service.searchOne(new SearchTerm(mappedBy.orElseGet(() -> StringHelper.uncapitalize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, selfId)).orElse(null);
     } else {
       return null;
     }

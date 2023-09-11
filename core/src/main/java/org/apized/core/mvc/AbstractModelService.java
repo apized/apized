@@ -26,6 +26,8 @@ import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.error.exception.NotFoundException;
 import org.apized.core.federation.Federation;
+import org.apized.core.model.Action;
+import org.apized.core.model.Apized;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
 import org.apized.core.search.SearchTerm;
@@ -51,7 +53,12 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
 
   @Override
   public Optional<T> searchOne(List<SearchTerm> search) {
-    return getRepository().searchOne(search);
+    Optional<T> t = getRepository().searchOne(search);
+    t.ifPresent(value -> ApizedContext.getRequest().getPathVariables().put(
+      StringHelper.uncapitalize(getType().getSimpleName()),
+      value.getId()
+    ));
+    return t;
   }
 
   @Override
@@ -61,12 +68,22 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
 
   @Override
   public T find(UUID id) {
-    return getRepository().get(id).orElseThrow(NotFoundException::new);
+    Optional<T> t = getRepository().get(id);
+    t.ifPresent(value -> ApizedContext.getRequest().getPathVariables().put(
+      StringHelper.uncapitalize(getType().getSimpleName()),
+      value.getId()
+    ));
+    return t.orElseThrow(NotFoundException::new);
   }
 
   @Override
   public T get(UUID id) {
-    return getRepository().get(id).orElseThrow(NotFoundException::new);
+    Optional<T> t = getRepository().get(id);
+    t.ifPresent(value -> ApizedContext.getRequest().getPathVariables().put(
+      StringHelper.uncapitalize(getType().getSimpleName()),
+      value.getId()
+    ));
+    return t.orElseThrow(NotFoundException::new);
   }
 
   @Override
@@ -161,8 +178,8 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .filter(p -> Model.class.isAssignableFrom(p.getType()) || (Collection.class.isAssignableFrom(p.getType()) && Model.class.isAssignableFrom(p.asArgument().getTypeParameters()[0].getType())))
       .filter(p -> isBefore == (
           (p.hasAnnotation(OneToOne.class) && p.getAnnotation(OneToOne.class).stringValue("mappedBy").isEmpty())
-            || p.hasAnnotation(ManyToOne.class)
-            || (p.hasAnnotation(ManyToMany.class) && p.getAnnotation(ManyToMany.class).stringValue("mappedBy").isPresent())
+          || p.hasAnnotation(ManyToOne.class)
+          || (p.hasAnnotation(ManyToMany.class) && p.getAnnotation(ManyToMany.class).stringValue("mappedBy").isPresent())
         )
       )
       .forEach(p -> {
@@ -208,6 +225,16 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
             }
             add.forEach(o -> getRepository().add(p.getName(), it.getId(), o));
             remove.forEach(o -> getRepository().remove(p.getName(), it.getId(), o));
+          }
+
+          if (p.hasAnnotation(OneToMany.class) && !List.of(BeanIntrospection.getIntrospection(type).getAnnotation(Apized.class).classValues("scope")).contains(getType())) {
+            String field = p.getAnnotation(OneToMany.class).stringValue("mappedBy").orElse(StringHelper.uncapitalize(getType().getSimpleName()));
+            values.forEach(subModel -> {
+              BeanWrapper.getWrapper(subModel).setProperty(field, it);
+              if (subModel._getModelMetadata().getAction().equals(Action.NO_OP)) {
+                subModel._getModelMetadata().setAction(Action.UPDATE);
+              }
+            });
           }
 
           if (service.isPresent()) {
