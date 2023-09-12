@@ -52,6 +52,7 @@ public class ApizedPlugin implements Plugin<Project> {
         project.getDependencies().add("compileOnly", "org.projectlombok:lombok");
       });
 
+      //replace with wither jitpack or simply remove (and add on the docs that the packages are available via jitpack
       project.getRepositories().maven(r -> {
         r.setName("Apized GitHub Repository");
         r.setUrl("https://maven.pkg.github.com/apized/apized");
