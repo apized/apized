@@ -17,6 +17,7 @@
 package org.apized.core.mvc;
 
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanWrapper;
 import io.micronaut.core.type.Argument;
@@ -95,8 +96,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PrePersist.class) != null)
-      .findFirst()
-      .ifPresent(prePersist -> prePersist.invoke(it));
+      .forEach(prePersist -> prePersist.invoke(it));
 
     T create = getRepository().create(it);
     ApizedContext.getRequest().getPathVariables().put(StringHelper.uncapitalize(getType().getSimpleName()), create.getId());
@@ -106,8 +106,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PostPersist.class) != null)
-      .findFirst()
-      .ifPresent(prePersist -> prePersist.invoke(it));
+      .forEach(prePersist -> prePersist.invoke(it));
 
     performSubExecutions(it, false);
     return create;
@@ -123,8 +122,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PreUpdate.class) != null)
-      .findFirst()
-      .ifPresent(preUpdate -> preUpdate.invoke(it));
+      .forEach(preUpdate -> preUpdate.invoke(it));
 
     T update = getRepository().update(id, it);
 
@@ -133,8 +131,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PostUpdate.class) != null)
-      .findFirst()
-      .ifPresent(preUpdate -> preUpdate.invoke(it));
+      .forEach(preUpdate -> preUpdate.invoke(it));
 
     performSubExecutions(it, false);
     return update;
@@ -143,6 +140,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
   @Override
   public T delete(UUID id) {
     T it = get(id);
+    it._getModelMetadata().setAction(Action.DELETE);
     performSubExecutions(it, true);
 
     BeanIntrospection
@@ -150,8 +148,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PreRemove.class) != null)
-      .findFirst()
-      .ifPresent(prePersist -> prePersist.invoke(it));
+      .forEach(prePersist -> prePersist.invoke(it));
 
     getRepository().delete(id);
 
@@ -160,8 +157,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PostRemove.class) != null)
-      .findFirst()
-      .ifPresent(prePersist -> prePersist.invoke(it));
+      .forEach(prePersist -> prePersist.invoke(it));
 
     performSubExecutions(it, false);
     return it;
@@ -173,13 +169,14 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     BeanIntrospection<T> introspection = BeanIntrospection.getIntrospection(getType());
 
     introspection.getBeanProperties().stream()
-      .filter(p -> p.getAnnotation(Federation.class) == null)
-      .filter(p -> it._getModelMetadata().getTouched().contains(p.getName()))
+      .filter(p -> !p.hasAnnotation(Federation.class))
+      .filter(p -> it._getModelMetadata().getTouched().contains(p.getName()) || (p.hasAnnotation(OneToMany.class) && it._getModelMetadata().getAction().equals(Action.DELETE)))
       .filter(p -> Model.class.isAssignableFrom(p.getType()) || (Collection.class.isAssignableFrom(p.getType()) && Model.class.isAssignableFrom(p.asArgument().getTypeParameters()[0].getType())))
       .filter(p -> isBefore == (
           (p.hasAnnotation(OneToOne.class) && p.getAnnotation(OneToOne.class).stringValue("mappedBy").isEmpty())
-          || p.hasAnnotation(ManyToOne.class)
-          || (p.hasAnnotation(ManyToMany.class) && p.getAnnotation(ManyToMany.class).stringValue("mappedBy").isPresent())
+            || p.hasAnnotation(ManyToOne.class)
+            || (p.hasAnnotation(OneToMany.class) && it._getModelMetadata().getAction().equals(Action.DELETE))
+            || (p.hasAnnotation(ManyToMany.class) && p.getAnnotation(ManyToMany.class).stringValue("mappedBy").isPresent())
         )
       )
       .forEach(p -> {
@@ -204,30 +201,54 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
             )
           );
 
-          if (p.hasAnnotation(ManyToMany.class)) {
-            String table = p.getAnnotation(JoinTable.class).stringValue("name").get();
-            String self = p.getAnnotation(JoinTable.class).getAnnotations("joinColumns").get(0).stringValue("name").get();
-            String other = p.getAnnotation(JoinTable.class).getAnnotations("inverseJoinColumns").get(0).stringValue("name").get();
-
+          if (p.hasAnnotation(ManyToMany.class) || p.hasAnnotation(OneToMany.class)) {
             Model original = it._getModelMetadata().getOriginal();
-            List<UUID> remove = new ArrayList<>();
-            List<UUID> add = new ArrayList<>(values.stream().map(Model::getId).toList());
+            List<Model> remove = new ArrayList<>();
+            List<Model> add = new ArrayList<>(values.stream().toList());
 
             if (original != null) {
               BeanWrapper<?> originalWrapper = BeanWrapper.getWrapper(original);
-              ((List<Model>) originalWrapper.getProperty(p.getName(), p.getType()).get()).stream().map(Model::getId).forEach(o -> {
-                if (add.contains(o)) {
-                  add.remove(o);
-                } else {
-                  remove.add(o);
+              if (it._getModelMetadata().getAction().equals(Action.DELETE)) {
+                add.clear();
+                remove.addAll(values);
+              } else {
+                ((List<Model>) originalWrapper.getProperty(p.getName(), p.getType()).get()).forEach(o -> {
+                  if (add.contains(o)) {
+                    add.remove(o);
+                  } else {
+                    remove.add(o);
+                  }
+                });
+              }
+            }
+
+            if (p.hasAnnotation(ManyToMany.class)) {
+              add.stream().map(Model::getId).forEach(o -> getRepository().add(p.getName(), it.getId(), o));
+              remove.stream().map(Model::getId).forEach(o -> getRepository().remove(p.getName(), it.getId(), o));
+            } else if (p.hasAnnotation(OneToMany.class)) {
+              AnnotationValue<OneToMany> annotation = p.getAnnotation(OneToMany.class);
+              String field = annotation.stringValue("mappedBy").orElse(StringHelper.uncapitalize(getType().getSimpleName()));
+              add.forEach(o -> {
+                BeanWrapper.getWrapper(o).setProperty(field, it);
+                if (o._getModelMetadata().getAction().equals(Action.NO_OP)) {
+                  o._getModelMetadata().setAction(Action.UPDATE);
                 }
               });
+              remove.forEach(o -> {
+                BeanWrapper.getWrapper(o).setProperty(field, null);
+                if (annotation.booleanValue("orphanRemoval").orElse(false)) {
+                  o._getModelMetadata().setAction(Action.DELETE);
+                } else if (o._getModelMetadata().getAction().equals(Action.NO_OP)) {
+                  o._getModelMetadata().setAction(Action.UPDATE);
+                }
+              });
+              values = new ArrayList<>();
+              values.addAll(add);
+              values.addAll(remove);
             }
-            add.forEach(o -> getRepository().add(p.getName(), it.getId(), o));
-            remove.forEach(o -> getRepository().remove(p.getName(), it.getId(), o));
           }
 
-          if (p.hasAnnotation(OneToMany.class) && !List.of(BeanIntrospection.getIntrospection(type).getAnnotation(Apized.class).classValues("scope")).contains(getType())) {
+          if (!it._getModelMetadata().getAction().equals(Action.DELETE) && p.hasAnnotation(OneToMany.class) && !List.of(BeanIntrospection.getIntrospection(type).getAnnotation(Apized.class).classValues("scope")).contains(getType())) {
             String field = p.getAnnotation(OneToMany.class).stringValue("mappedBy").orElse(StringHelper.uncapitalize(getType().getSimpleName()));
             values.forEach(subModel -> {
               BeanWrapper.getWrapper(subModel).setProperty(field, it);

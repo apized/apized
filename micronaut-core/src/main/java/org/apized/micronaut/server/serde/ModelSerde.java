@@ -282,7 +282,7 @@ public class ModelSerde implements Serde<Model> {
         if (isCollection) {
           encoder.encodeArray(property.asArgument());
           for (Object subVal : (Collection<?>) val) {
-            if (isModel && !fields.containsKey(property.getName())) {
+            if (isModel && (!fields.containsKey(property.getName()) || ((Map<?, ?>) fields.get(property.getName())).isEmpty())) {
               encoder.encodeString(((Model) subVal).getId().toString());
             } else {
               defaultSerialize(encoder, context, subType, subVal);
@@ -290,7 +290,7 @@ public class ModelSerde implements Serde<Model> {
           }
           encoder.finishStructure();
         } else {
-          if (isModel && !fields.containsKey(property.getName())) {
+          if (isModel && (!fields.containsKey(property.getName()) || ((Map<?, ?>) fields.get(property.getName())).isEmpty())) {
             encoder.encodeString(((Model) val).getId().toString());
           } else {
             defaultSerialize(encoder, context, Argument.of(val.getClass()), val);

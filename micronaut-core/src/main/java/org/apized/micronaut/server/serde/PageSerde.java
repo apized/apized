@@ -44,7 +44,7 @@ public class PageSerde implements Serde<Page<? extends Model>> {
   @Override
   public void serialize(Encoder encoder, EncoderContext context, Argument<? extends Page<? extends Model>> type, Page<? extends Model> value) throws IOException {
     if (!ApizedContext.getRequest().getFields().containsKey("content")) {
-      ApizedContext.getRequest().setFields(Map.of("*", Map.of(), "content", ApizedContext.getRequest().getFields()));
+      ApizedContext.getRequest().setFields(Map.of("*", Map.of(), "content", ApizedContext.getRequest().getFields().isEmpty() ? Map.of("*", Map.of()) : ApizedContext.getRequest().getFields()));
       ApizedContext.getRequest().setSearch(Map.of("content", ApizedContext.getRequest().getSearch()));
       ApizedContext.getRequest().setSort(Map.of("content", ApizedContext.getRequest().getSort()));
     }

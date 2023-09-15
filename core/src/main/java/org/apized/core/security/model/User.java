@@ -16,14 +16,14 @@
 
 package org.apized.core.security.model;
 
-import io.micronaut.core.annotation.Introspected;
-import org.apized.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import io.micronaut.core.annotation.Introspected;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -33,13 +33,14 @@ public class User extends Permissionable {
   protected UUID id;
   protected String username;
   protected String name;
+  protected Map<String, Object> metadata = new HashMap<>();
   protected List<Role> roles = new ArrayList<>();
 
   @JsonIgnore
   protected List<String> inferredPermissions = new ArrayList<>();
 
   @Builder
-  public User(UUID id, String username, String name, List<Role> roles, List<String> permissions, List<String> inferredPermissions) {
+  public User(UUID id, String username, String name, List<Role> roles, List<String> permissions, List<String> inferredPermissions, Map<String, Object> metadata) {
     this.id = id;
     this.username = username;
     this.name = name;
@@ -51,6 +52,9 @@ public class User extends Permissionable {
     }
     if (inferredPermissions != null) {
       this.inferredPermissions = inferredPermissions;
+    }
+    if (metadata != null) {
+      this.metadata = metadata;
     }
   }
 
