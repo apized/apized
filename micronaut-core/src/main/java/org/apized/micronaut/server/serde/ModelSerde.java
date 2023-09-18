@@ -142,16 +142,16 @@ public class ModelSerde implements Serde<Model> {
         BeanProperty<? super Model, Object> property = propOpt.get();
         touched.add(property);
         ApizedContext.getSerde().push(new SerdeContext.SerdeStackEntry(model, property));
-        if (Collection.class.isAssignableFrom(property.getType()) && Model.class.isAssignableFrom(property.asArgument().getTypeParameters()[0].getType())) {
+        if (Collection.class.isAssignableFrom(property.getType())) {
           //noinspection rawtypes
           Class subType = property.asArgument().getTypeParameters()[0].getType();
           Deserializer<?> deserializer = context.findDeserializer(subType);
-          List<Model> subValues = new ArrayList<>();
+          List<Object> subValues = new ArrayList<>();
 
           decoder.decodeArray();
           while (decoder.hasNextArrayValue()) {
             //noinspection unchecked
-            subValues.add((Model) deserializer.deserialize(decoder, context, Argument.of(subType)));
+            subValues.add(deserializer.deserialize(decoder, context, Argument.of(subType)));
           }
           decoder.close();
 
