@@ -50,7 +50,7 @@ class ETagFilter implements HttpServerFilter {
               response.getHeaders().set("Last-Modified", LocalDateTime.now().toString());
             }
           } catch (IOException e) {
-            throw new RuntimeException(e);
+            //Do nothing
           }
         });
       }

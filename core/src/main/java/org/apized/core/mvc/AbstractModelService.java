@@ -213,7 +213,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
                 remove.addAll(values);
               } else {
                 ((List<Model>) originalWrapper.getProperty(p.getName(), p.getType()).get()).forEach(o -> {
-                  if (add.contains(o)) {
+                  if (add.stream().anyMatch(model -> o.getId().equals(model.getId()))) {
                     add.remove(o);
                   } else {
                     remove.add(o);
