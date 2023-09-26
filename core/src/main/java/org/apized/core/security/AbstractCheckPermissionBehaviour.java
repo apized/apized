@@ -16,23 +16,23 @@
 
 package org.apized.core.security;
 
+import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.beans.BeanIntrospection;
+import io.micronaut.core.beans.BeanProperty;
+import io.micronaut.core.beans.BeanWrapper;
+import io.micronaut.core.type.Argument;
+import io.micronaut.data.annotation.TypeDef;
+import io.micronaut.data.model.DataType;
 import org.apized.core.MapHelper;
 import org.apized.core.StringHelper;
 import org.apized.core.behaviour.BehaviourHandler;
 import org.apized.core.behaviour.BehaviourManager;
 import org.apized.core.context.ApizedContext;
-import org.apized.core.context.SecurityContext;
 import org.apized.core.error.exception.ForbiddenException;
 import org.apized.core.execution.Execution;
-import org.apized.core.model.Action;
-import org.apized.core.model.Layer;
-import org.apized.core.model.Model;
-import org.apized.core.model.When;
-import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.beans.BeanProperty;
-import io.micronaut.core.beans.BeanWrapper;
-import io.micronaut.data.annotation.TypeDef;
-import io.micronaut.data.model.DataType;
+import org.apized.core.model.*;
+import org.apized.core.mvc.ModelRepository;
+import org.apized.core.security.annotation.Owner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +63,36 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
 
     String fullPerm = slug + "." + entityName + "." + action.getType() + (modelId != null ? "." + modelId : "");
     boolean allowed = ApizedContext.getSecurity().getUser().isAllowed(fullPerm);
+
+    //this might be simplified if we evaluate get actions after the action instead of before. as it stands we might get the model from the database twice in order to validate if the user can or cannot do the action
+    if (!allowed && BeanIntrospection.getIntrospection(type).getBeanProperties().stream().anyMatch(prop -> prop.hasAnnotation(Owner.class))) {
+      BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(
+        Optional.ofNullable(model)
+          .orElse(
+            (Model) findBean(Argument.of(ModelRepository.class, type)).get().get(UUID.fromString(modelId)).get()
+          )
+      );
+      Optional<BeanProperty<Model, Object>> ownerProp = BeanIntrospection.getIntrospection(type).getBeanProperties().stream()
+        .filter(property -> property.hasAnnotation(Owner.class))
+        .findFirst();
+      if (ownerProp.isPresent() && ownerProp.get().getAnnotation(Owner.class).get("actions",Argument.of(List.class,Action.class)).get().contains(action)) {
+        BeanProperty<Model, Object> prop = ownerProp.get();
+        UUID ownerId = null;
+
+        if (UUID.class.isAssignableFrom(prop.getType())) {
+          ownerId = wrapper.getProperty(prop.getName(), UUID.class).orElse(null);
+        } else if (Model.class.isAssignableFrom(prop.getType())) {
+          ownerId = wrapper.getProperty(prop.getName(), Model.class).orElse(new DummyModel()).getId();
+        }
+
+        if (ApizedContext.getSecurity().getUser().getId().equals(ownerId)) {
+          ApizedContext.getSecurity().getUser().getInferredPermissions().add(
+            slug + "." + entityName + "." + action.getType() + "." + modelId
+          );
+          allowed = ApizedContext.getSecurity().getUser().isAllowed(fullPerm);
+        }
+      }
+    }
 
     log.debug("Permissions check for '" + fullPerm + "' " + (allowed ? "passed" : "failed"));
 
@@ -113,5 +143,7 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
       throw new ForbiddenException("Not allowed to " + action.getType() + " " + StringHelper.capitalize(entityName) + (model.getId() != null ? " with id " + model.getId() : "") + " with `" + field + "` set to " + val, perm);
     }
   }
+
+  public abstract <K> Optional<K> findBean(Argument<K> argument);
 }
 

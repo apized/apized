@@ -1,20 +1,20 @@
 #set ( $d = "$")
 package $module;
 
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.core.annotation.Introspected;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.Generated;
 import org.apized.core.behaviour.annotation.BehaviourExecution;
 import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
 import org.apized.core.model.Page;
-import org.apized.core.mvc.AbstractModelService;
 import org.apized.core.mvc.ModelRepository;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 import org.apized.micronaut.annotation.MicronautBehaviourExecution;
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.core.annotation.Introspected;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import org.apized.micronaut.server.mvc.MicronautModelService;
 #foreach( $it in $extension.service.imports )
 import $it;
 #end
@@ -26,7 +26,7 @@ import java.util.UUID;
 @Generated
 @Introspected
 @Singleton
-public class ${type}Service extends AbstractModelService<${type}> {
+public class ${type}Service extends MicronautModelService<${type}> {
   @Inject
   ${type}Repository repository;
 
@@ -35,10 +35,6 @@ public class ${type}Service extends AbstractModelService<${type}> {
   @Inject
   ${it};
 #end
-
-  public ${type}Service(ApplicationContext appContext) {
-    super(appContext);
-  }
 
   @Override
   public Class getType(){

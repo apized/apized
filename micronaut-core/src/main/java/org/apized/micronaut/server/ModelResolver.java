@@ -57,7 +57,7 @@ public class ModelResolver {
           )
           .filter(p ->
             Objects.requireNonNull(p.getAnnotation(ManyToMany.class)).stringValue("mappedBy").orElse("").equals(field) ||
-            p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
+              p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
           )
           .findFirst();
         service = applicationContext.getBean(new DefaultArgument<>(ModelService.class, null, new DefaultArgument<>(inverseModel.getBeanType(), inverseModel.getAnnotationMetadata())));
@@ -70,11 +70,11 @@ public class ModelResolver {
       return service.find(otherId);
     } else if (selfId != null) {
       Optional<AnnotationValue<OneToOne>> oneToOne = property.getAnnotationMetadata().findAnnotation(OneToOne.class);
-      if (oneToOne.isEmpty()) {
+      if (oneToOne.isEmpty() || oneToOne.flatMap(annotation -> annotation.stringValue("mappedBy")).isEmpty()) {
         return null;
       }
-      Optional<String> mappedBy = oneToOne.flatMap(annotation -> annotation.stringValue("mappedBy"));
-      return service.searchOne(new SearchTerm(mappedBy.orElseGet(() -> StringHelper.uncapitalize(property.getDeclaringType().getSimpleName())), SearchOperation.eq, selfId)).orElse(null);
+      String mappedBy = oneToOne.flatMap(annotation -> annotation.stringValue("mappedBy")).get();
+      return service.searchOne(new SearchTerm(mappedBy, SearchOperation.eq, selfId)).orElse(null);
     } else {
       return null;
     }

@@ -16,6 +16,8 @@
 
 package org.apized.core.security.annotation;
 
+import org.apized.core.model.Action;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,4 +25,11 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-public @interface Owner { }
+public @interface Owner {
+  /**
+   * Actions the user automatically gets permissions for when he is the owner
+   *
+   * @return List of actions that the user will be dynamically allowed to perform.
+   */
+  Action[] actions() default {Action.LIST, Action.GET, Action.CREATE, Action.UPDATE, Action.DELETE};
+}

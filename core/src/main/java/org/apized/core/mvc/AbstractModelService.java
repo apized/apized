@@ -16,12 +16,10 @@
 
 package org.apized.core.mvc;
 
-import io.micronaut.context.ApplicationContext;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanWrapper;
 import io.micronaut.core.type.Argument;
-import io.micronaut.core.type.DefaultArgument;
 import jakarta.persistence.*;
 import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
@@ -37,15 +35,9 @@ import org.apized.core.search.SortTerm;
 import java.util.*;
 
 public abstract class AbstractModelService<T extends Model> implements ModelService<T> {
-  ApplicationContext appContext;
-
   public abstract Class<T> getType();
 
   protected abstract ModelRepository<T> getRepository();
-
-  public AbstractModelService(ApplicationContext appContext) {
-    this.appContext = appContext;
-  }
 
   @Override
   public Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
@@ -193,11 +185,10 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
             values.add((Model) value.get());
           }
 
-          Optional<ModelService> service = appContext.findBean(
-            new DefaultArgument<>(
+          Optional<ModelService> service = findBean(
+            Argument.of(
               ModelService.class,
-              introspection,
-              Argument.of(type)
+              type
             )
           );
 
@@ -274,4 +265,6 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
         }
       });
   }
+
+  public abstract <K> Optional<K> findBean(Argument<K> argument);
 }
