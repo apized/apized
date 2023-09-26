@@ -75,7 +75,7 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
       Optional<BeanProperty<Model, Object>> ownerProp = BeanIntrospection.getIntrospection(type).getBeanProperties().stream()
         .filter(property -> property.hasAnnotation(Owner.class))
         .findFirst();
-      if (ownerProp.isPresent() && ownerProp.get().getAnnotation(Owner.class).get("actions",Argument.of(List.class,Action.class)).get().contains(action)) {
+      if (ownerProp.isPresent() && ownerProp.get().getAnnotation(Owner.class).get("actions", Argument.of(List.class, Action.class)).get().contains(action)) {
         BeanProperty<Model, Object> prop = ownerProp.get();
         UUID ownerId = null;
 
@@ -85,7 +85,7 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
           ownerId = wrapper.getProperty(prop.getName(), Model.class).orElse(new DummyModel()).getId();
         }
 
-        if (ApizedContext.getSecurity().getUser().getId().equals(ownerId)) {
+        if (ApizedContext.getSecurity().getUser().getId().equals(ownerId) && !ApizedContext.getSecurity().getUser().getPermissions().stream().anyMatch(p -> p.startsWith(slug + "." + entityName + "." + action.getType() + "." + modelId))) {
           ApizedContext.getSecurity().getUser().getInferredPermissions().add(
             slug + "." + entityName + "." + action.getType() + "." + modelId
           );
