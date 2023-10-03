@@ -30,6 +30,10 @@ public class ${type}Service extends MicronautModelService<${type}> {
   @Inject
   ${type}Repository repository;
 
+  public ${type}Service(ApplicationContext appContext){
+    super(appContext);
+  }
+
 #foreach( $it in $extension.service.injects )
 
   @Inject
