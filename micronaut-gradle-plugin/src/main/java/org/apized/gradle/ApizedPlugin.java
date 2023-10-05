@@ -59,9 +59,10 @@ public class ApizedPlugin implements Plugin<Project> {
         r.credentials(c -> {
           c.setUsername("apized-bot");
           c.setPassword("gh" +
-            "p_xYJWgXO" +
-            "RXU5dfw00ce4ZUy" +
-            "UgnuealP1BKcLj");
+            "p_x9oqph1jm" +
+            "81lnHg4QMQA" +
+            "o3M1XkxcM72X" +
+            "1nAx");
         });
       });
 
