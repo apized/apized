@@ -49,18 +49,6 @@ abstract class AbstractUserResolverMock implements UserResolver {
   }
 
   @Override
-  User ensureUser(User user) {
-    User resolved = users.find { it.value.username == user.username }?.value
-    if (!resolved) {
-      user.id = UUID.randomUUID()
-      userAlias[user.username.replaceAll(/@.*/, '')] = user
-      users[user.id] = user
-      resolved = user
-    }
-    resolved ?: user
-  }
-
-  @Override
   String generateToken(User user, boolean expiring) {
     ''
   }
