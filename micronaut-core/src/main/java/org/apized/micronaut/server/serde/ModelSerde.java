@@ -132,7 +132,8 @@ public class ModelSerde implements Serde<Model> {
         propOpt.isPresent()
           && propOpt.get().getAnnotation(JsonIgnore.class) == null
           && (
-          propOpt.get().getAnnotation(JsonProperty.class) == null
+            key.equals("id") ||
+            propOpt.get().getAnnotation(JsonProperty.class) == null
             || !propOpt.get().getAnnotation(JsonProperty.class)
             .enumValue("access", JsonProperty.Access.class)
             .get()

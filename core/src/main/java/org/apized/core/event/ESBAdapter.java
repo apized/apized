@@ -33,13 +33,11 @@ public interface ESBAdapter {
     headers.put("timestamp", timestamp);
     headers.put("token", ApizedContext.getSecurity().getToken());
 
-    ApizedContext.getRequest().getPathVariables().entrySet().forEach(e ->
-      headers.put(e.getKey(), e.getValue() != null ? e.getValue().toString() : null)
-    );
+    ApizedContext.getRequest().getPathVariables().forEach((key, value) -> headers.put(key, value != null ? value.toString() : null));
     headers.putAll(ApizedContext.getEvent().getHeaders());
 
     send(event.getId(), timestamp, event.getTopic(), headers, event.getPayload());
   }
 
-  void send(UUID messageId, Date timestamp, String topic, Map<String, Object> headers, Map<String, Object> payload);
+  void send(UUID messageId, Date timestamp, String topic, Map<String, Object> headers, Object payload);
 }

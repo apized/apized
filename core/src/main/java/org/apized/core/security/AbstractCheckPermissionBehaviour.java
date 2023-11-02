@@ -69,7 +69,7 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
       BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(
         Optional.ofNullable(model)
           .orElse(
-            (Model) findBean(Argument.of(ModelRepository.class, type)).get().get(UUID.fromString(modelId)).get()
+            (Model) findBean(Argument.of(ModelRepository.class, type)).get().get(UUID.fromString(modelId)).get()//todo modelId is null when the action is list!!! Also the create action will probably also error out and additionally shouldn't be considered since just because something has an owner it's not reasonable to assume that a particular user is allowed to create it.
           )
       );
       Optional<BeanProperty<Model, Object>> ownerProp = BeanIntrospection.getIntrospection(type).getBeanProperties().stream()

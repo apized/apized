@@ -30,7 +30,7 @@ public class RabbitMQESBAdapter implements ESBAdapter {
   List<EventContextEnricher> enrichers;
 
   @Override
-  public void send(UUID messageId, Date timestamp, String topic, Map<String, Object> headers, Map<String, Object> payload) {
+  public void send(UUID messageId, Date timestamp, String topic, Map<String, Object> headers, Object payload) {
     enrichers.forEach(it -> it.process(topic, headers, payload));
     try {
       pool.getChannel().basicPublish(

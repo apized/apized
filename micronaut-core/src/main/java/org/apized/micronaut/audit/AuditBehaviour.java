@@ -17,6 +17,7 @@
 package org.apized.micronaut.audit;
 
 import io.micronaut.context.annotation.Context;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Slf4j
+@Requires(bean = AuditEntryRepository.class)
 @Context
 public class AuditBehaviour extends AbstractAuditBehaviour {
   @Inject
