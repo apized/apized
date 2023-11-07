@@ -17,7 +17,6 @@
 package org.apized.micronaut.federation;
 
 import io.micronaut.serde.ObjectMapper;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.core.ApizedConfig;
 import org.apized.core.federation.AbstractFederationResolver;

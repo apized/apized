@@ -25,4 +25,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ElementType.TYPE})
 @Retention(RUNTIME)
 public @interface Federated {
+  /**
+   * @return The slug of the API this references
+   */
+  String value();
+
+  /**
+   * @return The type this is referencing
+   */
+  String type();
+
+  /**
+   *
+   * @return the url for this model
+   */
+  String uri();
 }

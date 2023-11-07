@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package org.apized.core.federation;
+package org.apized.micronaut.federation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import jakarta.inject.Inject;
+import org.apized.core.federation.AbstractFederatedModelService;
+import org.apized.core.federation.ModelClient;
+import org.apized.core.model.Model;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+public abstract class MicronautFederatedModelService<T extends Model> extends AbstractFederatedModelService<T> {
+  @Inject
+  ModelClient<T> client;
 
-@Target({ElementType.FIELD, ElementType.METHOD})
-@Retention(RUNTIME)
-public @interface Federation {
+  public MicronautFederatedModelService(String modelBaseUrl) {
+    client = new MicronautModelClient<>(modelBaseUrl, getType());
+  }
+
+  @Override
+  protected ModelClient<T> getClient() {
+    return client;
+  }
 }
