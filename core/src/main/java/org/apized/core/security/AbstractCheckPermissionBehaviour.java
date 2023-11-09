@@ -65,7 +65,11 @@ public abstract class AbstractCheckPermissionBehaviour implements BehaviourHandl
     boolean allowed = ApizedContext.getSecurity().getUser().isAllowed(fullPerm);
 
     //this might be simplified if we evaluate get actions after the action instead of before. as it stands we might get the model from the database twice in order to validate if the user can or cannot do the action
-    if (!allowed && BeanIntrospection.getIntrospection(type).getBeanProperties().stream().anyMatch(prop -> prop.hasAnnotation(Owner.class))) {
+    if (
+      !allowed
+        && BeanIntrospection.getIntrospection(type).getBeanProperties().stream().anyMatch(prop -> prop.hasAnnotation(Owner.class))
+        && !List.of(Action.LIST, Action.CREATE).contains(action)
+    ) {
       BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(
         Optional.ofNullable(model)
           .orElse(
