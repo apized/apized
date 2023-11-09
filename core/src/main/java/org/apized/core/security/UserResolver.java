@@ -16,6 +16,7 @@
 
 package org.apized.core.security;
 
+import org.apized.core.context.ApizedContext;
 import org.apized.core.security.model.User;
 
 import java.util.UUID;
@@ -26,4 +27,22 @@ public interface UserResolver {
   User getUser(UUID userId);
 
   String generateToken(User user, boolean expiring);
+
+  default void runAs(UUID userId, Runnable execution) {
+    if (userId == ApizedContext.getSecurity().getUser().getId()) {
+      execution.run();
+    } else {
+      runAs(getUser(userId), execution);
+    }
+  }
+
+  default void runAs(User user, Runnable execution) {
+    User currentUser = ApizedContext.getSecurity().getUser();
+    try {
+      ApizedContext.getSecurity().setUser(user);
+      execution.run();
+    } finally {
+      ApizedContext.getSecurity().setUser(currentUser);
+    }
+  }
 }
