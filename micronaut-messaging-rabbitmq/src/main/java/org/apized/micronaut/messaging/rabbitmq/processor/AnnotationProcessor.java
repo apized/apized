@@ -47,14 +47,18 @@ public class AnnotationProcessor extends AbstractProcessor {
   @Override
   public SourceVersion getSupportedSourceVersion() {
     SourceVersion sourceVersion = SourceVersion.latest();
-    if (sourceVersion.ordinal() <= 17) {
-      if (sourceVersion.ordinal() >= 8) {
-        return sourceVersion;
+    if (sourceVersion.ordinal() <= 21) {
+      if (sourceVersion.ordinal() <= 17) {
+        if (sourceVersion.ordinal() >= 8) {
+          return sourceVersion;
+        } else {
+          return SourceVersion.RELEASE_8;
+        }
       } else {
-        return SourceVersion.RELEASE_8;
+        return (SourceVersion.values())[17];
       }
     } else {
-      return (SourceVersion.values())[17];
+      return (SourceVersion.values())[21];
     }
   }
 

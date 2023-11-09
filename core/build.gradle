@@ -3,10 +3,10 @@ plugins {
 }
 
 dependencies {
-  annotationProcessor("org.projectlombok:lombok:1.18.24")
+  annotationProcessor("org.projectlombok:lombok:1.18.30")
   annotationProcessor("io.micronaut:micronaut-inject-java")
 
-  compileOnly("org.projectlombok:lombok:1.18.24")
+  compileOnly("org.projectlombok:lombok:1.18.30")
   compileOnly("org.slf4j:slf4j-api:1.7.25")
   compileOnly("io.micronaut:micronaut-inject")
   compileOnly("io.micronaut.data:micronaut-data-model")

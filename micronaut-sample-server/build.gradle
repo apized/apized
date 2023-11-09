@@ -9,8 +9,8 @@ repositories {
 }
 
 dependencies {
-  annotationProcessor('org.projectlombok:lombok')
-  compileOnly('org.projectlombok:lombok')
+  annotationProcessor('org.projectlombok:lombok:1.18.30')
+  compileOnly('org.projectlombok:lombok:1.18.30')
 
   project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
   project.getDependencies().add("annotationProcessor", "io.micronaut.validation:micronaut-validation-processor");
@@ -42,8 +42,8 @@ application {
 }
 
 java {
-  sourceCompatibility = JavaVersion.toVersion("17")
-  targetCompatibility = JavaVersion.toVersion("17")
+  sourceCompatibility = JavaVersion.toVersion("21")
+  targetCompatibility = JavaVersion.toVersion("21")
 }
 
 micronaut {

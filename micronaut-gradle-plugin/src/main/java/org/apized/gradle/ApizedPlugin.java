@@ -48,8 +48,8 @@ public class ApizedPlugin implements Plugin<Project> {
 
       project.getPlugins().apply(MicronautApplicationPlugin.class);
       project.getPlugins().withType(JavaPlugin.class, plugin -> {
-        project.getDependencies().add("annotationProcessor", "org.projectlombok:lombok");
-        project.getDependencies().add("compileOnly", "org.projectlombok:lombok");
+        project.getDependencies().add("annotationProcessor", "org.projectlombok:lombok:1.18.30");
+        project.getDependencies().add("compileOnly", "org.projectlombok:lombok:1.18.30");
       });
 
       //replace with wither jitpack or simply remove (and add on the docs that the packages are available via jitpack

@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  annotationProcessor("org.projectlombok:lombok")
+  annotationProcessor("org.projectlombok:lombok:1.18.30")
   annotationProcessor("io.micronaut:micronaut-inject-java")
 
   api(project(":core"))
@@ -18,7 +18,7 @@ dependencies {
 
   implementation("org.apache.velocity:velocity-engine-core")
 
-  compileOnly("org.projectlombok:lombok")
+  compileOnly("org.projectlombok:lombok:1.18.30")
   compileOnly("io.micronaut.data:micronaut-data-model")
   compileOnly("io.micronaut.data:micronaut-data-runtime")
   compileOnly("io.micronaut.data:micronaut-data-jdbc")

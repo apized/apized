@@ -5,8 +5,8 @@ plugins {
 dependencies {
   compileOnly project(":micronaut-core")
   compileOnly project(":micronaut-tracing")
-  annotationProcessor("org.projectlombok:lombok:1.18.24")
-  compileOnly("org.projectlombok:lombok:1.18.24")
+  annotationProcessor("org.projectlombok:lombok:1.18.30")
+  compileOnly("org.projectlombok:lombok:1.18.30")
 
   api "io.micronaut.rabbitmq:micronaut-rabbitmq"
   implementation("org.apache.velocity:velocity-engine-core")

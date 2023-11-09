@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'adopt'
       - name: Run tests
         run: ./gradlew clean :micronaut-sample-server:test
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'adopt'
       - name: Publish jars
         run: ./gradlew clean publish
@@ -56,7 +56,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'adopt'
       - name: Publish plugin
         run: ./gradlew clean publishPlugins
