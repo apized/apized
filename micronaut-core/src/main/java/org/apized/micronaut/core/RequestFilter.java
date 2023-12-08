@@ -35,7 +35,7 @@ public class RequestFilter implements HttpServerFilter {
     if (!request.getPath().equals("/") && !request.getPath().startsWith("/health")) {
       long start = System.currentTimeMillis();
       ApizedContext.destroy();
-      log.info("Request {} started: {}", ApizedContext.getRequest().getId(), request.getPath());
+      log.info("Request {} started: {} {}", ApizedContext.getRequest().getId(), request.getMethod(), request.getPath());
       return Publishers.then(
         chain.proceed(request),
         response -> log.info("Request {} took {}ms", ApizedContext.getRequest().getId(), System.currentTimeMillis() - start)
