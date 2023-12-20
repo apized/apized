@@ -38,7 +38,7 @@ abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock 
     if (expected != null) {
       User current = ApizedContext.security.user
       try {
-        ApizedContext.security.user = new User(UUID.randomUUID(), 'admin@apized.org', 'administrator', [ ], [ '*' ], [ ])
+        ApizedContext.security.user = new User(UUID.randomUUID(), 'admin@apized.org', 'administrator', [ ], [ '*' ], [ ], [ : ])
         mapper.readValue(expected, clazz)
       } finally {
         ApizedContext.security.user = current
@@ -53,7 +53,7 @@ abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock 
     if (expected != null) {
       User current = ApizedContext.security.user
       try {
-        ApizedContext.security.user = new User(UUID.randomUUID(), 'admin@apized.org', 'administrator', [ ], [ '*' ], [ ])
+        ApizedContext.security.user = new User(UUID.randomUUID(), 'admin@apized.org', 'administrator', [ ], [ '*' ], [ ], [ : ])
         mapper.readValue(expected, clazz)
       } finally {
         ApizedContext.security.user = current
@@ -70,7 +70,7 @@ abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock 
 
   @Override
   void setExpectation(String method, String value) {
-    expectations[method] = value
+    expectations[ method ] = value
   }
 
   @Override
@@ -92,10 +92,10 @@ abstract class AbstractServiceIntegrationMock implements ServiceIntegrationMock 
   @Override
   void addExecution(String method, Map arguments) {
     if (!executions.containsKey(method)) {
-      executions[method] = [ ]
+      executions[ method ] = [ ]
     }
 
-    executions[method].add(arguments)
+    executions[ method ].add(arguments)
   }
 
   @Override
