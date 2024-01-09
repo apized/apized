@@ -1,11 +1,13 @@
 package org.apized.micronaut.messaging.rabbitmq;
 
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.rabbitmq.connect.ChannelPool;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import org.apized.core.event.ESBAdapter;
 
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Singleton
 public class RabbitMQESBAdapter implements ESBAdapter {
 
@@ -33,7 +36,8 @@ public class RabbitMQESBAdapter implements ESBAdapter {
   public void send(UUID messageId, Date timestamp, String topic, Map<String, Object> headers, Object payload) {
     enrichers.forEach(it -> it.process(topic, headers, payload));
     try {
-      pool.getChannel().basicPublish(
+      Channel channel = pool.getChannel();
+      channel.basicPublish(
         exchange,
         topic,
         new AMQP.BasicProperties.Builder()
@@ -44,6 +48,7 @@ public class RabbitMQESBAdapter implements ESBAdapter {
           .build(),
         mapper.writeValueAsBytes(Map.of("header", headers, "payload", payload))
       );
+      pool.returnChannel(channel);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -49,7 +49,9 @@ public abstract class EnvelopeConsumer {
     this.notifiers = notifiers;
 
     try {
-      this.setup(pool.getChannel());
+      Channel channel = pool.getChannel();
+      this.setup(channel);
+      pool.returnChannel(channel);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

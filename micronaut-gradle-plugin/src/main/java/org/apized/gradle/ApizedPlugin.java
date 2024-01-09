@@ -31,9 +31,15 @@ import java.util.Properties;
 
 
 /**
- *
+ * Apized Plugin
  */
 public class ApizedPlugin implements Plugin<Project> {
+
+  /**
+   * Constructor
+   */
+  public ApizedPlugin() {
+  }
 
   @Override
   public void apply(Project project) {
