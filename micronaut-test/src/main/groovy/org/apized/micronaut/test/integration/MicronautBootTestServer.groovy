@@ -53,16 +53,18 @@ class MicronautBootTestServer {
       .defaultEnvironments("test")
       .eagerInitSingletons(true)
 
-    try {
-      Class.forName("io.micronaut.rabbitmq.connect.ChannelPool")
-      GenericContainer rabbitMq = new GenericContainer<>("rabbitmq:3-management")
-        .withExposedPorts(5672, 15672)
-        .withCreateContainerCmdModifier(cmd -> cmd.withHostName("my-rabbit"))
-        .withCreateContainerCmdModifier(cmd -> cmd.withName("some-rabbit"))
-      rabbitMq.start()
-      builder.properties([ "rabbitmq.port": rabbitMq.getMappedPort(5672) ])
-    } catch (Exception e) {
+    if (System.getProperty("rabbitmq.embedded.disable") == null) {
+      try {
+        Class.forName("io.micronaut.rabbitmq.connect.ChannelPool")
+        GenericContainer rabbitMq = new GenericContainer<>("rabbitmq:3-management")
+          .withExposedPorts(5672, 15672)
+          .withCreateContainerCmdModifier(cmd -> cmd.withHostName("my-rabbit"))
+          .withCreateContainerCmdModifier(cmd -> cmd.withName("some-rabbit"))
+        rabbitMq.start()
+        builder.properties([ "rabbitmq.port": rabbitMq.getMappedPort(5672) ])
+      } catch (Exception e) {
 
+      }
     }
 
     application = builder.run(NettyEmbeddedServer)
