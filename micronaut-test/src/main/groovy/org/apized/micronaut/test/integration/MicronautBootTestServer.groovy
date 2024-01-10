@@ -18,19 +18,19 @@ package org.apized.micronaut.test.integration
 
 import io.cucumber.java.BeforeAll
 import io.micronaut.context.ApplicationContext
-import io.micronaut.core.beans.BeanIntrospectionReference
-import io.micronaut.core.beans.BeanIntrospector
+import io.micronaut.context.ApplicationContextBuilder
 import io.micronaut.core.reflect.GenericTypeUtils
 import io.micronaut.http.server.netty.NettyEmbeddedServer
 import io.micronaut.runtime.server.EmbeddedServer
-import org.apized.core.model.Apized
 import org.apized.core.mvc.ModelService
 import org.apized.test.integration.core.IntegrationConfig
 import org.apized.test.integration.core.IntegrationContext
 import org.apized.test.integration.core.RestIntegrationTest
 import org.apized.test.integration.core.ServerConfig
 import org.apized.test.integration.mocks.AbstractUserResolverMock
+import org.testcontainers.containers.GenericContainer
 
+@SuppressWarnings('unused')
 class MicronautBootTestServer {
   static boolean initialized = false
   static private EmbeddedServer application
@@ -48,11 +48,24 @@ class MicronautBootTestServer {
   }
 
   static ServerConfig boot() {
-    application = ApplicationContext
+    ApplicationContextBuilder builder = ApplicationContext
       .builder()
       .defaultEnvironments("test")
       .eagerInitSingletons(true)
-      .run(NettyEmbeddedServer)
+
+    try {
+      Class.forName("io.micronaut.rabbitmq.connect.ChannelPool")
+      GenericContainer rabbitMq = new GenericContainer<>("rabbitmq:3-management")
+        .withExposedPorts(5672, 15672)
+        .withCreateContainerCmdModifier(cmd -> cmd.withHostName("my-rabbit"))
+        .withCreateContainerCmdModifier(cmd -> cmd.withName("some-rabbit"))
+      rabbitMq.start()
+      builder.properties([ "rabbitmq.port": rabbitMq.getMappedPort(5672) ])
+    } catch (Exception e) {
+
+    }
+
+    application = builder.run(NettyEmbeddedServer)
     new ServerConfig(
       baseUrl: "http://localhost:${application.port}",
       types: application.applicationContext.getBeansOfType(ModelService).collect {
