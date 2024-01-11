@@ -6,5 +6,9 @@
         "name": "delegate"
       }
     ]
+  },
+  {
+    "name":"org.apized.micronaut.tracing.OpenTelemetryAppender",
+    "allDeclaredConstructors": true
   }
 ]
