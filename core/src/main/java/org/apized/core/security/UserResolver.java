@@ -36,6 +36,10 @@ public interface UserResolver {
     }
   }
 
+  default void runAs(String token, Runnable execution) {
+    runAs(getUser(token), execution);
+  }
+
   default void runAs(User user, Runnable execution) {
     User currentUser = ApizedContext.getSecurity().getUser();
     try {
