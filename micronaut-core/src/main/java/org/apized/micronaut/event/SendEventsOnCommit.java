@@ -29,7 +29,7 @@ import java.io.IOException;
 
 @Slf4j
 @Singleton
-@Requires(property = "apized.esb-enabled", notEquals = "false")
+@Requires(bean = ESBAdapter.class)
 class SendEventsOnCommit {
   @Inject
   ObjectMapper mapper;

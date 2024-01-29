@@ -4,6 +4,7 @@ package $module;
 import com.rabbitmq.client.BasicProperties;
 import com.rabbitmq.client.Envelope;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.env.Environment;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
@@ -27,7 +28,7 @@ import java.util.List;
 @Generated
 @Slf4j
 @RabbitListener
-@Requires(property = "apized.esb-enabled", notEquals = "false")
+@Requires(notEnv = Environment.TEST)
 class ${type}${d}Listener extends EnvelopeConsumer {
 
   @Inject
