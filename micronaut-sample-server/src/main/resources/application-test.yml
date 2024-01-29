@@ -13,6 +13,3 @@ endpoints:
   all:
     port: 0
     enabled: false
-
-apized:
-  esb-enabled: false
