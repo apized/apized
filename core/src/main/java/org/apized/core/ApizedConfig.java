@@ -62,4 +62,9 @@ public class ApizedConfig {
    * Known apis that can be used for federation.
    */
   private Map<String, String> federation = new HashMap<>();
+
+  /**
+   * Boolean to control is the ESB functionality is enabled
+   */
+  private Boolean esbEnabled = true;
 }

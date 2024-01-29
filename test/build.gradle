@@ -8,7 +8,6 @@ dependencies {
   api 'io.cucumber:cucumber-junit:7.13.0'
   api 'io.rest-assured:rest-assured:5.3.1'
 
-  api 'org.testcontainers:rabbitmq:1.18.3'
   api 'org.testcontainers:mysql:1.17.4'
   api 'org.testcontainers:postgresql:1.17.4'
   api 'org.testcontainers:oracle-xe:1.17.4'

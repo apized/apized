@@ -27,7 +27,7 @@ import java.util.List;
 @Generated
 @Slf4j
 @RabbitListener
-@Requires(bean = ChannelPool.class)
+@Requires(property = "apized.esb-enabled", notEquals = "false")
 class ${type}${d}Listener extends EnvelopeConsumer {
 
   @Inject
