@@ -64,7 +64,7 @@ public class ApizedConfig {
   private Map<String, String> federation = new HashMap<>();
 
   /**
-   * Boolean to control is the ESB functionality is enabled
+   * Boolean to control is the ESB functionality is enabled. Default `true`
    */
-  private Boolean esbEnabled = true;
+  private boolean esbEnabled = true;
 }
