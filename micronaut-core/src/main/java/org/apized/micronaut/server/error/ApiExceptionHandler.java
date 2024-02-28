@@ -25,14 +25,14 @@ import io.micronaut.http.server.exceptions.ExceptionHandler;
 import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ElementKind;
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.error.exception.ServerException;
 import org.apized.micronaut.server.error.model.MicronautErrorEntry;
 import org.apized.micronaut.server.error.model.MicronautErrorResponse;
 
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.ElementKind;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -123,6 +123,14 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
           .build()
       );
       case "UnauthorizedException" -> HttpResponse.unauthorized().body(MicronautErrorResponse.builder().errors(
+        List.of(
+          MicronautErrorEntry
+            .builder()
+            .message(exception.getMessage())
+            .build()
+        )
+      ).build());
+      case "IllegalArgumentException", "IllegalStateException" -> HttpResponse.badRequest().body(MicronautErrorResponse.builder().errors(
         List.of(
           MicronautErrorEntry
             .builder()
