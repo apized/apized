@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Properties to configure apized.
  */
-@ConfigurationProperties(value = "apized")
+@ConfigurationProperties("apized")
 public class MicronautApizedConfig extends ApizedConfig {
 
   /**

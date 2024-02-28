@@ -29,7 +29,7 @@ public interface UserResolver {
   String generateToken(User user, boolean expiring);
 
   default void runAs(UUID userId, Runnable execution) {
-    if (userId == ApizedContext.getSecurity().getUser().getId()) {
+    if (userId.equals(ApizedContext.getSecurity().getUser().getId())) {
       execution.run();
     } else {
       runAs(getUser(userId), execution);

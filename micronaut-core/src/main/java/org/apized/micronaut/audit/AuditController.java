@@ -43,7 +43,7 @@ public class AuditController {
   @Operation(operationId = "Get audits for a given model", tags = {"Audit Controller"})
   public HttpResponse<List<AuditEntry>> getAuditForType(@PathVariable(value = "entity") String entity) {
     List<AuditEntry> results = new ArrayList<>();
-    Iterable<AuditEntry> entries = repository.findByTypeOrderByTimestampAsc(StringHelper.capitalize(StringHelper.singularize(entity)));
+    Iterable<AuditEntry> entries = repository.findByTypeOrderByEpochAsc(StringHelper.capitalize(StringHelper.singularize(entity)));
     entries.iterator().forEachRemaining(results::add);
     return HttpResponse.status(HttpStatus.OK).body(results);
   }
@@ -55,7 +55,7 @@ public class AuditController {
     @PathVariable(value = "id") UUID id
   ) {
     List<AuditEntry> results = new ArrayList<>();
-    Iterable<AuditEntry> entries = repository.findByTypeAndTargetOrderByTimestampAsc(StringHelper.capitalize(StringHelper.singularize(entity)), id);
+    Iterable<AuditEntry> entries = repository.findByTypeAndTargetOrderByEpochAsc(StringHelper.capitalize(StringHelper.singularize(entity)), id);
     entries.iterator().forEachRemaining(results::add);
     return HttpResponse.status(HttpStatus.OK).body(results);
   }

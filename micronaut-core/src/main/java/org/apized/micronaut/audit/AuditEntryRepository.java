@@ -22,7 +22,7 @@ import org.apized.core.audit.model.AuditEntry;
 import java.util.UUID;
 
 public interface AuditEntryRepository  extends CrudRepository<AuditEntry, UUID> {
-  Iterable<AuditEntry> findByTypeAndTargetOrderByTimestampAsc(String type, UUID id);
+  Iterable<AuditEntry> findByTypeAndTargetOrderByEpochAsc(String type, UUID id);
 
-  Iterable<AuditEntry> findByTypeOrderByTimestampAsc(String type);
+  Iterable<AuditEntry> findByTypeOrderByEpochAsc(String type);
 }
