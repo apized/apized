@@ -20,46 +20,40 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.http.simple.cookies.SimpleCookie;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.apized.core.ApizedConfig;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.security.UserResolver;
+import org.apized.micronaut.core.ApizedHttpServerFilter;
 import org.reactivestreams.Publisher;
 
 @Slf4j
 @Filter("/**")
 @Requires(bean = UserResolver.class)
-public class SecurityFilter implements HttpServerFilter {
-  @Inject
-  ApizedConfig config;
-
+public class SecurityFilter extends ApizedHttpServerFilter {
   @Inject
   UserResolver resolver;
 
   @Override
-  public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    if (!request.getPath().equals("/") && !request.getPath().startsWith("/health")) {
-      try {
-        String authorization = request.getHeaders().get("Authorization");
-        String token;
+  public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
+    try {
+      String authorization = request.getHeaders().get("Authorization");
+      String token;
 
-        if (authorization != null) {
-          token = authorization.replaceAll("Bearer (.*)", "$1");
-        } else {
-          token = request.getCookies().findCookie(config.getCookie()).orElse(new SimpleCookie(config.getCookie(), null)).getValue();
-        }
-        ApizedContext.getSecurity().setToken(token);
-        long start = System.currentTimeMillis();
-        ApizedContext.getSecurity().setUser(resolver.getUser(token));
-        log.info("User {} resolved in {} ms for {}", ApizedContext.getSecurity().getUser() != null ? ApizedContext.getSecurity().getUser().getUsername() : null, System.currentTimeMillis() - start, request.getPath());
-      } catch (Exception ignored) {
-        log.error(ignored.getMessage(), ignored);
+      if (authorization != null) {
+        token = authorization.replaceAll("Bearer (.*)", "$1");
+      } else {
+        token = request.getCookies().findCookie(config.getCookie()).orElse(new SimpleCookie(config.getCookie(), null)).getValue();
       }
+      ApizedContext.getSecurity().setToken(token);
+      long start = System.currentTimeMillis();
+      ApizedContext.getSecurity().setUser(resolver.getUser(token));
+      log.info("User {} resolved in {} ms for {}", ApizedContext.getSecurity().getUser() != null ? ApizedContext.getSecurity().getUser().getUsername() : null, System.currentTimeMillis() - start, request.getPath());
+    } catch (Exception ignored) {
+      log.error(ignored.getMessage(), ignored);
     }
 
     return chain.proceed(request);

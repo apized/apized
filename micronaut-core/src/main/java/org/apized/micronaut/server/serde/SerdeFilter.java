@@ -19,11 +19,11 @@ package org.apized.micronaut.server.serde;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
 import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
+import org.apized.micronaut.core.ApizedHttpServerFilter;
 import org.reactivestreams.Publisher;
 
 import java.util.*;
@@ -31,18 +31,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Filter("/**")
-public class SerdeFilter implements HttpServerFilter {
+public class SerdeFilter extends ApizedHttpServerFilter {
   private final Pattern urlPattern = Pattern.compile("/(\\w+)(/(\\p{Alnum}{8}-\\p{Alnum}{4}-\\p{Alnum}{4}-\\p{Alnum}{4}-\\p{Alnum}{12}))?");
 
   @Override
-  public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    if (!request.getPath().equals("/") && !request.getPath().startsWith("/health")) {
-      ApizedContext.getRequest().setPathVariables(getPathVariables(request));
-      ApizedContext.getRequest().setFields(getParameters(request, "fields"));
-      ApizedContext.getRequest().setSearch(getParameters(request, "search"));
-      ApizedContext.getRequest().setSort(getParameters(request, "sort"));
-      ApizedContext.getRequest().setReason(request.getHeaders().get("X-Reason"));
-    }
+  public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
+    ApizedContext.getRequest().setPathVariables(getPathVariables(request));
+    ApizedContext.getRequest().setFields(getParameters(request, "fields"));
+    ApizedContext.getRequest().setSearch(getParameters(request, "search"));
+    ApizedContext.getRequest().setSort(getParameters(request, "sort"));
+    ApizedContext.getRequest().setReason(request.getHeaders().get("X-Reason"));
 
     return chain.proceed(request);
   }

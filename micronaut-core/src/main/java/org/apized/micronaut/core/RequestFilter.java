@@ -20,7 +20,6 @@ import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
 import lombok.extern.slf4j.Slf4j;
@@ -29,20 +28,16 @@ import org.reactivestreams.Publisher;
 
 @Slf4j
 @Filter("/**")
-public class RequestFilter implements HttpServerFilter {
+public class RequestFilter extends ApizedHttpServerFilter {
   @Override
-  public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-    if (!request.getPath().equals("/") && !request.getPath().startsWith("/health")) {
-      long start = System.currentTimeMillis();
-      ApizedContext.destroy();
-      log.info("Request {} started: {} {}", ApizedContext.getRequest().getId(), request.getMethod(), request.getPath());
-      return Publishers.then(
-        chain.proceed(request),
-        response -> log.info("Request {} took {}ms", ApizedContext.getRequest().getId(), System.currentTimeMillis() - start)
-      );
-    } else {
-      return chain.proceed(request);
-    }
+  public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
+    long start = System.currentTimeMillis();
+    ApizedContext.destroy();
+    log.info("Request {} started: {} {}", ApizedContext.getRequest().getId(), request.getMethod(), request.getPath());
+    return Publishers.then(
+      chain.proceed(request),
+      response -> log.info("Request {} took {}ms", ApizedContext.getRequest().getId(), System.currentTimeMillis() - start)
+    );
   }
 
   @Override

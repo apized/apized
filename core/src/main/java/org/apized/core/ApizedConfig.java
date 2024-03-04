@@ -19,6 +19,7 @@ package org.apized.core;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -57,6 +58,11 @@ public class ApizedConfig {
    * The token for this application to use. Only needed if security is enabled (by providing an implementation of UserResolver)
    */
   private String token;
+
+  /**
+   * The urls to exclude from the Apized filters
+   */
+  List<String> exclusions;
 
   /**
    * Known apis that can be used for federation.
