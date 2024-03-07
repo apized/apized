@@ -16,12 +16,13 @@
 
 package org.apized.core;
 
-import org.apized.core.audit.annotation.AuditField;
-import org.apized.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanProperty;
 import io.micronaut.core.beans.BeanWrapper;
+import io.micronaut.core.naming.Named;
+import org.apized.core.audit.annotation.AuditField;
+import org.apized.core.model.Model;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -38,6 +39,7 @@ public class ModelMapper {
     this.ignoreAnnotation = ignoreAnnotation;
   }
 
+  @SuppressWarnings("unchecked")
   public Map<String, Object> createMapOf(Object instance) {
 
     Map<String, Object> result = new HashMap<>();
@@ -45,8 +47,13 @@ public class ModelMapper {
     if (instance != null) {
       if (instance instanceof Model) {
         BeanWrapper<Model> wrapper = BeanWrapper.getWrapper((Model) instance);
+        BeanIntrospection<Model> introspection = BeanIntrospection.getIntrospection(
+          instance.getClass().getSimpleName().endsWith("$Proxy")
+            ? (Class<Model>) instance.getClass().getSuperclass()
+            : (Class<Model>) instance.getClass()
+        );
 
-        for (BeanProperty<Model, Object> field : wrapper.getBeanProperties()) {
+        for (BeanProperty<Model, Object> field : introspection.getBeanProperties()) {
           boolean ignore = field.getAnnotation(fieldAnnotation) == null && (field.getAnnotation(JsonIgnore.class) != null || field.getAnnotation(ignoreAnnotation) != null);
 
           if (!ignore) {
@@ -79,23 +86,60 @@ public class ModelMapper {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
   private Map<String, Object> getObjectMap(List<String> included, Object it) {
     Map<String, Object> result = new HashMap<>();
+    BeanWrapper<Object> subWrapper = BeanWrapper.getWrapper(it);
+    BeanIntrospection<Object> subIntrospection = BeanIntrospection.getIntrospection(
+      it.getClass().getSimpleName().endsWith("$Proxy")
+        ? (Class<Object>) it.getClass().getSuperclass()
+        : (Class<Object>) it.getClass()
+    );
+
+    if (included.remove("*")) {
+      included.addAll(
+        subIntrospection.getBeanProperties().stream()
+          .filter(p -> !(p.getAnnotation(JsonIgnore.class) != null || p.getAnnotation(ignoreAnnotation) != null))
+          .map(Named::getName)
+          .toList()
+      );
+    }
+
     for (String subFieldName : included) {
-      BeanWrapper<Object> subWrapper = BeanWrapper.getWrapper(it);
-      BeanIntrospection<Object> subIntrospection = subWrapper.getIntrospection();
+      if (subIntrospection.getProperty(subFieldName).isEmpty()) {
+        continue;
+      }
+
       if (subFieldName.contains(".")) {
         List<String> split = List.of(subFieldName.split("\\."));
         String directSubField = split.get(0);
         String subSubField = String.join(".", split.subList(1, split.size()));
-        Map<String, Object> subResult = getObjectMap(List.of(subSubField), subWrapper.getProperty(directSubField, subIntrospection.getProperty(directSubField).get().getType()).orElse(null));
-        if (result.containsKey(directSubField)) {
-          ((Map<String, Object>) result.get(directSubField)).putAll(subResult);
-        } else {
-          result.put(directSubField, subResult);
+        Object subValue = subWrapper.getProperty(directSubField, subIntrospection.getProperty(directSubField).get().getType()).orElse(null);
+
+        if (subValue != null) {
+          if (List.class.isAssignableFrom(subValue.getClass())) {
+            result.put(directSubField, ((List<?>) subValue).stream().map(p -> getObjectMap(new ArrayList<>(List.of(subSubField)), p)).toList());
+          } else {
+            Map<String, Object> subResult = getObjectMap(new ArrayList<>(List.of(subSubField)), subValue);
+            if (result.containsKey(directSubField)) {
+              ((Map<String, Object>) result.get(directSubField)).putAll(subResult);
+            } else {
+              result.put(directSubField, subResult);
+            }
+          }
         }
       } else {
-        result.put(subFieldName, subWrapper.getProperty(subFieldName, subIntrospection.getProperty(subFieldName).get().getType()).orElse(null));
+        Object value = subWrapper.getProperty(subFieldName, subIntrospection.getProperty(subFieldName).get().getType()).orElse(null);
+        if (value != null) {
+//          if (List.class.isAssignableFrom(value.getClass())) {
+//            result.put(subFieldName, getObjectMap(List.of("id"), value));
+//          } else
+          if (value instanceof Model) {
+            result.put(subFieldName, ((Model) value).getId());
+          } else {
+            result.put(subFieldName, value);
+          }
+        }
       }
     }
     return result;
@@ -103,8 +147,8 @@ public class ModelMapper {
 
   private Object retrieveValueFrom(Object it) {
     if (it instanceof Model) {
-      if (BeanIntrospection.getIntrospection(it.getClass()).getAnnotation(AuditField.class) != null) {
-        return createMapOf((Model) it);
+      if (BeanIntrospection.getIntrospection(it.getClass()).getAnnotation(fieldAnnotation) != null) {
+        return createMapOf(it);
       } else {
         return ((Model) it).getId();
       }
