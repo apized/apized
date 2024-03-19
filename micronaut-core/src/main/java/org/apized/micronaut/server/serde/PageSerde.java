@@ -31,18 +31,18 @@ import java.io.IOException;
 import java.util.Map;
 
 @Singleton
-public class PageSerde implements Serde<Page<? extends Model>> {
+public class PageSerde implements Serde<Page<Object>> {
   @Inject
   ModelSerde serde;
 
   @Nullable
   @Override
-  public Page<? extends Model> deserialize(Decoder decoder, DecoderContext context, Argument<? super Page<? extends Model>> type) throws IOException {
-    return (Page<? extends Model>) serde.deserialize(decoder, context, (Argument<? super Model>) type);
+  public Page<Object> deserialize(Decoder decoder, DecoderContext context, Argument<? super Page<Object>> type) throws IOException {
+    return (Page<Object>) serde.deserialize(decoder, context, (Argument<Object>) type);
   }
 
   @Override
-  public void serialize(Encoder encoder, EncoderContext context, Argument<? extends Page<? extends Model>> type, Page<? extends Model> value) throws IOException {
+  public void serialize(Encoder encoder, EncoderContext context, Argument<? extends Page<Object>> type, Page<Object> value) throws IOException {
     if (!ApizedContext.getRequest().getFields().containsKey("content")) {
       ApizedContext.getRequest().setFields(Map.of("*", Map.of(), "content", ApizedContext.getRequest().getFields().isEmpty() ? Map.of("*", Map.of()) : ApizedContext.getRequest().getFields()));
       ApizedContext.getRequest().setSearch(Map.of("content", ApizedContext.getRequest().getSearch()));

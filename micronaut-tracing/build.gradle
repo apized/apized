@@ -7,7 +7,6 @@ dependencies {
   api "io.opentelemetry:opentelemetry-exporter-otlp"
   api "io.opentelemetry:opentelemetry-exporter-logging"
   api "io.opentelemetry:opentelemetry-exporter-otlp-common"
-  api "io.opentelemetry:opentelemetry-exporter-otlp-logs"
   api "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0"
   api "io.micronaut.tracing:micronaut-tracing-opentelemetry-http"
 

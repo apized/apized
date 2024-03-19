@@ -110,10 +110,12 @@ public class ApizedPlugin implements Plugin<Project> {
           project.getDependencies().add("runtimeOnly", "mysql:mysql-connector-java");
           project.getDependencies().add("runtimeOnly", "org.flywaydb:flyway-mysql");
         }
-        case POSTGRES -> project.getDependencies().add("runtimeOnly", "org.postgresql:postgresql");
+        case POSTGRES -> {
+          project.getDependencies().add("runtimeOnly", "org.postgresql:postgresql");
+          project.getDependencies().add("runtimeOnly", "org.flywaydb:flyway-database-postgresql");
+        }
         case ORACLE -> {
           project.getDependencies().add("runtimeOnly", "com.oracle.database.jdbc:ojdbc8");
-
         }
         case SQL_SERVER -> {
           project.getDependencies().add("implementation", "com.microsoft.sqlserver:mssql-jdbc");

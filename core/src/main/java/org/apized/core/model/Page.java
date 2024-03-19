@@ -31,7 +31,7 @@ import java.util.UUID;
 @Builder
 @EqualsAndHashCode
 @Introspected
-public class Page<T extends Model> implements Model {
+public class Page<T> implements Model {
   @JsonIgnore
   UUID id;
 

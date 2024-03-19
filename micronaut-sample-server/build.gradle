@@ -24,6 +24,7 @@ dependencies {
 
   implementation('io.micronaut.data:micronaut-data-jdbc')
   runtimeOnly "org.postgresql:postgresql"
+  runtimeOnly "org.flywaydb:flyway-database-postgresql"
   runtimeOnly "io.micronaut.sql:micronaut-jdbc-hikari"
   runtimeOnly "org.yaml:snakeyaml"
 

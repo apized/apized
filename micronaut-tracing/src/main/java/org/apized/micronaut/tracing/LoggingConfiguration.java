@@ -4,14 +4,13 @@ import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.runtime.server.event.ServerStartupEvent;
-import io.opentelemetry.api.logs.GlobalLoggerProvider;
 import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.logs.LogLimits;
 import io.opentelemetry.sdk.logs.SdkLoggerProvider;
 import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
 import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
+import io.opentelemetry.semconv.ResourceAttributes;
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -57,6 +56,6 @@ public class LoggingConfiguration {
 
     OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder().setLoggerProvider(logEmitterProvider).build();
 
-    GlobalLoggerProvider.set(logEmitterProvider);
+    OpenTelemetryAppender.install(openTelemetrySdk);
   }
 }

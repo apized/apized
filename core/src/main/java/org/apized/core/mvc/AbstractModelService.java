@@ -98,7 +98,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PostPersist.class) != null)
-      .forEach(prePersist -> prePersist.invoke(it));
+      .forEach(postPersist -> postPersist.invoke(it));
 
     performSubExecutions(it, false);
     return create;
@@ -123,7 +123,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PostUpdate.class) != null)
-      .forEach(preUpdate -> preUpdate.invoke(it));
+      .forEach(postUpdate -> postUpdate.invoke(it));
 
     performSubExecutions(it, false);
     return update;
@@ -140,7 +140,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PreRemove.class) != null)
-      .forEach(prePersist -> prePersist.invoke(it));
+      .forEach(preRemove -> preRemove.invoke(it));
 
     getRepository().delete(id);
 
@@ -149,7 +149,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
       .getBeanMethods()
       .stream()
       .filter(m -> m.getAnnotation(PostRemove.class) != null)
-      .forEach(prePersist -> prePersist.invoke(it));
+      .forEach(postRemove -> postRemove.invoke(it));
 
     performSubExecutions(it, false);
     return it;
