@@ -41,6 +41,7 @@ public class SerdeFilter extends ApizedHttpServerFilter {
     ApizedContext.getRequest().setSearch(getParameters(request, "search"));
     ApizedContext.getRequest().setSort(getParameters(request, "sort"));
     ApizedContext.getRequest().setReason(request.getHeaders().get("X-Reason"));
+    ApizedContext.getRequest().setQueryParams(request.getParameters().asMap());
 
     return chain.proceed(request);
   }
