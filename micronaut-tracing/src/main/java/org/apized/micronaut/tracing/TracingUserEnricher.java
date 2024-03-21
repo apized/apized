@@ -15,7 +15,7 @@ import org.reactivestreams.Publisher;
 
 @Requires(bean = Tracer.class)
 @Filter("/**")
-class TracingUserEnricher extends ApizedHttpServerFilter {
+public class TracingUserEnricher extends ApizedHttpServerFilter {
   @Override
   @ContinueSpan
   public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
