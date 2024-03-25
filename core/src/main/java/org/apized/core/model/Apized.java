@@ -35,14 +35,35 @@ public @interface Apized {
    */
   Action[] operations() default {Action.LIST, Action.GET, Action.CREATE, Action.UPDATE, Action.DELETE};
 
+  /**
+   * List of Service and Repository extensions for this model.
+   * @return The classes that are Service or Repository extensions for this model.
+   */
   Class<?>[] extensions() default {};
 
+  /**
+   * The scope of this model.
+   * @return The parent scope.
+   */
   Class<? extends Model>[] scope() default {};
 
+  /**
+   * Should this model generate and store an audit trail
+   * @return If this model generate and store an audit trail
+   */
   boolean audit() default true;
 
+  /**
+   * Should this model generate and publish events
+   * @return If this model should generate and publish events
+   */
   boolean event() default true;
 
+  /**
+   * Maximum allowed pageSize for List operations.
+   * @return The max number of elements to be allowed to be retrieved in a single list request.
+   */
+  int maxPageSize() default 50;
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)

@@ -34,6 +34,8 @@ import java.util.UUID;
 ###end
 @Controller("$path[0]")
 public class ${type}Controller extends AbstractModelController<${type}>{
+  protected final int MAX_PAGE_SIZE = ${maxPageSize};
+
   @Inject
   protected ${type}Service service;
 
@@ -54,7 +56,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.LIST)
   )
   public Page<${type}> list(@Nullable @Bindable(defaultValue = "1") Integer page, @Nullable @Bindable(defaultValue = "50") Integer pageSize, @Nullable @Bindable(defaultValue = "") List<SearchTerm> search, @Nullable @Bindable(defaultValue = "") List<SortTerm> sort) {
-    Page<$type> result = super.list(page, pageSize, search, sort);
+    Page<$type> result = super.list(page, pageSize <= MAX_PAGE_SIZE ? pageSize : MAX_PAGE_SIZE, search, sort);
     eventPublisher.publishEvent("${type}Controller::list");
     return result;
   }

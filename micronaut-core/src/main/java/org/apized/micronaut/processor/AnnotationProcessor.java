@@ -164,6 +164,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         bindings.put("module", ((PackageElement) it.getEnclosingElement()).getQualifiedName().toString());
         bindings.put("type", it.getSimpleName().toString());
         bindings.put("actions", Arrays.stream(annotation.operations()).map(Enum::toString).collect(Collectors.toList()));
+        bindings.put("maxPageSize", annotation.maxPageSize());
         bindings.put("descriptions", getActionDescription(it, Arrays.stream(annotation.operations()).map(Enum::toString).toList()));
         bindings.put("extension", Map.of(
           "repository", Map.of(
