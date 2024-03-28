@@ -1,0 +1,10 @@
+[
+  {
+    "name": "org.flywaydb.database.postgresql.PostgreSQLConfigurationExtension",
+    "allPublicMethods" : true
+  },
+  {
+    "name": "org.apized.micronaut.core.ApizedHttpServerFilter",
+    "allDeclaredFields" : true
+  }
+]
