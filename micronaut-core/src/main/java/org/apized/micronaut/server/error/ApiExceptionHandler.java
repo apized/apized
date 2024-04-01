@@ -148,19 +148,19 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
         yield HttpResponse.serverError(
           MicronautErrorResponse
             .builder()
-//            .errors(
-//              List.of(
-//                MicronautErrorEntry
-//                  .builder()
-//                  .message(
-//                    String.format(
-//                      "%s: %s",
-//                      exception.getClass().getSimpleName(),
-//                      exception.getMessage()
-//                    )
-//                  ).build()
-//              )
-//            )
+            .errors(
+              List.of(
+                MicronautErrorEntry
+                  .builder()
+                  .message(
+                    String.format(
+                      "%s: %s",
+                      exception.getClass().getSimpleName(),
+                      exception.getMessage()
+                    )
+                  ).build()
+              )
+            )
             .build()
         );
       }
