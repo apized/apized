@@ -12,6 +12,7 @@ import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Filter("/**")
 class ETagFilter implements HttpServerFilter {
   @Inject
@@ -49,8 +51,8 @@ class ETagFilter implements HttpServerFilter {
               response.getHeaders().set("ETag", tokenHeader);
               response.getHeaders().set("Last-Modified", LocalDateTime.now().toString());
             }
-          } catch (IOException e) {
-            //Do nothing
+          } catch (IOException | ArrayIndexOutOfBoundsException e) {
+            log.info("{} on {} - {}", e.getMessage(), request.getPath(), obj);
           }
         });
       }

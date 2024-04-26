@@ -70,7 +70,9 @@ public abstract class RepositoryHelper {
         Arrays.stream(apized.classValues("scope")).forEach(s -> {
           String uncapitalize = StringHelper.uncapitalize(s.getSimpleName());
           if (pathVariables.get(uncapitalize) != null || !ApizedContext.getSecurity().getUser().isAllowed(slug + "." + uncapitalize + ".get")) {
-            search.add(new SearchTerm(uncapitalize, SearchOperation.eq, pathVariables.get(uncapitalize)));
+            if (search.stream().noneMatch(term -> term.getField().equals(uncapitalize))) {
+              search.add(new SearchTerm(uncapitalize, SearchOperation.eq, pathVariables.get(uncapitalize)));
+            }
 
             BeanIntrospection.getIntrospection(s).getBeanProperties().stream()
               .filter(p -> p.getAnnotation(Owner.class) != null)
