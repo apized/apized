@@ -19,7 +19,9 @@ public class TracingUserEnricher extends ApizedHttpServerFilter {
   @Override
   @ContinueSpan
   public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
-    Span.current().setAttribute("user", ApizedContext.getSecurity().getUser().getId().toString());
+    if (ApizedContext.getSecurity().getUser() != null) {
+      Span.current().setAttribute("user", ApizedContext.getSecurity().getUser().getId().toString());
+    }
     return chain.proceed(request);
   }
 

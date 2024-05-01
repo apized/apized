@@ -6,7 +6,6 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.serde.ObjectMapper;
@@ -22,7 +21,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Filter("/**")
-class ETagFilter implements HttpServerFilter {
+class ETagFilter extends ApizedHttpServerFilter {
   @Inject
   ObjectMapper mapper;
 
@@ -34,7 +33,7 @@ class ETagFilter implements HttpServerFilter {
   }
 
   @Override
-  public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
+  public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
     return Publishers.then(chain.proceed(request), response -> {
       if (HttpMethod.GET.equals(request.getMethod())) {
         String previousToken = request.getHeaders().get("If-None-Match");
