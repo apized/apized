@@ -5,6 +5,8 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Envelope;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.type.Argument;
 import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
 import io.micronaut.rabbitmq.connect.ChannelPool;
 import io.micronaut.serde.ObjectMapper;
@@ -22,7 +24,8 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 @Slf4j
-public abstract class EnvelopeConsumer {
+@Introspected
+public abstract class EnvelopeConsumer<T> {
   protected Map<String, Integer> registry = new HashMap<>();
 
   protected final QueueConfig queue;
@@ -84,9 +87,9 @@ public abstract class EnvelopeConsumer {
     long start = System.currentTimeMillis();
 
     try {
-      Map<String, Object> message = Optional.ofNullable(mapper.readValue(data, Map.class)).orElseGet(HashMap::new);
+      Map<String, Object> message = Optional.ofNullable(mapper.readValue(data, Argument.of(Map.class, String.class, Object.class))).orElseGet(HashMap::new);
       Map<String, Object> header = (Map<String, Object>) message.getOrDefault("header", new HashMap<>());
-      Map<String, Object> payload = (Map<String, Object>) message.get("payload");
+      T payload = (T) message.get("payload");
       Date timestamp = Optional.ofNullable(properties.getTimestamp())
         .orElseGet(() ->
           header.containsKey("timestamp")
@@ -102,7 +105,14 @@ public abstract class EnvelopeConsumer {
         ApizedContext.getSecurity().setUser(resolver.getUser(config.getToken()));
       }
 
-      getConsumer().process(envelope.getRoutingKey(), timestamp, header, Optional.ofNullable(payload).orElse(message));
+      getConsumer().process(
+        envelope.getRoutingKey(),
+        timestamp,
+        header,
+        Optional.ofNullable(payload).isPresent()
+          ? (T) mapper.readValue(mapper.writeValueAsString(payload), getType())
+          : (T) mapper.readValue(data, getType())
+      );
 
       eventPublisher.publishEvent(this.getClass().getSuperclass().getSimpleName() + "::process");
       acknowledgement.ack(false);
@@ -125,7 +135,9 @@ public abstract class EnvelopeConsumer {
     }
   }
 
-  protected abstract RabbitMQConsumer getConsumer();
+  protected abstract RabbitMQConsumer<T> getConsumer();
+
+  protected abstract Argument<?> getType();
 
   private String checksum(byte[] data) {
     Checksum crc32 = new CRC32();

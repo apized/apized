@@ -79,9 +79,13 @@ public class AnnotationProcessor extends AbstractProcessor {
       } else {
         RabbitMQConsume annotation = it.getAnnotation(RabbitMQConsume.class);
 
+        String genericType = processingEnv.getElementUtils().getTypeElement(it.asType().toString()).getInterfaces().get(0).toString();
+
         Map<String, Object> bindings = getDefaultBindings();
         bindings.put("module", ((PackageElement) it.getEnclosingElement()).getQualifiedName().toString());
         bindings.put("type", it.getSimpleName().toString());
+        bindings.put("generic", genericType.replaceAll("^[^<]+<(.+)>$", "$1"));
+        bindings.put("argument", String.join(", ", Arrays.stream(genericType.replaceAll("^[^<]+<(.+)>$", "$1").split("[,<>]")).map(t -> t + ".class").toList()));
         bindings.put("exchange", annotation.exchange());
         bindings.put("queue", annotation.queue());
         bindings.put("bindings", Arrays.stream(annotation.bindings()).map(b -> "\"" + b + "\"").collect(Collectors.joining(", ")));

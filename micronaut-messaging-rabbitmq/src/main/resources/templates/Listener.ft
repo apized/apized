@@ -6,30 +6,30 @@ import com.rabbitmq.client.Envelope;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.core.type.Argument;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
 import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
 import io.micronaut.rabbitmq.connect.ChannelPool;
 import io.micronaut.serde.ObjectMapper;
-import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.ApizedConfig;
 import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.security.UserResolver;
-import org.apized.core.ApizedConfig;
 import org.apized.micronaut.messaging.rabbitmq.consumer.EnvelopeConsumer;
 import org.apized.micronaut.messaging.rabbitmq.consumer.QueueConfig;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
 
 @Generated
 @Slf4j
 @RabbitListener
 @Requires(notEnv = Environment.TEST)
-class ${type}${d}Listener extends EnvelopeConsumer {
+class ${type}${d}Listener extends EnvelopeConsumer<${generic}> {
 
   @Inject
   @Getter
@@ -59,5 +59,9 @@ class ${type}${d}Listener extends EnvelopeConsumer {
   @Queue("${queue}")
   protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
     super.consume(data, envelope, properties, acknowledgement);
+  }
+
+  protected Argument<?> getType() {
+    return Argument.of(${argument});
   }
 }
