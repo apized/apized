@@ -153,6 +153,8 @@ public class ModelSerde implements Serde<Model> {
           while (decoder.hasNextArrayValue()) {
             //noinspection unchecked
             subValues.add(deserializer.deserialize(decoder, context, Argument.of(subType)));
+            //remove the pathVariable after the subList element deserialization so it doesn't affect other elements on the list
+            ApizedContext.getRequest().getPathVariables().remove(StringHelper.uncapitalize(subType.getSimpleName()));
           }
           decoder.close();
 
