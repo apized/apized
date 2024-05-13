@@ -35,7 +35,7 @@ public class ApizedRepositoryTracingInterceptor implements MethodInterceptor<Obj
     String operation = String.format("%s::%s", context.getTarget().getClass().getSimpleName(), context.getMethodName());
     Span span = tracer
       .spanBuilder(operation)
-      .setSpanKind(SpanKind.CLIENT)
+      .setSpanKind(SpanKind.INTERNAL)
       .setAttribute("db.system", apizedConfig.getDialect().toString().toLowerCase())
       .setAttribute("db.operation", operation)
       .startSpan();
