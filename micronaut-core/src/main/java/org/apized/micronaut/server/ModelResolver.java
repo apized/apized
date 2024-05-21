@@ -56,8 +56,10 @@ public class ModelResolver {
             p.getAnnotationMetadata().hasAnnotation(ManyToMany.class)
           )
           .filter(p ->
-            Objects.requireNonNull(p.getAnnotation(ManyToMany.class)).stringValue("mappedBy").orElse("").equals(field) ||
-              p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
+            p.asArgument().getTypeParameters()[0].getType().equals(property.getDeclaringType()) && (
+              Objects.requireNonNull(p.getAnnotation(ManyToMany.class)).stringValue("mappedBy").orElse("").equals(field) ||
+                p.getName().equals(manyToMany.get().stringValue("mappedBy").orElse(""))
+            )
           )
           .findFirst();
         service = applicationContext.getBean(new DefaultArgument<>(ModelService.class, null, new DefaultArgument<>(inverseModel.getBeanType(), inverseModel.getAnnotationMetadata())));
