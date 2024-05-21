@@ -19,7 +19,7 @@ public interface ${type}Repository extends MicronautModelRepository<${type}>#for
     default void add(String field, UUID self, UUID other){
         switch(field) {
 #foreach( $it in ${manyToMany})
-            case "${it.name}": add${it.Name}(self, other);
+            case "${it.name}" -> add${it.Name}(self, other);
 #end
         }
     }
@@ -28,7 +28,7 @@ public interface ${type}Repository extends MicronautModelRepository<${type}>#for
     default void remove(String field, UUID self, UUID other){
         switch(field) {
 #foreach( $it in ${manyToMany})
-            case "${it.name}": remove${it.Name}(self, other);
+            case "${it.name}" -> remove${it.Name}(self, other);
 #end
         }
     }
