@@ -12,6 +12,7 @@ import io.micronaut.rabbitmq.annotation.RabbitListener;
 import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
 import io.micronaut.rabbitmq.connect.ChannelPool;
 import io.micronaut.serde.ObjectMapper;
+import io.opentelemetry.api.trace.SpanKind;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.Generated;
@@ -22,6 +23,7 @@ import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.security.UserResolver;
 import org.apized.micronaut.messaging.rabbitmq.consumer.EnvelopeConsumer;
 import org.apized.micronaut.messaging.rabbitmq.consumer.QueueConfig;
+import org.apized.micronaut.tracing.Traced;
 
 import java.util.List;
 
@@ -57,6 +59,7 @@ class ${type}${d}Listener extends EnvelopeConsumer<${generic}> {
   @Override
   @Transactional
   @Queue("${queue}")
+  @Traced(kind = SpanKind.CONSUMER)
   protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
     super.consume(data, envelope, properties, acknowledgement);
   }

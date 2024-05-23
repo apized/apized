@@ -34,6 +34,8 @@ public class HttpHistogramMeterFilterFactory {
    * Configure new MeterFilter for http.server.requests metrics.
    *
    * @param histogram If a histogram should be published
+   * @param minMs the minimum time (in ms) value expected to use in the histogram. Defaults to 100ms
+   * @param maxMs the maximum (in ms) value expected to use in the histogram. Defaults to 60_000ms, i.e. 60s
    * @return A MeterFilter
    */
   @Bean
@@ -51,6 +53,8 @@ public class HttpHistogramMeterFilterFactory {
    * Configure new MeterFilter for http.client.requests metrics.
    *
    * @param histogram If a histogram should be published
+   * @param minMs the minimum time (in ms) value expected to use in the histogram. Defaults to 100ms
+   * @param maxMs the maximum (in ms) value expected to use in the histogram. Defaults to 60_000ms, i.e. 60s
    * @return A MeterFilter
    */
   @Bean

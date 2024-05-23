@@ -10,13 +10,11 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
 import io.micronaut.rabbitmq.connect.ChannelPool;
 import io.micronaut.serde.ObjectMapper;
-import io.opentelemetry.api.trace.SpanKind;
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.ApizedConfig;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.security.UserResolver;
-import org.apized.micronaut.tracing.Traced;
 
 import java.io.IOException;
 import java.util.*;
@@ -79,7 +77,6 @@ public abstract class EnvelopeConsumer<T> {
     }
   }
 
-  @Traced(kind = SpanKind.CONSUMER)//todo the tracing version should maybe be part of the tracing module
   @SuppressWarnings("unchecked")
   protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
     String messageId = Optional.ofNullable(properties.getMessageId()).orElseGet(() -> checksum(data));
