@@ -3,6 +3,9 @@ package $module;
 
 import com.rabbitmq.client.BasicProperties;
 import com.rabbitmq.client.Envelope;
+#if($metrics)
+import io.micrometer.core.annotation.Timed;
+#end
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -12,7 +15,9 @@ import io.micronaut.rabbitmq.annotation.RabbitListener;
 import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
 import io.micronaut.rabbitmq.connect.ChannelPool;
 import io.micronaut.serde.ObjectMapper;
+#if($traced)
 import io.opentelemetry.api.trace.SpanKind;
+#end
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import lombok.Generated;
@@ -23,7 +28,9 @@ import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.security.UserResolver;
 import org.apized.micronaut.messaging.rabbitmq.consumer.EnvelopeConsumer;
 import org.apized.micronaut.messaging.rabbitmq.consumer.QueueConfig;
+#if($traced)
 import org.apized.micronaut.tracing.Traced;
+#end
 
 import java.util.List;
 
@@ -59,7 +66,12 @@ class ${type}${d}Listener extends EnvelopeConsumer<${generic}> {
   @Override
   @Transactional
   @Queue("${queue}")
+#if($metrics)
+  @Timed(value = "rabbitmq.consumer", extraTags = {"consumer", "${type}"}, histogram = true)
+#end
+#if($traced)
   @Traced(kind = SpanKind.CONSUMER)
+#end
   protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
     super.consume(data, envelope, properties, acknowledgement);
   }

@@ -12,9 +12,7 @@ import io.micronaut.configuration.metrics.binder.web.WebMetricsPublisher;
 import io.micronaut.context.annotation.*;
 import jakarta.inject.Singleton;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Arrays;
 
 import static io.micronaut.configuration.metrics.micrometer.MeterRegistryFactory.MICRONAUT_METRICS_BINDERS;
 import static io.micronaut.core.util.StringUtils.FALSE;
@@ -34,8 +32,9 @@ public class HttpHistogramMeterFilterFactory {
    * Configure new MeterFilter for http.server.requests metrics.
    *
    * @param histogram If a histogram should be published
-   * @param minMs the minimum time (in ms) value expected to use in the histogram. Defaults to 100ms
-   * @param maxMs the maximum (in ms) value expected to use in the histogram. Defaults to 60_000ms, i.e. 60s
+   * @param min       the minimum time (in ms) value expected.
+   * @param max       the maximum time (in ms) value expected.
+   * @param slas      the user-defined service levels (in ms) to create.
    * @return A MeterFilter
    */
   @Bean
@@ -43,18 +42,20 @@ public class HttpHistogramMeterFilterFactory {
   @Requires(property = MICRONAUT_METRICS_BINDERS + ".web.server.histogram")
   MeterFilter addServerPercentileMeterFilter(
     @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.server.histogram.enabled:false}") Boolean histogram,
-    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.server.histogram.minMs:100}") int minMs,
-    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.server.histogram.maxMs:60000}") int maxMs
+    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.server.histogram.min:-1}") Double min,
+    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.server.histogram.max:-1}") Double max,
+    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.server.histogram.slas:}") Double[] slas
   ) {
-    return getMeterFilter(histogram, minMs, maxMs, WebMetricsPublisher.METRIC_HTTP_SERVER_REQUESTS);
+    return getMeterFilter(histogram, min, max, slas, WebMetricsPublisher.METRIC_HTTP_SERVER_REQUESTS);
   }
 
   /**
    * Configure new MeterFilter for http.client.requests metrics.
    *
    * @param histogram If a histogram should be published
-   * @param minMs the minimum time (in ms) value expected to use in the histogram. Defaults to 100ms
-   * @param maxMs the maximum (in ms) value expected to use in the histogram. Defaults to 60_000ms, i.e. 60s
+   * @param min       the minimum time (in ms) value expected.
+   * @param max       the maximum time (in ms) value expected.
+   * @param slas      the user-defined service levels (in ms) to create.
    * @return A MeterFilter
    */
   @Bean
@@ -62,44 +63,35 @@ public class HttpHistogramMeterFilterFactory {
   @Requires(property = MICRONAUT_METRICS_BINDERS + ".web.client.histogram")
   MeterFilter addClientPercentileMeterFilter(
     @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.client.histogram:false}") Boolean histogram,
-    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.client.histogram.minMs:100}") int minMs,
-    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.client.histogram.maxMs:60000}") int maxMs
+    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.client.histogram.min:-1}") Double min,
+    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.client.histogram.max:-1}") Double max,
+    @Value("${" + MICRONAUT_METRICS_BINDERS + ".web.client.histogram.slas:}") Double[] slas
   ) {
-    return getMeterFilter(histogram, minMs, maxMs, WebMetricsPublisher.METRIC_HTTP_CLIENT_REQUESTS);
+    return getMeterFilter(histogram, min, max, slas, WebMetricsPublisher.METRIC_HTTP_CLIENT_REQUESTS);
   }
 
-  private MeterFilter getMeterFilter(Boolean histogram, int minMs, int maxMs, String metricNamePrefix) {
+  private MeterFilter getMeterFilter(Boolean histogram, Double minMs, Double maxMs, Double[] slas, String metricNamePrefix) {
     return new MeterFilter() {
       @Override
       public DistributionStatisticConfig configure(Meter.Id id, DistributionStatisticConfig config) {
         if (id.getName().startsWith(metricNamePrefix)) {
-          var min = (int) Math.floor(Math.log10(minMs)) + 1;
-          var max = (int) Math.floor(Math.log10(maxMs)) + 1;
+          var build = DistributionStatisticConfig.builder().percentilesHistogram(histogram);
 
-          List<Double> reduce = new ArrayList<>();
-          IntStream.rangeClosed(min, max)
-            .forEach(p ->
-              IntStream.rangeClosed(0, 9)
-                .forEach(i ->
-                  IntStream.rangeClosed(0, 9)
-                    .forEach(j -> {
-                      double val = (Math.pow(10, p + 1) * i + (Math.pow(10, p) * j));
-                      if (val <= maxMs * 10) {
-                        reduce.add(val * 100_000d);
-                      }
-                    })
-                )
+          if (slas != null) {
+            build.serviceLevelObjectives(
+              Arrays.stream(slas).mapToDouble(v -> v * 1_000_000_000d).toArray()
             );
+          }
 
-          return DistributionStatisticConfig.builder()
-            .percentilesHistogram(histogram)
-            .serviceLevelObjectives(
-              reduce.stream().filter(i -> i > 0).mapToDouble(i -> i).toArray()
-            )
-            .minimumExpectedValue(minMs * 1_000_000d)
-            .maximumExpectedValue(maxMs * 1_000_000d)
-            .build()
-            .merge(config);
+          if (minMs != -1) {
+            build.minimumExpectedValue(minMs * 1_000_000_000d);
+          }
+
+          if (maxMs != -1) {
+            build.maximumExpectedValue(maxMs * 1_000_000_000d);
+          }
+
+          return build.build().merge(config);
         }
         return config;
       }
