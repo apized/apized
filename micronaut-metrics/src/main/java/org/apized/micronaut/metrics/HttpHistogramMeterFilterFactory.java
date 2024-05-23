@@ -32,9 +32,9 @@ public class HttpHistogramMeterFilterFactory {
    * Configure new MeterFilter for http.server.requests metrics.
    *
    * @param histogram If a histogram should be published
-   * @param min       the minimum time (in ms) value expected.
-   * @param max       the maximum time (in ms) value expected.
-   * @param slas      the user-defined service levels (in ms) to create.
+   * @param min       the minimum time (in s) value expected.
+   * @param max       the maximum time (in s) value expected.
+   * @param slas      the user-defined service levels (in s) to create.
    * @return A MeterFilter
    */
   @Bean
@@ -53,9 +53,9 @@ public class HttpHistogramMeterFilterFactory {
    * Configure new MeterFilter for http.client.requests metrics.
    *
    * @param histogram If a histogram should be published
-   * @param min       the minimum time (in ms) value expected.
-   * @param max       the maximum time (in ms) value expected.
-   * @param slas      the user-defined service levels (in ms) to create.
+   * @param min       the minimum time (in s) value expected.
+   * @param max       the maximum time (in s) value expected.
+   * @param slas      the user-defined service levels (in s) to create.
    * @return A MeterFilter
    */
   @Bean
