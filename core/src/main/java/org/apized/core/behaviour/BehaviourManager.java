@@ -16,13 +16,14 @@
 
 package org.apized.core.behaviour;
 
+import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import org.apized.core.error.exception.ServerException;
 import org.apized.core.execution.Execution;
 import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
 import org.apized.core.model.Model;
 import org.apized.core.model.When;
-import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
@@ -55,7 +56,9 @@ public class BehaviourManager {
           log.info("[" + signature + ":" + it.type().getSimpleName() + "] Behaviour {} done in {}ms", it.name(), System.currentTimeMillis() - init);
         });
     } catch (Exception e) {
-      log.error("Error occurred running '" + type + "." + layer.getKey() + "." + when.getKey() + "'", e);
+      if (!(e instanceof ServerException)) {
+        log.error("Error occurred running '" + type + "." + layer.getKey() + "." + when.getKey() + "'", e);
+      }
       throw e;
     }
   }
