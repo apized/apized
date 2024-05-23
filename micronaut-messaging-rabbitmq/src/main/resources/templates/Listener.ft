@@ -70,7 +70,7 @@ class ${type}${d}Listener extends EnvelopeConsumer<${generic}> {
   @Timed(value = "rabbitmq.consumer", extraTags = {"consumer", "${type}"}, histogram = true)
 #end
 #if($traced)
-  @Traced(kind = SpanKind.CONSUMER)
+  @Traced(value="${type}", kind = SpanKind.CONSUMER)
 #end
   protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
     super.consume(data, envelope, properties, acknowledgement);
