@@ -23,6 +23,7 @@ public @interface Traced {
 
   @interface Attribute {
     String key();
-    String value();
+    String value() default "";
+    String arg() default "";
   }
 }

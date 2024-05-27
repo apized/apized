@@ -6,18 +6,11 @@ import io.micronaut.aop.MethodInvocationContext;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.tracing.annotation.SpanTag;
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
-import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Scope;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Optional;
 
 @Singleton
@@ -37,53 +30,37 @@ public class TracedInterceptor implements MethodInterceptor<Object, Object> {
       name = String.format("%s::%s", context.getDeclaringType().getSimpleName(), context.getMethodName());
     }
 
-    SpanKind kind = traced.enumValue("kind", SpanKind.class).orElse(SpanKind.SERVER);
+    SpanKind kind = traced.enumValue("kind", SpanKind.class).orElse(SpanKind.INTERNAL);
 
-    Span span = tracer
-      .spanBuilder(name)
-      .setSpanKind(kind)
-      .startSpan();
-
-    if (kind.equals(SpanKind.CONSUMER)) {
-      span.setAttribute("messaging.consumer_id", context.getDeclaringType().getSimpleName());
-    }
-
-    context.getParameters().forEach((key, value) ->
-      Optional.ofNullable(value.getAnnotation(SpanTag.class)).ifPresent(annotation -> {
-          String attrName = annotation.stringValue("value").orElse("");
-          if (attrName.isBlank()) {
-            attrName = key;
-          }
-          span.setAttribute(attrName, value.toString());
+    return TraceUtils.wrap(
+      tracer,
+      name,
+      kind,
+      (spanBuilder) -> {
+        if (kind.equals(SpanKind.CONSUMER)) {
+          spanBuilder.setAttribute("messaging.consumer_id", context.getDeclaringType().getSimpleName());
         }
-      ));
 
-    traced.getAnnotations("attributes", Traced.Attribute.class).forEach(attr -> {
-      span.setAttribute(
-        attr.stringValue("key").orElse(""),
-        attr.stringValue("value").orElse("")
-      );
-    });
+        context.getParameters().forEach((key, value) ->
+          Optional.ofNullable(value.getAnnotation(SpanTag.class)).ifPresent(annotation -> {
+              String attrName = annotation.stringValue("value").orElse("");
+              if (attrName.isBlank()) {
+                attrName = key;
+              }
+              spanBuilder.setAttribute(attrName, value.toString());
+            }
+          ));
 
-    try (Scope ignore = span.makeCurrent()) {
-      return context.proceed();
-    } catch (Throwable t) {
-      span.setStatus(StatusCode.ERROR);
-      StringWriter sw = new StringWriter();
-      PrintWriter pw = new PrintWriter(sw);
-      t.printStackTrace(pw);
-      span.recordException(
-        t,
-        Attributes.of(
-          AttributeKey.booleanKey("exception.escaped"), true,
-          AttributeKey.stringKey("exception.message"), t.getMessage(),
-          AttributeKey.stringKey("exception.stacktrace"), sw.toString(),
-          AttributeKey.stringKey("exception.type"), t.getClass().getName()
-        )
-      );
-      throw t;
-    } finally {
-      span.end();
-    }
+        traced.getAnnotations("attributes", Traced.Attribute.class).forEach(attr -> {
+          String value = attr.stringValue("value").orElse("");
+          String arg = attr.stringValue("arg").orElse("");
+          spanBuilder.setAttribute(
+            attr.stringValue("key").orElse(""),
+            !arg.isBlank() && context.getParameters().containsKey(arg) ? context.getParameters().get(arg).getValue().toString() : value
+          );
+        });
+      },
+      context::proceed
+    );
   }
 }
