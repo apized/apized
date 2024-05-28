@@ -29,8 +29,6 @@ public class TracedRabbitMQESBAdapter extends RabbitMQESBAdapter {
       tracer,
       "TracedRabbitMQESBAdapter::send",
       SpanKind.PRODUCER,
-      (spanBuilder) -> {
-      },
       () -> {
         SpanContext spanContext = Span.current().getSpanContext();
         Map<String, Object> enrichedHeaders = new HashMap<>(headers);

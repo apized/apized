@@ -12,14 +12,22 @@ import java.util.function.Supplier;
 
 public class TraceUtils {
 
-  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Consumer<SpanBuilder> spanCustomizer, Supplier<T> execution) {
-    SpanBuilder spanBuilder = tracer
+  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Supplier<T> execution) {
+    return TraceUtils.wrap(tracer, name, kind,(a)->{}, execution, (b)->{});
+  }
+
+  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Consumer<SpanBuilder> spanBuilder, Supplier<T> execution) {
+    return TraceUtils.wrap(tracer, name, kind, spanBuilder, execution, (b)->{});
+  }
+
+  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Consumer<SpanBuilder> spanBuilder, Supplier<T> execution, Consumer<Span> spanFinalizer) {
+    SpanBuilder builder = tracer
       .spanBuilder(name)
       .setSpanKind(kind);
 
-    spanCustomizer.accept(spanBuilder);
+    spanBuilder.accept(builder);
 
-    Span span = spanBuilder.startSpan();
+    Span span = builder.startSpan();
     try (Scope ignore = span.makeCurrent()) {
       return execution.get();
     } catch (Throwable t) {
@@ -38,6 +46,7 @@ public class TraceUtils {
       );
       throw t;
     } finally {
+      spanFinalizer.accept(span);
       span.end();
     }
   }
