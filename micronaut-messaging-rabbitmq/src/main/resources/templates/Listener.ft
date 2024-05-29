@@ -103,6 +103,7 @@ class ${type}${d}Listener extends EnvelopeConsumer<${generic}> {
                 TraceState.getDefault()
               )
             )));
+            spanBuilder.setAttribute("messaging.system", "rabbitmq");
             spanBuilder.setAttribute("messaging.operation.type", "receive");
             spanBuilder.setAttribute("messaging.rabbitmq.destination.routing_key", envelope.getRoutingKey());
             spanBuilder.setAttribute("messaging.message", new String(data));

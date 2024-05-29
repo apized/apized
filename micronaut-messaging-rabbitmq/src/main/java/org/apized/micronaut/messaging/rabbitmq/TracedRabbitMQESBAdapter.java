@@ -31,6 +31,7 @@ public class TracedRabbitMQESBAdapter extends RabbitMQESBAdapter {
       "TracedRabbitMQESBAdapter::send",
       SpanKind.PRODUCER,
       (builder) -> {
+        builder.setAttribute("messaging.system", "rabbitmq");
         builder.setAttribute("messaging.operation.type", "publish");
         builder.setAttribute("messaging.destination.name", topic);
       },
