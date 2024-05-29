@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.micronaut.tracing.TraceUtils;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,11 +30,23 @@ public class TracedRabbitMQESBAdapter extends RabbitMQESBAdapter {
       tracer,
       "TracedRabbitMQESBAdapter::send",
       SpanKind.PRODUCER,
+      (builder) -> {
+        builder.setAttribute("messaging.operation.type", "publish");
+        builder.setAttribute("messaging.destination.name", topic);
+      },
       () -> {
-        SpanContext spanContext = Span.current().getSpanContext();
+        Span span = Span.current();
+        SpanContext spanContext = span.getSpanContext();
         Map<String, Object> enrichedHeaders = new HashMap<>(headers);
         enrichedHeaders.put("traceId", spanContext.getTraceId());
         enrichedHeaders.put("spanId", spanContext.getSpanId());
+
+        try {
+          span.setAttribute("messaging.message", mapper.writeValueAsString(Map.of("header", enrichedHeaders, "payload", payload)));
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+
         super.send(messageId, timestamp, topic, enrichedHeaders, payload);
         return null;
       }

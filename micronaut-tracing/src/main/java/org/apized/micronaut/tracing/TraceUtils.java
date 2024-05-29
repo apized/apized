@@ -29,7 +29,9 @@ public class TraceUtils {
 
     Span span = builder.startSpan();
     try (Scope ignore = span.makeCurrent()) {
-      return execution.get();
+      T t = execution.get();
+      span.setStatus(StatusCode.OK);
+      return t;
     } catch (Throwable t) {
       span.setStatus(StatusCode.ERROR);
       StringWriter sw = new StringWriter();
