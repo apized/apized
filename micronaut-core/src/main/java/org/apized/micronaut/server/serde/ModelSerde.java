@@ -34,7 +34,7 @@ import jakarta.persistence.ManyToOne;
 import org.apized.core.MapHelper;
 import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
-import org.apized.core.context.SerdeContext;
+import org.apized.core.context.SerdeStackEntry;
 import org.apized.core.federation.Federation;
 import org.apized.core.model.*;
 import org.apized.core.mvc.ModelService;
@@ -80,9 +80,9 @@ public class ModelSerde implements Serde<Model> {
     AnnotationValue<Apized> annotation = introspection.getAnnotation(Apized.class);
     List<Class<?>> scopes = annotation != null ? List.of(annotation.classValues("scope")) : List.of();
 
-    if (ApizedContext.getSerde().size() > 0) {
-      Model peekedValue = ApizedContext.getSerde().peek().getValue();
-      BeanProperty<?, ?> peekedProperty = ApizedContext.getSerde().peek().getProperty();
+    if (!ApizedContext.getSerde().getStack().isEmpty()) {
+      Model peekedValue = ApizedContext.getSerde().getStack().peek().getValue();
+      BeanProperty<?, ?> peekedProperty = ApizedContext.getSerde().getStack().peek().getProperty();
       Class<?> peekedPropertyType = Collection.class.isAssignableFrom(peekedProperty.getType()) ? peekedProperty.asArgument().getTypeParameters()[0].getType() : peekedProperty.getType();
 
       introspection.getBeanProperties().stream()
@@ -113,10 +113,10 @@ public class ModelSerde implements Serde<Model> {
           appContext.getBean(new DefaultArgument<>(ModelService.class, scopeIntrospection.getAnnotationMetadata(), Argument.of(scope)))
             .get(scopeId)
         );
-      } else if (ApizedContext.getSerde().stream().anyMatch(e -> StringHelper.uncapitalize(e.getValue().getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName))) {
+      } else if (ApizedContext.getSerde().getStack().stream().anyMatch(e -> StringHelper.uncapitalize(e.getValue().getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName))) {
         deserializationWrapper.setProperty(
           scopeTypeName,
-          ApizedContext.getSerde().stream().map(SerdeContext.SerdeStackEntry::getValue).filter(e -> StringHelper.uncapitalize(e.getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName)).findFirst().orElse(null)
+          ApizedContext.getSerde().getStack().stream().map(SerdeStackEntry::getValue).filter(e -> StringHelper.uncapitalize(e.getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName)).findFirst().orElse(null)
         );
       }
     }
@@ -142,7 +142,7 @@ public class ModelSerde implements Serde<Model> {
       ) {
         BeanProperty<? super Model, Object> property = propOpt.get();
         touched.add(property);
-        ApizedContext.getSerde().push(new SerdeContext.SerdeStackEntry(model, property));
+        ApizedContext.getSerde().getStack().push(new SerdeStackEntry(model, property));
         if (Collection.class.isAssignableFrom(property.getType())) {
           //noinspection rawtypes
           Class subType = property.asArgument().getTypeParameters()[0].getType();
@@ -167,7 +167,7 @@ public class ModelSerde implements Serde<Model> {
         } else {
           deserializationWrapper.setProperty(key, defaultDeserialize(decoder, context, property));
         }
-        ApizedContext.getSerde().pop();
+        ApizedContext.getSerde().getStack().pop();
       } else {
         decoder.skipValue();
       }

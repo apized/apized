@@ -16,20 +16,15 @@
 
 package org.apized.core.context;
 
-import org.apized.core.model.Model;
-import io.micronaut.core.beans.BeanProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 @Getter
-public class SerdeContext extends Stack<SerdeContext.SerdeStackEntry> {
-  @AllArgsConstructor
-  @Data
-  public static class SerdeStackEntry {
-    Model value;
-    BeanProperty property;
-  }
+public class SerdeContext {
+  Stack<SerdeStackEntry> stack = new Stack<>();
+
+  Map<String, Object> cache = new HashMap<>();
 }

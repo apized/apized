@@ -1,20 +1,21 @@
+
 dependencies {
   api project(":micronaut-core")
 
   api 'org.apache.groovy:groovy'
   api 'org.apache.groovy:groovy-templates'
   api 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
-  api 'io.cucumber:cucumber-java:7.13.0'
-  api 'io.cucumber:cucumber-junit:7.13.0'
-  api 'io.rest-assured:rest-assured:5.3.1'
+  api 'io.cucumber:cucumber-java:7.18.0'
+  api 'io.cucumber:cucumber-junit:7.18.0'
+  api 'io.rest-assured:rest-assured'
 
-  api 'org.testcontainers:mysql:1.17.4'
-  api 'org.testcontainers:postgresql:1.17.4'
-  api 'org.testcontainers:oracle-xe:1.17.4'
-  api 'io.micronaut.testresources:micronaut-test-resources-jdbc-oracle-xe:1.0.1'
-  api 'org.testcontainers:mssqlserver:1.17.4'
-  api 'io.micronaut.testresources:micronaut-test-resources-jdbc-mssql:1.0.1'
+  api "org.testcontainers:mysql"
+  api 'org.testcontainers:postgresql'
+  api 'org.testcontainers:oracle-xe'
+  api 'io.micronaut.testresources:micronaut-test-resources-jdbc-oracle-xe'
+  api 'org.testcontainers:mssqlserver'
+  api 'io.micronaut.testresources:micronaut-test-resources-jdbc-mssql'
 
-  runtimeOnly 'org.junit.jupiter:junit-jupiter:5.8.2'
-  runtimeOnly 'org.junit.vintage:junit-vintage-engine:5.8.2'
+  runtimeOnly 'org.junit.jupiter:junit-jupiter'
+  runtimeOnly 'org.junit.vintage:junit-vintage-engine'
 }
