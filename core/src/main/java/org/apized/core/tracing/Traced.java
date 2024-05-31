@@ -1,7 +1,6 @@
-package org.apized.micronaut.tracing;
+package org.apized.core.tracing;
 
 import io.micronaut.aop.Around;
-import io.opentelemetry.api.trace.SpanKind;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -17,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Traced {
   String value() default "";
 
-  SpanKind kind();
+  TraceKind kind() default TraceKind.INTERNAL;
 
   Attribute[] attributes() default {};
 

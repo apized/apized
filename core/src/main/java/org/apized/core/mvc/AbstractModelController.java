@@ -20,6 +20,7 @@ import org.apized.core.model.Model;
 import org.apized.core.model.Page;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
+import org.apized.core.tracing.Traced;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,27 +28,32 @@ import java.util.UUID;
 public abstract class AbstractModelController<T extends Model> implements ModelController<T> {
   protected abstract ModelService<T> getService();
 
+  @Traced
   @Override
   public Page<T> list(Integer page, Integer pageSize, List<SearchTerm> search, List<SortTerm> sort) {
     if (page < 1) page = 1;
     return getService().list(page, pageSize, search, sort);
   }
 
+  @Traced
   @Override
   public T get(UUID id) {
     return getService().get(id);
   }
 
+  @Traced
   @Override
   public T create(T it) {
     return getService().create(it);
   }
 
+  @Traced
   @Override
   public T update(UUID id, T it) {
     return getService().update(id, it);
   }
 
+  @Traced
   @Override
   public T delete(UUID id) {
     return getService().delete(id);

@@ -3,12 +3,13 @@ package org.apized.micronaut.tracing;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.serde.ObjectMapper;
-import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Singleton;
 import org.apized.core.ApizedConfig;
 import org.apized.core.model.Model;
 import org.apized.core.mvc.AbstractModelService;
+import org.apized.core.tracing.TraceKind;
+import org.apized.core.tracing.Traced;
 import org.apized.micronaut.federation.FederationResolver;
 
 import java.net.URI;
@@ -26,7 +27,7 @@ public class TracedFederationResolver extends FederationResolver {
 
   @Override
   @Traced(
-    kind = SpanKind.CLIENT,
+    kind = TraceKind.CLIENT,
     attributes = {
       @Traced.Attribute(key = "http.method", value = "GET"),
       @Traced.Attribute(key = "http.url", arg = "url")

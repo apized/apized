@@ -16,11 +16,19 @@
 
 package org.apized.core.behaviour;
 
+import org.apized.core.execution.Execution;
 import org.apized.core.model.Action;
 import org.apized.core.model.Model;
 import org.apized.core.model.When;
-import org.apized.core.execution.Execution;
+import org.apized.core.tracing.Traced;
 
 public interface BehaviourHandler<T extends Model> {
+  @Traced(
+    attributes = {
+      @Traced.Attribute(key = "behaviour.when", arg = "when"),
+      @Traced.Attribute(key = "behaviour.action", arg = "action"),
+      @Traced.Attribute(key = "behaviour.type", arg = "type")
+    }
+  )
   void process(Class<T> type, When when, Action action, Execution<T> execution);
 }

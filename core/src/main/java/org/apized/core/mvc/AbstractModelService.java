@@ -31,6 +31,7 @@ import org.apized.core.model.Model;
 import org.apized.core.model.Page;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
+import org.apized.core.tracing.Traced;
 
 import java.util.*;
 
@@ -39,11 +40,13 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
 
   protected abstract ModelRepository<T> getRepository();
 
+  @Traced
   @Override
   public Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
     return getRepository().list(page, pageSize, search, sort);
   }
 
+  @Traced
   @Override
   public Optional<T> searchOne(List<SearchTerm> search) {
     Optional<T> t = getRepository().searchOne(search);
@@ -54,11 +57,13 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     return t;
   }
 
+  @Traced
   @Override
   public Page<T> list(List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
     return getRepository().search(search, sort, skipAutoFilters);
   }
 
+  @Traced
   @Override
   public T find(UUID id) {
     Optional<T> t = getRepository().get(id);
@@ -69,6 +74,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     return t.orElseThrow(NotFoundException::new);
   }
 
+  @Traced
   @Override
   public T get(UUID id) {
     Optional<T> t = getRepository().get(id);
@@ -79,6 +85,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     return t.orElseThrow(NotFoundException::new);
   }
 
+  @Traced
   @Override
   public T create(T it) {
     performSubExecutions(it, true);
@@ -104,6 +111,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     return create;
   }
 
+  @Traced
   @Override
   public T update(UUID id, T it) {
     it.setId(id);
@@ -129,6 +137,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     return update;
   }
 
+  @Traced
   @Override
   public T delete(UUID id) {
     T it = get(id);

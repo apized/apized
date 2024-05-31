@@ -10,6 +10,8 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apized.core.tracing.TraceKind;
+import org.apized.core.tracing.Traced;
 
 import java.util.Optional;
 
@@ -30,7 +32,7 @@ public class TracedInterceptor implements MethodInterceptor<Object, Object> {
       name = String.format("%s::%s", context.getDeclaringType().getSimpleName(), context.getMethodName());
     }
 
-    SpanKind kind = traced.enumValue("kind", SpanKind.class).orElse(SpanKind.INTERNAL);
+    SpanKind kind = SpanKind.valueOf(traced.enumValue("kind", TraceKind.class).orElse(TraceKind.INTERNAL).name());
 
     return TraceUtils.wrap(
       tracer,
