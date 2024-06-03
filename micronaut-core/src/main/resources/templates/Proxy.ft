@@ -1,6 +1,7 @@
 #set ( $d = "$")
 package ${module};
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanWrapper;
@@ -13,15 +14,25 @@ import java.util.*;
 @Introspected
 public class ${type}${d}Proxy extends ${type} {
   private boolean building = true;
+  private boolean originalHasResolution = true;
+
   private Map<String, Object> resolutions = new HashMap<>();
+
+  @JsonIgnore
+  public Map<String, Object> _getResolutions(){
+    return resolutions;
+  }
 
   public ${type}${d}Proxy(@Nullable $type it) {
     if (it != null) {
       BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
       BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);
 
-      wrapper.getBeanProperties().stream().filter(prop-> !prop.isReadOnly()).forEach(prop ->
-        self.setProperty(prop.getName(), wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null))
+      wrapper.getBeanProperties().stream().filter(prop-> !prop.isReadOnly()).forEach(prop -> {
+          var value = wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null);
+          this.originalHasResolution = it instanceof ${type}${d}Proxy && ((${type}${d}Proxy)it)._getResolutions().containsKey(prop.getName());
+          self.setProperty(prop.getName(), value);
+        }
       );
     }
     building = false;
@@ -32,7 +43,7 @@ public class ${type}${d}Proxy extends ${type} {
 #if($it.isCollection)
   public void set${it.Name}($it.type<${it.typeParam}> it) {
     if(building) {
-      if (it != null && it.size()>0 && it.get(0) instanceof ${it.typeParam}${d}Proxy){
+      if (originalHasResolution || (it != null && it.size() > 0 && it.get(0) instanceof ${it.typeParam}${d}Proxy)){
 #else
   public void set${it.Name}($it.type it) {
     if(building) {
