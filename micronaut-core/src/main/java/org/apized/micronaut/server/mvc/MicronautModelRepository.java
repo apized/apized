@@ -22,6 +22,7 @@ import io.micronaut.data.repository.jpa.JpaSpecificationExecutor;
 import io.micronaut.data.repository.jpa.criteria.QuerySpecification;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
+import org.apized.core.mvc.ManyToManyTuple;
 import org.apized.core.mvc.ModelRepository;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
@@ -33,6 +34,19 @@ import java.util.UUID;
 
 @ApizedRepository
 public interface MicronautModelRepository<T extends Model> extends ModelRepository<T>, PageableRepository<T, UUID>, JpaSpecificationExecutor<T> {
+  @Override
+  default void add(String field, UUID self, UUID other) {
+  }
+
+  @Override
+  default void addMany(String field, List<ManyToManyTuple> adds) {}
+
+  @Override
+  default void remove(String field, UUID self, UUID other) {}
+
+  @Override
+  default void removeMany(String field, List<ManyToManyTuple> removes) {}
+
   @Override
   default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
     QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(new ArrayList<>(search));
@@ -75,8 +89,18 @@ public interface MicronautModelRepository<T extends Model> extends ModelReposito
   }
 
   @Override
+  default List<T> batchCreate(List<T> it) {
+    return saveAll(it);
+  }
+
+  @Override
   default T update(UUID id, T it) {
     return update(it);
+  }
+
+  @Override
+  default List<T> batchUpdate(List<T> it) {
+    return updateAll(it);
   }
 
   @Override

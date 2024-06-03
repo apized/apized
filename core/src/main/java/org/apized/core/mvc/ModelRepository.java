@@ -29,7 +29,11 @@ import java.util.UUID;
 public interface ModelRepository<T extends Model> {
   void add(String field, UUID self, UUID other);
 
+  void addMany(String field, List<ManyToManyTuple> adds);
+
   void remove(String field, UUID self, UUID other);
+
+  void removeMany(String field, List<ManyToManyTuple> removes);
 
   Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort);
 
@@ -41,7 +45,11 @@ public interface ModelRepository<T extends Model> {
 
   T create(T it);
 
+  List<T> batchCreate(List<T> it);
+
   T update(UUID id, T it);
+
+  List<T> batchUpdate(List<T> it);
 
   void delete(UUID id);
 }

@@ -113,6 +113,35 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
 
   @Traced
   @Override
+  public List<T> batchCreate(List<T> it) {
+    it.forEach(i -> {
+      performSubExecutions(i, true);
+
+      BeanIntrospection
+        .getIntrospection(getType())
+        .getBeanMethods()
+        .stream()
+        .filter(m -> m.getAnnotation(PrePersist.class) != null)
+        .forEach(prePersist -> prePersist.invoke(i));
+    });
+
+    List<T> create = getRepository().batchCreate(it);
+
+    it.forEach(i -> {
+      BeanIntrospection
+        .getIntrospection(getType())
+        .getBeanMethods()
+        .stream()
+        .filter(m -> m.getAnnotation(PostPersist.class) != null)
+        .forEach(postPersist -> postPersist.invoke(i));
+      performSubExecutions(i, false);
+    });
+
+    return create;
+  }
+
+  @Traced
+  @Override
   public T update(UUID id, T it) {
     it.setId(id);
     performSubExecutions(it, true);
@@ -135,6 +164,36 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
 
     performSubExecutions(it, false);
     return update;
+  }
+
+  @Traced
+  @Override
+  public List<T> batchUpdate(List<T> it) {
+    it.forEach(i -> {
+      performSubExecutions(i, true);
+
+      BeanIntrospection
+        .getIntrospection(getType())
+        .getBeanMethods()
+        .stream()
+        .filter(m -> m.getAnnotation(PreUpdate.class) != null)
+        .forEach(preUpdate -> preUpdate.invoke(i));
+    });
+
+    List<T> updates = getRepository().batchUpdate(it);
+
+    it.forEach(i -> {
+      BeanIntrospection
+        .getIntrospection(getType())
+        .getBeanMethods()
+        .stream()
+        .filter(m -> m.getAnnotation(PostUpdate.class) != null)
+        .forEach(postUpdate -> postUpdate.invoke(i));
+
+      performSubExecutions(i, false);
+    });
+
+    return updates;
   }
 
   @Traced
@@ -222,9 +281,11 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
               }
             }
 
-            if (p.hasAnnotation(ManyToMany.class)) {
+            if (p.hasAnnotation(ManyToMany.class) && !List.of(CascadeType.ALL, CascadeType.PERSIST).contains(p.getAnnotation(ManyToMany.class).enumValue("cascade", CascadeType.class).orElse(CascadeType.REFRESH))) {
               add.stream().map(Model::getId).forEach(o -> getRepository().add(p.getName(), it.getId(), o));
+//              getRepository().addMany(p.getName(), add.stream().map(o -> new ManyToManyTuple(it.getId(), o.getId())).toList());
               remove.stream().map(Model::getId).forEach(o -> getRepository().remove(p.getName(), it.getId(), o));
+//              getRepository().removeMany(p.getName(), remove.stream().map(o -> new ManyToManyTuple(it.getId(), o.getId())).toList());
             } else if (p.hasAnnotation(OneToMany.class)) {
               AnnotationValue<OneToMany> annotation = p.getAnnotation(OneToMany.class);
               String field = annotation.stringValue("mappedBy").orElse(StringHelper.uncapitalize(getType().getSimpleName()));
@@ -264,12 +325,26 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
               .forEach(subModel -> {
                 UUID subModelId = subModel.getId();
                 switch (subModel._getModelMetadata().getAction()) {
-                  case CREATE -> service.get().create(subModel);
-                  case UPDATE -> service.get().update(subModelId, subModel);
+//                  case CREATE -> service.get().create(subModel);
+//                  case UPDATE -> service.get().update(subModelId, subModel);
                   case DELETE ->
                     service.get().delete(subModelId);//todo should this have the reverse order of create/update?
                 }
               });
+
+            List<Model> creates = values.stream()
+              .filter(m -> m._getModelMetadata().isDirty() && m._getModelMetadata().getAction().equals(Action.CREATE))
+              .toList();
+            if (!creates.isEmpty()) {
+              service.get().batchCreate(creates);
+            }
+
+            List<Model> updates = values.stream()
+              .filter(m -> m._getModelMetadata().isDirty() && m._getModelMetadata().getAction().equals(Action.UPDATE))
+              .toList();
+            if (!updates.isEmpty()) {
+              service.get().batchUpdate(creates);
+            }
           }
         }
       });

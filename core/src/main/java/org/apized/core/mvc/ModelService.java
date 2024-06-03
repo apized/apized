@@ -69,7 +69,15 @@ public interface ModelService<T extends Model> {
     throw new NotImplementedException();
   }
 
+  default List<T> batchCreate(List<T> it) {
+    throw new NotImplementedException();
+  }
+
   default T update(UUID id, T it) {
+    throw new NotImplementedException();
+  }
+
+  default List<T> batchUpdate(List<T> it) {
     throw new NotImplementedException();
   }
 
