@@ -52,4 +52,6 @@ public interface ModelRepository<T extends Model> {
   List<T> batchUpdate(List<T> it);
 
   void delete(UUID id);
+
+  void batchDelete(List<UUID> it);
 }

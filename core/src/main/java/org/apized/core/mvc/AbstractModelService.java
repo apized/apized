@@ -29,6 +29,7 @@ import org.apized.core.model.Action;
 import org.apized.core.model.Apized;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
+import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 import org.apized.core.tracing.Traced;
@@ -223,6 +224,36 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     return it;
   }
 
+  @Traced
+  @Override
+  public List<T> batchDelete(List<UUID> ids) {
+    List<T> it = searchAll(true, new SearchTerm("id", SearchOperation.eq, ids));
+    it.forEach(i -> {
+      performSubExecutions(i, true);
+
+      BeanIntrospection
+        .getIntrospection(getType())
+        .getBeanMethods()
+        .stream()
+        .filter(m -> m.getAnnotation(PreRemove.class) != null)
+        .forEach(preRemove -> preRemove.invoke(i));
+    });
+
+    getRepository().batchDelete(ids);
+
+    it.forEach(i -> {
+      BeanIntrospection
+        .getIntrospection(getType())
+        .getBeanMethods()
+        .stream()
+        .filter(m -> m.getAnnotation(PostRemove.class) != null)
+        .forEach(postRemove -> postRemove.invoke(i));
+
+      performSubExecutions(i, false);
+    });
+    return it;
+  }
+
   @SuppressWarnings({"unchecked", "rawtypes", "DataFlowIssue", "OptionalGetWithoutIsPresent"})
   protected void performSubExecutions(T it, boolean isBefore) {
     BeanWrapper<T> wrapper = BeanWrapper.getWrapper(it);
@@ -320,17 +351,17 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
           }
 
           if (service.isPresent()) {
-            values.stream()
-              .filter(m -> m._getModelMetadata().isDirty())
-              .forEach(subModel -> {
-                UUID subModelId = subModel.getId();
-                switch (subModel._getModelMetadata().getAction()) {
+//            values.stream()
+//              .filter(m -> m._getModelMetadata().isDirty())
+//              .forEach(subModel -> {
+//                UUID subModelId = subModel.getId();
+//                switch (subModel._getModelMetadata().getAction()) {
 //                  case CREATE -> service.get().create(subModel);
 //                  case UPDATE -> service.get().update(subModelId, subModel);
-                  case DELETE ->
-                    service.get().delete(subModelId);//todo should this have the reverse order of create/update?
-                }
-              });
+//                  case DELETE ->
+//                    service.get().delete(subModelId);//todo should this have the reverse order of create/update?
+//                }
+//              });
 
             List<Model> creates = values.stream()
               .filter(m -> m._getModelMetadata().isDirty() && m._getModelMetadata().getAction().equals(Action.CREATE))
@@ -344,6 +375,13 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
               .toList();
             if (!updates.isEmpty()) {
               service.get().batchUpdate(creates);
+            }
+
+            List<Model> deletes = values.stream()
+              .filter(m -> m._getModelMetadata().isDirty() && m._getModelMetadata().getAction().equals(Action.DELETE))
+              .toList();
+            if (!deletes.isEmpty()) {
+              service.get().batchDelete(creates);
             }
           }
         }

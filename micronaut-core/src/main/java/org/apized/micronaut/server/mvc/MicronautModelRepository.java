@@ -16,10 +16,17 @@
 
 package org.apized.micronaut.server.mvc;
 
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.model.Pageable;
 import io.micronaut.data.repository.PageableRepository;
 import io.micronaut.data.repository.jpa.JpaSpecificationExecutor;
+import io.micronaut.data.repository.jpa.criteria.DeleteSpecification;
 import io.micronaut.data.repository.jpa.criteria.QuerySpecification;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
 import org.apized.core.mvc.ManyToManyTuple;
@@ -39,13 +46,16 @@ public interface MicronautModelRepository<T extends Model> extends ModelReposito
   }
 
   @Override
-  default void addMany(String field, List<ManyToManyTuple> adds) {}
+  default void addMany(String field, List<ManyToManyTuple> adds) {
+  }
 
   @Override
-  default void remove(String field, UUID self, UUID other) {}
+  default void remove(String field, UUID self, UUID other) {
+  }
 
   @Override
-  default void removeMany(String field, List<ManyToManyTuple> removes) {}
+  default void removeMany(String field, List<ManyToManyTuple> removes) {
+  }
 
   @Override
   default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
@@ -106,5 +116,15 @@ public interface MicronautModelRepository<T extends Model> extends ModelReposito
   @Override
   default void delete(UUID it) {
     deleteById(it);
+  }
+
+  @Override
+  default void batchDelete(List<UUID> it) {
+    deleteAll(new DeleteSpecification<T>() {
+      @Override
+      public @Nullable Predicate toPredicate(@NonNull Root<T> root, @NonNull CriteriaDelete<?> query, @NonNull CriteriaBuilder criteriaBuilder) {
+        return root.get("id").in(it);
+      }
+    });
   }
 }

@@ -32,7 +32,7 @@ public interface ModelService<T extends Model> {
     return searchAll(Arrays.asList(search), false);
   }
 
- default List<T> searchAll(boolean skipAutoFilters, SearchTerm... search) {
+  default List<T> searchAll(boolean skipAutoFilters, SearchTerm... search) {
     return searchAll(Arrays.asList(search), skipAutoFilters);
   }
 
@@ -90,6 +90,10 @@ public interface ModelService<T extends Model> {
   }
 
   default T delete(UUID id) {
+    throw new NotImplementedException();
+  }
+
+  default List<T> batchDelete(List<UUID> id) {
     throw new NotImplementedException();
   }
 }
