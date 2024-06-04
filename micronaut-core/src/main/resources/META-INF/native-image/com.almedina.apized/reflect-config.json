@@ -4,7 +4,7 @@
     "allPublicMethods" : true
   },
   {
-    "name": "org.apized.micronaut.core.ApizedHttpServerFilter",
+    "name": "org.apized.micronaut.core.ApizedServerFilter",
     "allDeclaredFields" : true
   }
 ]
