@@ -16,28 +16,42 @@
 
 package org.apized.micronaut.core;
 
-import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.ServerFilterChain;
+import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.http.annotation.ResponseFilter;
+import io.micronaut.http.annotation.ServerFilter;
 import io.micronaut.http.filter.ServerFilterPhase;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.context.ApizedContext;
-import org.reactivestreams.Publisher;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
-@Filter("/**")
-public class RequestFilter extends ApizedHttpServerFilter {
-  @Override
-  public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
-    long start = System.currentTimeMillis();
+@ServerFilter(Filter.MATCH_ALL_PATTERN)
+public class HttpRequestFilter extends ApizedServerFilter {
+
+  @RequestFilter
+  @ExecuteOn(TaskExecutors.BLOCKING)
+  void filterRequest(HttpRequest<?> request) {
+    if (shouldExclude(request.getPath())) return;
+
     ApizedContext.destroy();
     log.info("Request {} started: {} {}", ApizedContext.getRequest().getId(), request.getMethod(), request.getPath());
-    return Publishers.then(
-      chain.proceed(request),
-      response -> log.info("Request {} took {}ms", ApizedContext.getRequest().getId(), System.currentTimeMillis() - start)
-    );
+  }
+
+  @ResponseFilter
+  @ExecuteOn(TaskExecutors.BLOCKING)
+  void filterResponse(HttpRequest<?> request) {
+    if (shouldExclude(request.getPath())) return;
+
+    long start = ApizedContext.getRequest().getTimestamp().toInstant().toEpochMilli();
+    long end = Timestamp.valueOf(LocalDateTime.now(ZoneId.of("UTC"))).toInstant().toEpochMilli();
+    log.info("Request {} took {}ms", ApizedContext.getRequest().getId(), end - start);
   }
 
   @Override

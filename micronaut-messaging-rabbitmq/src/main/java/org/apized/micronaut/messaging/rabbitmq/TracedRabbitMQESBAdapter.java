@@ -35,8 +35,7 @@ public class TracedRabbitMQESBAdapter extends RabbitMQESBAdapter {
         builder.setAttribute("messaging.operation.type", "publish");
         builder.setAttribute("messaging.destination.name", topic);
       },
-      () -> {
-        Span span = Span.current();
+      (span) -> {
         SpanContext spanContext = span.getSpanContext();
         Map<String, Object> enrichedHeaders = new HashMap<>(headers);
         enrichedHeaders.put("traceId", spanContext.getTraceId());

@@ -18,27 +18,35 @@ package org.apized.micronaut.security;
 
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.ServerFilterChain;
+import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.http.annotation.ServerFilter;
 import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.http.simple.cookies.SimpleCookie;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.ApizedConfig;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.security.UserResolver;
-import org.apized.micronaut.core.ApizedHttpServerFilter;
-import org.reactivestreams.Publisher;
+import org.apized.micronaut.core.ApizedServerFilter;
 
 @Slf4j
-@Filter("/**")
+@ServerFilter(Filter.MATCH_ALL_PATTERN)
 @Requires(bean = UserResolver.class)
-public class SecurityFilter extends ApizedHttpServerFilter {
+public class SecurityFilter extends ApizedServerFilter {
+  @Inject
+  protected ApizedConfig config;
+
   @Inject
   UserResolver resolver;
 
-  @Override
-  public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
+  @RequestFilter
+  @ExecuteOn(TaskExecutors.BLOCKING)
+  void filterRequest(HttpRequest<?> request) {
+    if (shouldExclude(request.getPath())) return;
+
     try {
       String authorization = request.getHeaders().get("Authorization");
       String token;
@@ -55,8 +63,6 @@ public class SecurityFilter extends ApizedHttpServerFilter {
     } catch (Exception ignored) {
       log.error(ignored.getMessage(), ignored);
     }
-
-    return chain.proceed(request);
   }
 
   @Override

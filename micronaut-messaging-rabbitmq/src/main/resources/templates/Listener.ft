@@ -108,7 +108,7 @@ class ${type}${d}Listener extends EnvelopeConsumer<${generic}> {
             spanBuilder.setAttribute("messaging.rabbitmq.destination.routing_key", envelope.getRoutingKey());
             spanBuilder.setAttribute("messaging.message", new String(data));
           },
-          ()->{
+          (span)->{
             super.consume(data, envelope, properties, acknowledgement);
             return null;
           }

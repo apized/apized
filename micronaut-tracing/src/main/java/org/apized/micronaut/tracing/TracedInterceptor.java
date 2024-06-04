@@ -62,7 +62,7 @@ public class TracedInterceptor implements MethodInterceptor<Object, Object> {
           );
         });
       },
-      context::proceed
+      (span) -> context.proceed()
     );
   }
 }

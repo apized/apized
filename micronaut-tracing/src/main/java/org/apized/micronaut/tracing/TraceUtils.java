@@ -8,19 +8,19 @@ import io.opentelemetry.context.Scope;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class TraceUtils {
 
-  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Supplier<T> execution) {
+  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Function<Span,T> execution) {
     return TraceUtils.wrap(tracer, name, kind,(a)->{}, execution, (b)->{});
   }
 
-  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Consumer<SpanBuilder> spanBuilder, Supplier<T> execution) {
+  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Consumer<SpanBuilder> spanBuilder, Function<Span,T> execution) {
     return TraceUtils.wrap(tracer, name, kind, spanBuilder, execution, (b)->{});
   }
 
-  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Consumer<SpanBuilder> spanBuilder, Supplier<T> execution, Consumer<Span> spanFinalizer) {
+  public static <T> T wrap(Tracer tracer, String name, SpanKind kind, Consumer<SpanBuilder> spanBuilder, Function<Span,T> execution, Consumer<Span> spanFinalizer) {
     SpanBuilder builder = tracer
       .spanBuilder(name)
       .setSpanKind(kind);
@@ -29,7 +29,7 @@ public class TraceUtils {
 
     Span span = builder.startSpan();
     try (Scope ignore = span.makeCurrent()) {
-      T t = execution.get();
+      T t = execution.apply(span);
       span.setStatus(StatusCode.OK);
       return t;
     } catch (Throwable t) {

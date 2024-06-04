@@ -17,33 +17,35 @@
 package org.apized.micronaut.server.serde;
 
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.ServerFilterChain;
+import io.micronaut.http.annotation.RequestFilter;
+import io.micronaut.http.annotation.ServerFilter;
 import io.micronaut.http.filter.ServerFilterPhase;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
-import org.apized.micronaut.core.ApizedHttpServerFilter;
-import org.reactivestreams.Publisher;
+import org.apized.micronaut.core.ApizedServerFilter;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Filter("/**")
-public class SerdeFilter extends ApizedHttpServerFilter {
+@ServerFilter(Filter.MATCH_ALL_PATTERN)
+public class SerdeFilter extends ApizedServerFilter {
   private final Pattern urlPattern = Pattern.compile("/(\\w+)(/(\\p{Alnum}{8}-\\p{Alnum}{4}-\\p{Alnum}{4}-\\p{Alnum}{4}-\\p{Alnum}{12}))?");
 
-  @Override
-  public Publisher<MutableHttpResponse<?>> filter(HttpRequest<?> request, ServerFilterChain chain) {
+  @RequestFilter
+  @ExecuteOn(TaskExecutors.BLOCKING)
+  void filterRequest(HttpRequest<?> request) {
+    if (shouldExclude(request.getPath())) return;
+
     ApizedContext.getRequest().setPathVariables(getPathVariables(request));
     ApizedContext.getRequest().setFields(getParameters(request, "fields"));
     ApizedContext.getRequest().setSearch(getParameters(request, "search"));
     ApizedContext.getRequest().setSort(getParameters(request, "sort"));
     ApizedContext.getRequest().setReason(request.getHeaders().get("X-Reason"));
     ApizedContext.getRequest().setQueryParams(request.getParameters().asMap());
-
-    return chain.proceed(request);
   }
 
   private Map<String, UUID> getPathVariables(HttpRequest<?> request) {

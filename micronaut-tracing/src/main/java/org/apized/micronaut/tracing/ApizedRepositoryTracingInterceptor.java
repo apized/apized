@@ -33,7 +33,7 @@ public class ApizedRepositoryTracingInterceptor implements MethodInterceptor<Obj
       (spanBuilder) ->
         spanBuilder.setAttribute("db.system", apizedConfig.getDialect().toString().toLowerCase())
           .setAttribute("db.operation", operation),
-      context::proceed
+      (span) -> context.proceed()
     );
   }
 }
