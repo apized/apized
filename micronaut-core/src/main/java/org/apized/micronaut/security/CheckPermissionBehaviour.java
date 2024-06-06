@@ -19,14 +19,12 @@ package org.apized.micronaut.security;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.core.type.Argument;
 import jakarta.inject.Inject;
 import org.apized.core.ApizedConfig;
 import org.apized.core.behaviour.BehaviourManager;
 import org.apized.core.security.AbstractCheckPermissionBehaviour;
 import org.apized.core.security.UserResolver;
-
-import java.util.Optional;
+import org.apized.core.security.enricher.PermissionEnricherManager;
 
 @Context
 @Requires(bean = UserResolver.class)
@@ -34,12 +32,7 @@ public class CheckPermissionBehaviour extends AbstractCheckPermissionBehaviour {
   @Inject
   ApplicationContext appContext;
 
-  @Override
-  public <K> Optional<K> findBean(Argument<K> argument) {
-    return appContext.findBean(argument);
-  }
-
-  public CheckPermissionBehaviour(ApizedConfig config, BehaviourManager manager) {
-    super(config.getSlug(), manager);
+  public CheckPermissionBehaviour(ApizedConfig config, BehaviourManager behaviourManager, PermissionEnricherManager enricherManager) {
+    super(config.getSlug(), behaviourManager, enricherManager);
   }
 }

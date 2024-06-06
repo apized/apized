@@ -16,6 +16,7 @@ import org.apized.core.context.ApizedContext;
 import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
 import org.apized.core.model.When;
+import org.apized.core.security.enricher.PermissionEnricherManager;
 import org.apized.micronaut.context.MicronautContextProvider;
 import org.apized.micronaut.server.ApizedStartupEvent;
 import org.apized.micronaut.server.ModelResolver;
@@ -34,12 +35,20 @@ public class Initializer {
   ApizedConfig config;
 
   @Inject
-  BehaviourManager manager;
+  BehaviourManager behaviourManager;
+
+  @Inject
+  PermissionEnricherManager enricherManager;
 
   @Inject
   ProxyRegistry proxyRegistry;
 
 #foreach( $it in $behaviours )
+  @Inject
+  ${it.module}.${it.type} ${it.name};
+
+#end
+#foreach( $it in $enrichers )
   @Inject
   ${it.module}.${it.type} ${it.name};
 
@@ -60,7 +69,11 @@ public class Initializer {
     #end
 
     #foreach( $it in $behaviours )
-    manager.registerBehaviour(${it.annotation.module}.${it.annotation.model}.class, Layer.${it.annotation.layer}, List.of(#expandEnumList('When', ${it.annotation.when})), List.of(#expandEnumList('Action', ${it.annotation.actions})), ${it.annotation.order}, ${it.name});
+    behaviourManager.registerBehaviour(${it.annotation.module}.${it.annotation.model}.class, Layer.${it.annotation.layer}, List.of(#expandEnumList('When', ${it.annotation.when})), List.of(#expandEnumList('Action', ${it.annotation.actions})), ${it.annotation.order}, ${it.name});
+    #end
+
+    #foreach( $it in $enrichers )
+    enricherManager.registerEnricher(${it.annotation.module}.${it.annotation.model}.class, ${it.name});
     #end
 
     applicationContext.getEventPublisher(ApizedStartupEvent.class).publishEvent(new ApizedStartupEvent(config));

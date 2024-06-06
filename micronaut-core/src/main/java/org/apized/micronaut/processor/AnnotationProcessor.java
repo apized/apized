@@ -30,6 +30,7 @@ import org.apized.core.federation.Federated;
 import org.apized.core.model.Apized;
 import org.apized.core.model.BaseModel;
 import org.apized.core.model.Layer;
+import org.apized.core.security.enricher.annotation.PermissionEnricher;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -111,11 +112,33 @@ public class AnnotationProcessor extends AbstractProcessor {
       .filter(Objects::nonNull)
       .toList();
 
-    if (behaviours.size() > 0 || entities.size() > 0) {
+    List<Map<String, Object>> enrichers = roundEnv.getElementsAnnotatedWith(PermissionEnricher.class).stream().map(it -> {
+        if (it.getKind() != ElementKind.CLASS) {
+          env.getMessager().printMessage(Diagnostic.Kind.ERROR, "Not a class", it);
+          return null;
+        } else {
+          PermissionEnricher annotation = it.getAnnotation(PermissionEnricher.class);
+          Element model = env.getTypeUtils().asElement(getModelFromPermissionEnricher(annotation));
+          return Map.of(
+            "module", ((PackageElement) it.getEnclosingElement()).getQualifiedName().toString(),
+            "type", it.getSimpleName().toString(),
+            "name", ((TypeElement) it).getQualifiedName().toString().replaceAll("\\.", "_"),
+            "annotation", Map.of(
+              "module", ((PackageElement) model.getEnclosingElement()).getQualifiedName().toString(),
+              "model", model.getSimpleName().toString()
+            )
+          );
+        }
+      })
+      .filter(Objects::nonNull)
+      .toList();
+
+    if (!behaviours.isEmpty() || !enrichers.isEmpty() || !entities.isEmpty()) {
       Map<String, Object> bindings = getDefaultBindings();
       bindings.putAll(Map.of(
         "entities", entities.stream().map(e -> ((TypeElement) e).getQualifiedName().toString()).toList(),
-        "behaviours", behaviours
+        "behaviours", behaviours,
+        "enrichers", enrichers
       ));
       generateClassFor(
         "org.apized.core.init.Initializer",
@@ -129,6 +152,15 @@ public class AnnotationProcessor extends AbstractProcessor {
   private TypeMirror getModelFromBehaviour(Behaviour annotation) {
     try {
       annotation.model();
+    } catch (MirroredTypeException mte) {
+      return mte.getTypeMirror();
+    }
+    return null;
+  }
+
+  private TypeMirror getModelFromPermissionEnricher(PermissionEnricher annotation) {
+    try {
+      annotation.value();
     } catch (MirroredTypeException mte) {
       return mte.getTypeMirror();
     }

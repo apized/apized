@@ -16,15 +16,15 @@
 
 package org.apized.micronaut.server.api.organization;
 
-import org.apized.core.behaviour.AbstractApiBehaviourHandler;
+import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import org.apized.core.behaviour.BehaviourHandler;
 import org.apized.core.behaviour.annotation.Behaviour;
 import org.apized.core.execution.Execution;
 import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
 import org.apized.core.model.Page;
 import org.apized.core.model.When;
-import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
@@ -37,7 +37,7 @@ import java.util.UUID;
   actions = {Action.LIST, Action.GET, Action.CREATE, Action.UPDATE, Action.DELETE},
   order = Integer.MAX_VALUE
 )
-public class OrgServiceBehaviour extends AbstractApiBehaviourHandler<Organization> {
+public class OrgServiceBehaviour implements BehaviourHandler<Organization> {
   @Override
   public void preGet(Execution execution, UUID id) {
     log.info("SERVICE: PRE {}: Get Org", id);
