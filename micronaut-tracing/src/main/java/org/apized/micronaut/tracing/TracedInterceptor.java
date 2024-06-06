@@ -5,9 +5,13 @@ import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.propagation.PropagatedContext;
 import io.micronaut.tracing.annotation.SpanTag;
+import io.micronaut.tracing.opentelemetry.OpenTelemetryPropagationContext;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.core.tracing.TraceKind;
@@ -62,7 +66,12 @@ public class TracedInterceptor implements MethodInterceptor<Object, Object> {
           );
         });
       },
-      (span) -> context.proceed()
+      (span) -> {
+        PropagatedContext.Scope ignore = PropagatedContext.getOrEmpty()
+          .plus(new OpenTelemetryPropagationContext(Context.current().with(Span.current())))
+          .propagate();
+        return context.proceed();
+      }
     );
   }
 }

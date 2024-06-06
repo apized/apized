@@ -48,6 +48,11 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
 
   @Override
   public HttpResponse<MicronautErrorResponse> handle(HttpRequest request, Throwable exception) {
+    if (exception instanceof ServerException) {
+      log.info(exception.getMessage());
+    } else {
+      log.error(exception.getMessage(), exception);
+    }
     return switch (exception.getClass().getSimpleName()) {
       case "ConstraintViolationException" -> HttpResponse.badRequest(
         MicronautErrorResponse
@@ -139,11 +144,6 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
         )
       ).build());
       default -> {
-        if (exception instanceof ServerException) {
-          log.info(exception.getMessage());
-        } else {
-          log.error(exception.getMessage(), exception);
-        }
         notifiers.forEach(n -> n.report(exception));
         yield HttpResponse.serverError(
           MicronautErrorResponse
