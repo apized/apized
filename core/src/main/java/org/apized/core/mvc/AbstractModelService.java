@@ -312,7 +312,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
               }
             }
 
-            if (p.hasAnnotation(ManyToMany.class) && !List.of(CascadeType.ALL, CascadeType.PERSIST).contains(p.getAnnotation(ManyToMany.class).enumValue("cascade", CascadeType.class).orElse(CascadeType.REFRESH))) {
+            if (p.hasAnnotation(ManyToMany.class) && List.of(CascadeType.ALL, CascadeType.PERSIST).contains(p.getAnnotation(ManyToMany.class).enumValue("cascade", CascadeType.class).orElse(CascadeType.REFRESH))) {
               add.stream().map(Model::getId).forEach(o -> getRepository().add(p.getName(), it.getId(), o));
 //              getRepository().addMany(p.getName(), add.stream().map(o -> new ManyToManyTuple(it.getId(), o.getId())).toList());
               remove.stream().map(Model::getId).forEach(o -> getRepository().remove(p.getName(), it.getId(), o));
