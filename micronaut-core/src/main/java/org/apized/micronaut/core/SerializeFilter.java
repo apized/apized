@@ -35,7 +35,9 @@ class SerializeFilter extends ApizedServerFilter {
     if (!shouldExclude(request.getPath())) {
       response.getBody().ifPresent(obj -> {
         try {
-          response.body(mapper.writeValueAsBytes(obj));
+          if (!(obj instanceof String)) {
+            response.body(mapper.writeValueAsString(obj));
+          }
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
           log.info("{} on {} - {}", e.getMessage(), request.getPath(), obj);
         }

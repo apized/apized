@@ -16,6 +16,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 
@@ -40,7 +41,7 @@ class ETagFilter extends ApizedServerFilter {
       response.getBody().ifPresent(obj -> {
         String tokenHeader = String.format(
           "W/\"%s\"",
-          new BigInteger(1, md.digest((byte[]) obj)).toString(16)
+          new BigInteger(1, md.digest(((String) obj).getBytes(StandardCharsets.UTF_8))).toString(16)
         );
         if (previousToken != null && previousToken.equals(tokenHeader)) {
           response.status(HttpStatus.NOT_MODIFIED);
