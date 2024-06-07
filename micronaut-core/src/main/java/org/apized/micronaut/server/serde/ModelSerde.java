@@ -39,6 +39,7 @@ import org.apized.core.federation.Federation;
 import org.apized.core.model.*;
 import org.apized.core.mvc.ModelService;
 import org.apized.core.security.annotation.Owner;
+import org.apized.core.tracing.Traced;
 import org.apized.micronaut.federation.FederationResolver;
 import org.apized.micronaut.server.ModelResolver;
 import org.apized.micronaut.server.mvc.ProxyRegistry;
@@ -58,6 +59,9 @@ public class ModelSerde implements Serde<Model> {
   FederationResolver resolver;
 
   @Override
+  @Traced(attributes = {
+    @Traced.Attribute(key = "serde.entity", arg = "type")
+  })
   public Model deserialize(@NonNull Decoder decoder, @NonNull DecoderContext context, Argument<? super Model> type) throws IOException {
     BeanIntrospection<? super Model> introspection = BeanIntrospection.getIntrospection(type.getType());
     boolean isId = false;
@@ -202,6 +206,9 @@ public class ModelSerde implements Serde<Model> {
 
   @SuppressWarnings("unchecked")
   @Override
+  @Traced(attributes = {
+    @Traced.Attribute(key = "serde.entity", arg = "type")
+  })
   public void serialize(Encoder encoder, @NonNull EncoderContext context, @NonNull Argument<? extends Model> type, @NonNull Model value) throws IOException {
     encoder.encodeObject(type);
     BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(value);

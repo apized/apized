@@ -1,8 +1,6 @@
 package org.apized.micronaut.core;
 
-import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.annotation.ResponseFilter;
@@ -15,39 +13,31 @@ import jakarta.inject.Inject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigInteger;
+import java.io.IOException;
 import java.security.MessageDigest;
-import java.time.LocalDateTime;
 
 @Slf4j
 @ServerFilter(Filter.MATCH_ALL_PATTERN)
-class ETagFilter extends ApizedServerFilter {
+class SerializeFilter extends ApizedServerFilter {
   @Inject
   ObjectMapper mapper;
 
   MessageDigest md;
 
   @SneakyThrows
-  public ETagFilter() {
+  public SerializeFilter() {
     md = MessageDigest.getInstance("MD5");
   }
 
   @ResponseFilter
   @ExecuteOn(TaskExecutors.BLOCKING)
   void filterResponse(HttpRequest<?> request, MutableHttpResponse<?> response) {
-    if (!shouldExclude(request.getPath()) && HttpMethod.GET.equals(request.getMethod())) {
-      String previousToken = request.getHeaders().get("If-None-Match");
+    if (!shouldExclude(request.getPath())) {
       response.getBody().ifPresent(obj -> {
-        String tokenHeader = String.format(
-          "W/\"%s\"",
-          new BigInteger(1, md.digest((byte[]) obj)).toString(16)
-        );
-        if (previousToken != null && previousToken.equals(tokenHeader)) {
-          response.status(HttpStatus.NOT_MODIFIED);
-          response.getHeaders().set("Last-Modified", request.getHeaders().get("If-Modified-Since"));
-        } else {
-          response.getHeaders().set("ETag", tokenHeader);
-          response.getHeaders().set("Last-Modified", LocalDateTime.now().toString());
+        try {
+          response.body(mapper.writeValueAsBytes(obj));
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
+          log.info("{} on {} - {}", e.getMessage(), request.getPath(), obj);
         }
       });
     }
@@ -55,6 +45,6 @@ class ETagFilter extends ApizedServerFilter {
 
   @Override
   public int getOrder() {
-    return ServerFilterPhase.TRACING.order();
+    return ServerFilterPhase.TRACING.after();
   }
 }

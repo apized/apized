@@ -38,6 +38,7 @@ public class TracedInterceptor implements MethodInterceptor<Object, Object> {
 
     SpanKind kind = SpanKind.valueOf(traced.enumValue("kind", TraceKind.class).orElse(TraceKind.INTERNAL).name());
 
+    Span parentSpan = Span.current();
     return TraceUtils.wrap(
       tracer,
       name,
@@ -71,6 +72,11 @@ public class TracedInterceptor implements MethodInterceptor<Object, Object> {
           .plus(new OpenTelemetryPropagationContext(Context.current().with(Span.current())))
           .propagate();
         return context.proceed();
+      },
+      (span) -> {
+        PropagatedContext.Scope ignore = PropagatedContext.getOrEmpty()
+          .plus(new OpenTelemetryPropagationContext(Context.current().with(parentSpan)))
+          .propagate();
       }
     );
   }

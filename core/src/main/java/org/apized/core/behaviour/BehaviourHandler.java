@@ -28,9 +28,9 @@ import java.util.UUID;
 public interface BehaviourHandler<T extends Model> {
   @Traced(
     attributes = {
-      @Traced.Attribute(key = "enricher.when", arg = "when"),
-      @Traced.Attribute(key = "enricher.action", arg = "action"),
-      @Traced.Attribute(key = "enricher.type", arg = "type")
+      @Traced.Attribute(key = "behaviour.when", arg = "when"),
+      @Traced.Attribute(key = "behaviour.action", arg = "action"),
+      @Traced.Attribute(key = "behaviour.type", arg = "type")
     }
   )
   default void process(Class<T> type, When when, Action action, Execution<T> execution) {

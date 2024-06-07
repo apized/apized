@@ -1,6 +1,5 @@
 package org.apized.core.security.enricher;
 
-import io.micronaut.core.annotation.Introspected;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.execution.Execution;
 import org.apized.core.model.Action;
@@ -9,9 +8,7 @@ import org.apized.core.tracing.Traced;
 
 import java.util.UUID;
 
-@Introspected
 public interface PermissionEnricherHandler<T extends Model> {
-
   @Traced(
     attributes = {
       @Traced.Attribute(key = "permission.action", arg = "action"),
