@@ -374,14 +374,14 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
               .filter(m -> m._getModelMetadata().isDirty() && m._getModelMetadata().getAction().equals(Action.UPDATE))
               .toList();
             if (!updates.isEmpty()) {
-              service.get().batchUpdate(creates);
+              service.get().batchUpdate(updates);
             }
 
             List<Model> deletes = values.stream()
               .filter(m -> m._getModelMetadata().isDirty() && m._getModelMetadata().getAction().equals(Action.DELETE))
               .toList();
             if (!deletes.isEmpty()) {
-              service.get().batchDelete(creates);
+              service.get().batchDelete(deletes);
             }
           }
         }
