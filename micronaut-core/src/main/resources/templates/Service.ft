@@ -14,6 +14,7 @@ import org.apized.core.mvc.ModelRepository;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 import org.apized.micronaut.annotation.MicronautBehaviourExecution;
+import org.apized.micronaut.annotation.MicronautBulkBehaviourExecution;
 import org.apized.micronaut.server.mvc.MicronautModelService;
 #foreach( $it in $extension.service.imports )
 import $it;
@@ -85,6 +86,14 @@ public class ${type}Service extends MicronautModelService<${type}> {
   }
 
   @Override
+  @MicronautBulkBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.CREATE)
+  )
+  public List<${type}> batchCreate(List<${type}> it) {
+    return super.batchCreate(it);
+  }
+
+  @Override
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.UPDATE)
   )
@@ -93,11 +102,27 @@ public class ${type}Service extends MicronautModelService<${type}> {
   }
 
   @Override
+  @MicronautBulkBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.UPDATE)
+  )
+  public List<${type}> batchUpdate(List<${type}> it) {
+    return super.batchUpdate(it);
+  }
+
+  @Override
   @MicronautBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.DELETE)
   )
   public ${type} delete(UUID id) {
     return super.delete(id);
+  }
+
+  @Override
+  @MicronautBulkBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.DELETE)
+  )
+  public List<${type}> batchDelete(List<${type}> it) {
+    return super.batchDelete(it);
   }
 #foreach( $it in $extension.service.methods )
 

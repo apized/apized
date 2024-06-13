@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package org.apized.core.search;
+package org.apized.micronaut.annotation;
 
-public enum SearchOperation {
-  eq("="),
-  ne("!="),
-  like("~="),
-  gt(">"),
-  gte(">="),
-  lt("<"),
-  lte("<="),
-  in("<>"),
-  nin("<!>");
+import io.micronaut.aop.Around;
+import io.micronaut.core.annotation.Introspected;
+import org.apized.core.behaviour.annotation.BehaviourExecution;
 
-  private final String key;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-  SearchOperation(String key) {
-    this.key = key;
-  }
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-  public String getKey() {
-    return key;
-  }
+@Documented
+@Retention(RUNTIME)
+@Target({METHOD})
+@Introspected
+@Around
+public @interface MicronautBulkBehaviourExecution {
+  BehaviourExecution execution();
 }
+

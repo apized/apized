@@ -163,6 +163,8 @@ public abstract class RepositoryHelper {
           case gte -> criteria.add(builder.greaterThanOrEqualTo(from.get(field), (Comparable) value));
           case lt -> criteria.add(builder.lessThan(from.get(field), (Comparable) value));
           case lte -> criteria.add(builder.lessThanOrEqualTo(from.get(field), (Comparable) value));
+          case in -> criteria.add(builder.in(from.get(field)).value(value));
+          case nin -> criteria.add(builder.not(builder.in(from.get(field)).value(value)));
         }
       }
       return builder.and(criteria.toArray(new Predicate[0]));

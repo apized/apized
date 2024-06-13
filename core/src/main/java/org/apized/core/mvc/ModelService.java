@@ -93,7 +93,7 @@ public interface ModelService<T extends Model> {
     throw new NotImplementedException();
   }
 
-  default List<T> batchDelete(List<UUID> id) {
+  default List<T> batchDelete(List<T> id) {
     throw new NotImplementedException();
   }
 }

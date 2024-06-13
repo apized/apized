@@ -29,7 +29,6 @@ import org.apized.core.model.Action;
 import org.apized.core.model.Apized;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
-import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 import org.apized.core.tracing.Traced;
@@ -226,8 +225,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
 
   @Traced
   @Override
-  public List<T> batchDelete(List<UUID> ids) {
-    List<T> it = searchAll(true, new SearchTerm("id", SearchOperation.eq, ids));
+  public List<T> batchDelete(List<T> it) {
     it.forEach(i -> {
       performSubExecutions(i, true);
 
@@ -239,7 +237,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
         .forEach(preRemove -> preRemove.invoke(i));
     });
 
-    getRepository().batchDelete(ids);
+    getRepository().batchDelete(it.stream().map(Model::getId).toList());
 
     it.forEach(i -> {
       BeanIntrospection
