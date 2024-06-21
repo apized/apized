@@ -4,6 +4,7 @@ import io.micronaut.aop.InterceptorBean;
 import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
 import io.micronaut.core.beans.BeanIntrospection;
+import io.micronaut.data.model.CursoredPage;
 import io.micronaut.data.model.Page;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -28,7 +29,17 @@ public class ApizedRepositoryInterceptor implements MethodInterceptor<Object, Ob
     if (result != null && proxyRegistry.contains(type)) {
       BeanIntrospection<?> introspection = BeanIntrospection.getIntrospection(proxyRegistry.get(type));
 
-      if (Page.class.isAssignableFrom(result.getClass())) {
+      if (CursoredPage.class.isAssignableFrom(result.getClass())) {
+        CursoredPage<?> page = (CursoredPage<?>) result;
+        result = CursoredPage.of(
+          page.getContent().stream().map(it ->
+            instantiate(introspection, it)
+          ).toList(),
+          page.getPageable(),
+          page.getCursors(),
+          page.getTotalSize()
+        );
+      } else if (Page.class.isAssignableFrom(result.getClass())) {
         Page<?> page = (Page<?>) result;
         result = Page.of(
           page.getContent().stream().map(it ->
