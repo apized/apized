@@ -41,12 +41,6 @@ public class TracedRabbitMQESBAdapter extends RabbitMQESBAdapter {
         enrichedHeaders.put("traceId", spanContext.getTraceId());
         enrichedHeaders.put("spanId", spanContext.getSpanId());
 
-        try {
-          span.setAttribute("messaging.message", mapper.writeValueAsString(Map.of("header", enrichedHeaders, "payload", payload)));
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-
         super.send(messageId, timestamp, topic, enrichedHeaders, payload);
         return null;
       }
