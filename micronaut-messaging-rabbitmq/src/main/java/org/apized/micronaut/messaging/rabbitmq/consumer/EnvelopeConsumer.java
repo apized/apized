@@ -80,7 +80,7 @@ public abstract class EnvelopeConsumer<T> {
   @SuppressWarnings("unchecked")
   protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
     String messageId = Optional.ofNullable(properties.getMessageId()).orElseGet(() -> checksum(data));
-    log.info("Processing incoming message {} on `{}` with: {}", messageId, envelope.getRoutingKey(), new String(data));
+    log.debug("Processing incoming message {} on `{}` with: {}", messageId, envelope.getRoutingKey(), new String(data));
     long start = System.currentTimeMillis();
 
     try {
@@ -114,7 +114,7 @@ public abstract class EnvelopeConsumer<T> {
       eventPublisher.publishEvent(this.getClass().getSuperclass().getSimpleName() + "::process");
       acknowledgement.ack(false);
       registry.remove(messageId);
-      log.info("Message {} processed in {}ms", messageId, System.currentTimeMillis() - start);
+      log.debug("Message {} processed in {}ms", messageId, System.currentTimeMillis() - start);
     } catch (Throwable t) {
       log.error(t.getMessage(), t);
       notifiers.forEach(n -> n.report(t));
