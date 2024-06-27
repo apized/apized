@@ -21,7 +21,6 @@ import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanProperty;
 import io.micronaut.core.beans.BeanWrapper;
 import io.micronaut.core.naming.Named;
-import org.apized.core.audit.annotation.AuditField;
 import org.apized.core.model.Model;
 
 import java.lang.annotation.Annotation;
@@ -71,9 +70,9 @@ public class ModelMapper {
               }
             } else if (value != null) {
               if (List.class.isAssignableFrom(value.getClass())) {
-                result.put(field.getName(), ((List<?>) value).stream().map(this::retrieveValueFrom).collect(Collectors.toList()));
+                result.put(field.getName(), ((List<?>) value).stream().map(o -> retrieveValueFrom(field, o)).collect(Collectors.toList()));
               } else {
-                result.put(field.getName(), retrieveValueFrom(value));
+                result.put(field.getName(), retrieveValueFrom(field, value));
               }
             }
           }
@@ -145,9 +144,9 @@ public class ModelMapper {
     return result;
   }
 
-  private Object retrieveValueFrom(Object it) {
+  private Object retrieveValueFrom(BeanProperty<Model, Object> field, Object it) {
     if (it instanceof Model) {
-      if (BeanIntrospection.getIntrospection(it.getClass()).getAnnotation(fieldAnnotation) != null) {
+      if (field.getAnnotation(fieldAnnotation) != null) {
         return createMapOf(it);
       } else {
         return ((Model) it).getId();
