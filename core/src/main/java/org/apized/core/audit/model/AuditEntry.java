@@ -26,7 +26,7 @@ import lombok.*;
 import org.apized.core.model.Action;
 import org.apized.core.model.Model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -62,8 +62,7 @@ public class AuditEntry implements Model {
   @TypeDef(type = DataType.JSON)
   private Map<String, Object> payload;
 
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date timestamp;
+  private LocalDateTime timestamp;
 
   @JsonIgnore
   private long epoch;

@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apized.core.event.ESBAdapter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +35,7 @@ public class RabbitMQESBAdapter implements ESBAdapter {
   List<EventContextEnricher> enrichers;
 
   @Override
-  public void send(UUID messageId, Date timestamp, String topic, Map<String, Object> headers, Object payload) {
+  public void send(UUID messageId, LocalDateTime timestamp, String topic, Map<String, Object> headers, Object payload) {
     enrichers.forEach(it -> it.process(topic, headers, payload));
     try {
       Channel channel = pool.getChannel();
@@ -43,7 +45,7 @@ public class RabbitMQESBAdapter implements ESBAdapter {
         new AMQP.BasicProperties.Builder()
           .messageId(messageId.toString())
           .contentType("application/json")
-          .timestamp(timestamp)
+          .timestamp(Date.from(timestamp.toInstant(ZoneOffset.UTC)))
           .headers(headers)
           .build(),
         mapper.writeValueAsBytes(Map.of("header", headers, "payload", payload))

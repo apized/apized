@@ -27,9 +27,9 @@ import io.micronaut.scheduling.annotation.ExecuteOn;
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.context.ApizedContext;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 @Slf4j
 @ServerFilter(Filter.MATCH_ALL_PATTERN)
@@ -49,8 +49,8 @@ public class HttpRequestFilter extends ApizedServerFilter {
   void filterResponse(HttpRequest<?> request) {
     if (shouldExclude(request.getPath())) return;
 
-    long start = ApizedContext.getRequest().getTimestamp().toInstant().toEpochMilli();
-    long end = Timestamp.valueOf(LocalDateTime.now(ZoneId.of("UTC"))).toInstant().toEpochMilli();
+    long start = ApizedContext.getRequest().getTimestamp().toInstant(ZoneOffset.UTC).toEpochMilli();
+    long end = LocalDateTime.now(ZoneId.of("UTC")).toInstant(ZoneOffset.UTC).toEpochMilli();
     log.info("Request {} took {}ms", ApizedContext.getRequest().getId(), end - start);
   }
 

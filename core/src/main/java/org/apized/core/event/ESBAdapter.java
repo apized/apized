@@ -19,18 +19,21 @@ package org.apized.core.event;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.event.model.Event;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 public interface ESBAdapter {
   default void send(Event event) {
-    Date timestamp = Optional.ofNullable(
+    LocalDateTime timestamp = Optional.ofNullable(
       ApizedContext.getRequest().getTimestamp()
     ).orElse(
-      new Date()
+      LocalDateTime.now(ZoneId.of("UTC"))
     );
 
     Map<String, Object> headers = new HashMap<>();
-    headers.put("timestamp", timestamp);
+    headers.put("timestamp", Date.from(timestamp.toInstant(ZoneOffset.UTC)));
     headers.put("token", ApizedContext.getSecurity().getToken());
 
     ApizedContext.getRequest().getPathVariables().forEach((key, value) -> headers.put(key, value != null ? value.toString() : null));
@@ -39,5 +42,5 @@ public interface ESBAdapter {
     send(event.getId(), timestamp, event.getTopic(), headers, event.getPayload());
   }
 
-  void send(UUID messageId, Date timestamp, String topic, Map<String, Object> headers, Object payload);
+  void send(UUID messageId, LocalDateTime timestamp, String topic, Map<String, Object> headers, Object payload);
 }

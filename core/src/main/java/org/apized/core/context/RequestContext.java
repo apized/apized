@@ -19,16 +19,18 @@ package org.apized.core.context;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class RequestContext {
   private final UUID id = UUID.randomUUID();
-  private final Date timestamp = Timestamp.valueOf(LocalDateTime.now(ZoneId.of("UTC")));
+  private final LocalDateTime timestamp = LocalDateTime.now(ZoneId.of("UTC"));
   private String reason;
   private Map<String, Object> fields = new HashMap<>();
   private Map<String, UUID> pathVariables = new HashMap<>();
