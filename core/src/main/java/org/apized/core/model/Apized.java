@@ -80,5 +80,11 @@ public @interface Apized {
      * For Service extensions (a Singleton) the exclusions list the methods that shouldn't be present in the service itself.
      */
     String[] exclude() default {};
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    @interface Action {
+      org.apized.core.model.Action value();
+    }
   }
 }

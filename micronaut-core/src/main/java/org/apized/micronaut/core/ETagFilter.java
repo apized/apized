@@ -14,7 +14,9 @@ import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.model.Model;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -39,9 +41,17 @@ class ETagFilter extends ApizedServerFilter {
     if (!shouldExclude(request.getPath()) && HttpMethod.GET.equals(request.getMethod())) {
       String previousToken = request.getHeaders().get("If-None-Match");
       response.getBody().ifPresent(obj -> {
+        String payload = obj.toString();
+        if (obj instanceof Model) {
+          try {
+            payload = mapper.writeValueAsString(obj);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        }
         String tokenHeader = String.format(
           "W/\"%s\"",
-          new BigInteger(1, md.digest(((String) obj).getBytes(StandardCharsets.UTF_8))).toString(16)
+          new BigInteger(1, md.digest((payload).getBytes(StandardCharsets.UTF_8))).toString(16)
         );
         if (previousToken != null && previousToken.equals(tokenHeader)) {
           response.status(HttpStatus.NOT_MODIFIED);

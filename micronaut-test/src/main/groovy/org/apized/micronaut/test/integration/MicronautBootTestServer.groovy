@@ -44,6 +44,10 @@ class MicronautBootTestServer {
         "users",
         application.applicationContext.getBean(AbstractUserResolverMock).userAlias
       )
+      IntegrationConfig.testRunner.context.responses.put(
+        "port",
+        application.port
+      )
     }
   }
 

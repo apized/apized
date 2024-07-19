@@ -206,7 +206,14 @@ public class AnnotationProcessor extends AbstractProcessor {
           "service", Map.of(
             "imports", new HashSet<String>(),
             "injects", new ArrayList<String>(),
-            "methods", new ArrayList<Map<String, String>>()
+            "methods", new ArrayList<Map<String, String>>(),
+            "actions", new HashMap<String, Map<String, String>>()
+          ),
+          "controller", Map.of(
+            "imports", new HashSet<String>(),
+            "injects", new ArrayList<String>(),
+            "methods", new ArrayList<Map<String, String>>(),
+            "actions", new HashMap<String, Map<String, String>>()
           )
         ));
         bindings.put("subModels", new ArrayList<>());
@@ -269,11 +276,11 @@ public class AnnotationProcessor extends AbstractProcessor {
                 .toList();
 
               switch (extensionAnnotation.layer()) {
-                case SERVICE -> {
+                case CONTROLLER -> {
                   String injectName = StringHelper.uncapitalize(extension.getSimpleName().toString());
-                  extensionBindings.get("service").get("injects").add(String.format("%s %s", extension.getQualifiedName().toString(), injectName));
-                  extensionBindings.get("service").get("methods").addAll(
-                    methods.stream().filter(m -> m.getModifiers().contains(Modifier.PUBLIC)).map(m ->
+                  extensionBindings.get("controller").get("injects").add(String.format("%s %s", extension.getQualifiedName().toString(), injectName));
+                  extensionBindings.get("controller").get("methods").addAll(
+                    methods.stream().filter(m -> m.getModifiers().contains(Modifier.PUBLIC) && m.getAnnotation(Apized.Extension.Action.class) == null).map(m ->
                       Map.of(
                         "returnType", m.getReturnType().toString(),
                         "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
@@ -286,6 +293,57 @@ public class AnnotationProcessor extends AbstractProcessor {
                         "arguments", m.getParameters().stream().map(p -> p.getSimpleName().toString()).collect(Collectors.joining(", "))
                       )
                     ).toList()
+                  );
+                  ((Map) extensionBindings.get("controller").get("actions")).putAll(
+                    methods.stream().filter(m -> m.getModifiers().contains(Modifier.PUBLIC) && m.getAnnotation(Apized.Extension.Action.class) != null).map(m ->
+                      Map.of(
+                        "returnType", m.getReturnType().toString(),
+                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
+                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), collectionType),
+                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), optionalType),
+                        "returnTypeWrappedParameter", m.getReturnType().toString().replaceAll(".*<(.*?)>.*", "$1"),
+                        "name", m.getSimpleName().toString(),
+                        "parameters", m.getParameters().stream().map(p -> p.asType().toString() + " " + p.getSimpleName()).collect(Collectors.joining(", ")),
+                        "callee", injectName,
+                        "arguments", m.getParameters().stream().map(p -> p.getSimpleName().toString()).collect(Collectors.joining(", ")),
+                        "action", m.getAnnotation(Apized.Extension.Action.class).value().toString()
+                      )
+                    ).collect(Collectors.toMap((v) -> v.get("action"), (v) -> v))
+                  );
+                }
+                case SERVICE -> {
+                  String injectName = StringHelper.uncapitalize(extension.getSimpleName().toString());
+                  extensionBindings.get("service").get("injects").add(String.format("%s %s", extension.getQualifiedName().toString(), injectName));
+                  extensionBindings.get("service").get("methods").addAll(
+                    methods.stream().filter(m -> m.getModifiers().contains(Modifier.PUBLIC) && m.getAnnotation(Apized.Extension.Action.class) == null).map(m ->
+                      Map.of(
+                        "returnType", m.getReturnType().toString(),
+                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
+                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), collectionType),
+                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), optionalType),
+                        "returnTypeWrappedParameter", m.getReturnType().toString().replaceAll(".*<(.*?)>.*", "$1"),
+                        "name", m.getSimpleName().toString(),
+                        "parameters", m.getParameters().stream().map(p -> p.asType().toString() + " " + p.getSimpleName()).collect(Collectors.joining(", ")),
+                        "callee", injectName,
+                        "arguments", m.getParameters().stream().map(p -> p.getSimpleName().toString()).collect(Collectors.joining(", "))
+                      )
+                    ).toList()
+                  );
+                  ((Map) extensionBindings.get("service").get("actions")).putAll(
+                    methods.stream().filter(m -> m.getModifiers().contains(Modifier.PUBLIC) && m.getAnnotation(Apized.Extension.Action.class) != null).map(m ->
+                      Map.of(
+                        "returnType", m.getReturnType().toString(),
+                        "isModel", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), baseModelType),
+                        "isCollection", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), collectionType),
+                        "isOptional", processingEnv.getTypeUtils().isAssignable(m.getReturnType(), optionalType),
+                        "returnTypeWrappedParameter", m.getReturnType().toString().replaceAll(".*<(.*?)>.*", "$1"),
+                        "name", m.getSimpleName().toString(),
+                        "parameters", m.getParameters().stream().map(p -> p.asType().toString() + " " + p.getSimpleName()).collect(Collectors.joining(", ")),
+                        "callee", injectName,
+                        "arguments", m.getParameters().stream().map(p -> p.getSimpleName().toString()).collect(Collectors.joining(", ")),
+                        "action", m.getAnnotation(Apized.Extension.Action.class).value().toString()
+                      )
+                    ).collect(Collectors.toMap((v) -> v.get("action"), (v) -> v))
                   );
                 }
                 case REPOSITORY -> {

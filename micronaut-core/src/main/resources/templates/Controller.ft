@@ -19,6 +19,9 @@ import org.apized.core.mvc.ModelService;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 import org.apized.micronaut.annotation.MicronautBehaviourExecution;
+#foreach( $it in $extension.controller.imports )
+import $it;
+#end
 
 import javax.annotation.Nullable;
 import jakarta.transaction.Transactional;
@@ -44,12 +47,17 @@ public class ${type}Controller extends AbstractModelController<${type}>{
 
   @Inject
   protected ApplicationEventPublisher eventPublisher;
+#foreach( $it in $extension.controller.injects )
+
+  @Inject
+  ${it};
+#end
 
   @Override
   protected ModelService<${type}> getService() {
     return service;
   }
-#if($actions.contains('LIST'))
+#if($actions.contains('LIST') || $extension.controller.actions.containsKey('LIST'))
 
   @Get
   @Operation(operationId = "List $type", summary = "List", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
@@ -59,12 +67,16 @@ public class ${type}Controller extends AbstractModelController<${type}>{
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.LIST)
   )
   public Page<${type}> list(@Nullable @Bindable(defaultValue = "1") Integer page, @Nullable @Bindable(defaultValue = "50") Integer pageSize, @Nullable @Bindable(defaultValue = "") List<SearchTerm> search, @Nullable @Bindable(defaultValue = "") List<SortTerm> sort) {
+  #if($extension.controller.actions.containsKey('LIST'))
+    Page<$type> = ${extension.controller.actions['LIST'].callee}.${extension.controller.actions['LIST'].name}(${extension.controller.actions['LIST'].arguments});
+  #else
     Page<$type> result = super.list(page, pageSize <= MAX_PAGE_SIZE ? pageSize : MAX_PAGE_SIZE, search, sort);
+  #end
     eventPublisher.publishEvent("${type}Controller::list");
     return result;
   }
 #end
-#if($actions.contains('GET'))
+#if($actions.contains('GET') || $extension.controller.actions.containsKey('GET'))
 
   @Get(uri = "/{id}")
   @Operation(operationId = "Get $type", summary = "Get", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
@@ -74,12 +86,16 @@ public class ${type}Controller extends AbstractModelController<${type}>{
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.GET)
   )
   public $type get(UUID id) {
+  #if($extension.controller.actions.containsKey('GET'))
+    $type result = ${extension.controller.actions['GET'].callee}.${extension.controller.actions['GET'].name}(${extension.controller.actions['GET'].arguments});
+  #else
     $type result = super.get(id);
+  #end
     eventPublisher.publishEvent("${type}Controller::get");
     return result;
   }
 #end
-#if($actions.contains('CREATE'))
+#if($actions.contains('CREATE') || $extension.controller.actions.containsKey('CREATE'))
 
   @Post("/")
   @Operation(operationId = "Create $type", summary = "Create", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
@@ -89,12 +105,16 @@ public class ${type}Controller extends AbstractModelController<${type}>{
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.CREATE)
   )
   public $type create(@Valid @Body $type it) {
+  #if($extension.controller.actions.containsKey('CREATE'))
+    $type result = ${extension.controller.actions['CREATE'].callee}.${extension.controller.actions['CREATE'].name}(${extension.controller.actions['CREATE'].arguments});
+  #else
     $type result = super.create(it);
+  #end
     eventPublisher.publishEvent("${type}Controller::create");
     return result;
   }
 #end
-#if($actions.contains('UPDATE'))
+#if($actions.contains('UPDATE') || $extension.controller.actions.containsKey('UPDATE'))
 
   @Put("/{id}")
   @Operation(operationId = "Update $type", summary = "Update", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
@@ -104,12 +124,16 @@ public class ${type}Controller extends AbstractModelController<${type}>{
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.UPDATE)
   )
   public $type update(UUID id, @Valid @Body $type it) {
+  #if($extension.controller.actions.containsKey('UPDATE'))
+    $type result = ${extension.controller.actions['UPDATE'].callee}.${extension.controller.actions['UPDATE'].name}(${extension.controller.actions['UPDATE'].arguments});
+  #else
     $type result = super.update(id, it);
+  #end
     eventPublisher.publishEvent("${type}Controller::update");
     return result;
   }
 #end
-#if($actions.contains('DELETE'))
+#if($actions.contains('DELETE') || $extension.controller.actions.containsKey('DELETE'))
 
   @Delete("/{id}")
   @Operation(operationId = "Delete $type", summary = "Delete", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
@@ -119,7 +143,11 @@ public class ${type}Controller extends AbstractModelController<${type}>{
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.DELETE)
   )
   public $type delete(UUID id) {
+  #if($extension.controller.actions.containsKey('DELETE'))
+    $type result = ${extension.controller.actions['DELETE'].callee}.${extension.controller.actions['DELETE'].name}(${extension.controller.actions['DELETE'].arguments});
+  #else
     $type result = super.delete(id);
+  #end
     eventPublisher.publishEvent("${type}Controller::delete");
     return result;
   }
