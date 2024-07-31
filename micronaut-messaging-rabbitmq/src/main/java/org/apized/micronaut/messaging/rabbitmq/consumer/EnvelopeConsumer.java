@@ -17,6 +17,9 @@ import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.security.UserResolver;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -90,7 +93,7 @@ public abstract class EnvelopeConsumer<T> {
       Date timestamp = Optional.ofNullable(properties.getTimestamp())
         .orElseGet(() ->
           header.containsKey("timestamp")
-            ? new Date(((Number) header.get("timestamp")).longValue())
+            ? Date.from(LocalDateTime.parse(header.get("timestamp").toString(), DateTimeFormatter.ISO_DATE_TIME).toInstant(ZoneOffset.UTC))
             : new Date()
         );
 
