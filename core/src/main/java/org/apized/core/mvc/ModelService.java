@@ -58,6 +58,10 @@ public interface ModelService<T extends Model> {
 
   // Behaviour wrapped methods
   default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
+    return list(page, pageSize, search, sort, false);
+  }
+
+  default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
     throw new NotImplementedException();
   }
 

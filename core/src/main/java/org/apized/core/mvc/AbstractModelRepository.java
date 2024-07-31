@@ -34,7 +34,7 @@ public class AbstractModelRepository<T extends Model> implements ModelRepository
   }
 
   @Override
-  public Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
+  public Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
     throw new NotImplementedException();
   }
 

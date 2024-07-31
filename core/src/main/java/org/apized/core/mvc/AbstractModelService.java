@@ -42,8 +42,8 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
 
   @Traced
   @Override
-  public Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
-    return getRepository().list(page, pageSize, search, sort);
+  public Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
+    return getRepository().list(page, pageSize, search, sort, skipAutoFilters);
   }
 
   @Traced

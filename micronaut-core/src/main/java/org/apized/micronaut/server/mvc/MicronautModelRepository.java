@@ -58,8 +58,8 @@ public interface MicronautModelRepository<T extends Model> extends ModelReposito
   }
 
   @Override
-  default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
-    QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(new ArrayList<>(search));
+  default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
+    QuerySpecification<T> spec = RepositoryHelper.getQuerySpecification(new ArrayList<>(search), skipAutoFilters);
 
     io.micronaut.data.model.Page<T> micronautPage = findAll(
       spec,

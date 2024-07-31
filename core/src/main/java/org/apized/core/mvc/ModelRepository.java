@@ -16,7 +16,6 @@
 
 package org.apized.core.mvc;
 
-import io.micronaut.data.annotation.Query;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
 import org.apized.core.search.SearchTerm;
@@ -35,7 +34,11 @@ public interface ModelRepository<T extends Model> {
 
   void removeMany(String field, List<ManyToManyTuple> removes);
 
-  Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort);
+  default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
+    return list(page, pageSize, search, sort, false);
+  }
+
+  Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters);
 
   Optional<T> searchOne(List<SearchTerm> search);
 
