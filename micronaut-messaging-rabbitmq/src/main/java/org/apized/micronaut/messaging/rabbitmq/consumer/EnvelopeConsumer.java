@@ -9,12 +9,15 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.type.Argument;
 import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
 import io.micronaut.rabbitmq.connect.ChannelPool;
+import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.serde.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.ApizedConfig;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.security.UserResolver;
+import org.apized.micronaut.server.ApizedStartupEvent;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -27,6 +30,8 @@ import java.util.zip.Checksum;
 @Slf4j
 @Introspected
 public abstract class EnvelopeConsumer<T> {
+  protected boolean started = false;
+
   protected Map<String, Integer> registry = new HashMap<>();
 
   protected final QueueConfig queue;
@@ -80,8 +85,16 @@ public abstract class EnvelopeConsumer<T> {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @EventListener
+  public void onStart(ApizedStartupEvent event) {
+    this.started = true;
+  }
+
+  @SneakyThrows
+  @SuppressWarnings({ "unchecked", "BusyWait" })
   protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
+    while (!started) Thread.sleep(100);
+
     String messageId = Optional.ofNullable(properties.getMessageId()).orElseGet(() -> checksum(data));
     log.debug("Processing incoming message {} on `{}` with: {}", messageId, envelope.getRoutingKey(), new String(data));
     long start = System.currentTimeMillis();
