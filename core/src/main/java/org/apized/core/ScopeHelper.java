@@ -47,7 +47,7 @@ public class ScopeHelper {
     } else {
       Arrays.stream(annotation.classValues("scope")).forEach(scope -> {
         scopeUpUntil(
-          (T) wrapper.getProperty(scope.getSimpleName(), scope).orElse(null),
+          (T) wrapper.getProperty(StringHelper.uncapitalize(scope.getSimpleName()), scope).orElse(null),
           condition,
           consumer
         );

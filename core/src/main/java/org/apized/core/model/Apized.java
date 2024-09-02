@@ -75,7 +75,7 @@ public @interface Apized {
     Layer layer();
 
     /**
-     * For Repository extensions (an interface) the exclusions list the methods that we shouldn't create a Server layer
+     * For Repository extensions (an interface) the exclusions list the methods that we shouldn't create a Service layer
      * "proxy" for.
      * For Service extensions (a Singleton) the exclusions list the methods that shouldn't be present in the service itself.
      */
