@@ -155,7 +155,7 @@ public abstract class RepositoryHelper {
               criteria.add(builder.notEqual(from.get(field), value));
             }
           }
-          case like -> criteria.add(((RuntimeCriteriaBuilder) builder).ilikeString(
+          case like -> criteria.add(((RuntimeCriteriaBuilder) builder).ilike(
             from.get(field),
             builder.literal("%" + value.toString() + "%"))
           );
@@ -167,7 +167,12 @@ public abstract class RepositoryHelper {
           case nin -> criteria.add(builder.not(builder.in(from.get(field)).value(value)));
         }
       }
-      return builder.and(criteria.toArray(new Predicate[0]));
+
+      if (!criteria.isEmpty()) {
+        return builder.and(criteria.toArray(new Predicate[0]));
+      }
+
+      return null;
     };
     return spec;
   }
