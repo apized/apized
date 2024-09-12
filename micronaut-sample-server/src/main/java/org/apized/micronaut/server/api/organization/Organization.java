@@ -20,7 +20,6 @@ import org.apized.core.model.Apized;
 import org.apized.core.model.BaseModel;
 import org.apized.micronaut.server.api.department.Department;
 import org.apized.micronaut.server.api.employee.Employee;
-import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -30,12 +29,10 @@ import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
 @Entity
-@Serdeable
 @Apized(extensions = OrganizationRepositoryExtension.class)
 public class Organization extends BaseModel {
   @NotBlank

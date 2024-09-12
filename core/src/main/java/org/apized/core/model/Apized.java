@@ -16,6 +16,8 @@
 
 package org.apized.core.model;
 
+import io.micronaut.serde.annotation.Serdeable;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,6 +25,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Serdeable
 public @interface Apized {
   /**
    * Set of components to generate. Generated Repositories are assumed to be for DB access and will not trigger behaviours.

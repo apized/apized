@@ -22,7 +22,6 @@ import org.apized.core.model.BaseModel;
 import org.apized.micronaut.server.api.employee.Employee;
 import org.apized.micronaut.server.api.organization.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +32,6 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Serdeable
 @Apized(scope = Organization.class)
 public class Department extends BaseModel {
   @NotNull

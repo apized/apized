@@ -19,7 +19,6 @@ package org.apized.micronaut.server.api.employee;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.DataType;
-import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -37,7 +36,6 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @Setter
 @Entity
-@Serdeable
 @Apized(scope = {Organization.class, Department.class}, extensions = EmployeeRepositoryExtension.class)
 public class Employee extends BaseModel {
   @NotNull

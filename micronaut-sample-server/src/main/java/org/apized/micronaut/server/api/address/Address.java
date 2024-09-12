@@ -21,7 +21,6 @@ import org.apized.core.model.BaseModel;
 import org.apized.core.model.Layer;
 import org.apized.micronaut.server.api.organization.Organization;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
@@ -34,7 +33,6 @@ import jakarta.validation.constraints.Size;
 @Getter
 @Setter
 @Entity
-@Serdeable
 @Apized(scope = Organization.class, layers = {Layer.SERVICE, Layer.REPOSITORY})
 public class Address extends BaseModel {
   @NotNull

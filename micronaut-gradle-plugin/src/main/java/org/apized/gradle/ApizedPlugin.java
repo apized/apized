@@ -58,7 +58,7 @@ public class ApizedPlugin implements Plugin<Project> {
         project.getDependencies().add("compileOnly", "org.projectlombok:lombok:1.18.30");
       });
 
-      //replace with wither jitpack or simply remove (and add on the docs that the packages are available via jitpack
+      //replace with either jitpack or simply remove (and add on the docs that the packages are available via jitpack
       project.getRepositories().maven(r -> {
         r.setName("Apized GitHub Repository");
         r.setUrl("https://maven.pkg.github.com/apized/apized");
@@ -75,7 +75,7 @@ public class ApizedPlugin implements Plugin<Project> {
       MicronautExtension micronaut = project.getExtensions().getByType(MicronautExtension.class);
       micronaut.runtime("netty");
       project.getTasks().withType(Test.class).configureEach(Test::useJUnitPlatform);
-//      micronaut.testRuntime("junit5");
+      micronaut.testRuntime("junit5");
 
       project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
       project.getDependencies().add("annotationProcessor", "io.micronaut.validation:micronaut-validation-processor");

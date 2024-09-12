@@ -35,7 +35,6 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @Setter
 @Entity
-@Serdeable
 @ToString(callSuper = true)
 @Apized(scope = Organization.class, layers = {Layer.SERVICE, Layer.REPOSITORY})
 public class Billing extends BaseModel {
