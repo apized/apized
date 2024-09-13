@@ -7,6 +7,7 @@ import io.micronaut.core.beans.BeanWrapper;
 import io.micronaut.core.type.Argument;
 import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
+import org.apized.core.error.exception.NotFoundException;
 import org.apized.core.execution.Execution;
 import org.apized.core.model.Action;
 import org.apized.core.model.DummyModel;
@@ -77,12 +78,17 @@ public abstract class AbstractOwnerPermissionEnricher implements PermissionEnric
 
   private boolean currentUserIsOwner(Class<Model> type, Execution<Model> execution, BeanProperty<Model, Object> prop) {
     UUID ownerId = null;
-    BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(
-      Optional.ofNullable(execution.getInput())
-        .orElse(
-          (Model) findBean(Argument.of(ModelRepository.class, type)).get().get(execution.getId()).get()
-        )
-    );
+    Optional<Model> model =
+      Optional.ofNullable(
+        Optional.ofNullable(execution.getInput())
+          .orElse(
+            findBean(Argument.of(ModelRepository.class, type))
+              .flatMap(r -> ((ModelRepository<? extends Model>) r).get(execution.getId()))
+              .orElseThrow(NotFoundException::new)
+          )
+      );
+    if (model.isEmpty()) return false;
+    BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model.get());
 
     if (UUID.class.isAssignableFrom(prop.getType())) {
       ownerId = wrapper.getProperty(prop.getName(), UUID.class).orElse(null);
