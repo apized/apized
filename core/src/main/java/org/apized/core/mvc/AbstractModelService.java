@@ -114,6 +114,8 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
   @Traced
   @Override
   public List<T> batchCreate(List<T> it) {
+    if (it.isEmpty()) return it;
+
     it.forEach(i -> {
       performSubExecutions(i, true);
 
@@ -169,6 +171,8 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
   @Traced
   @Override
   public List<T> batchUpdate(List<T> it) {
+    if (it.isEmpty()) return it;
+
     it.forEach(i -> {
       performSubExecutions(i, true);
 
@@ -226,7 +230,11 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
   @Traced
   @Override
   public List<T> batchDelete(List<T> it) {
+    if (it.isEmpty()) return it;
+
     it.forEach(i -> {
+      i._getModelMetadata().setAction(Action.DELETE);
+
       performSubExecutions(i, true);
 
       BeanIntrospection
