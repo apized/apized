@@ -41,15 +41,15 @@ public class Billing extends BaseModel {
   @NotNull
   @OneToOne
   @JsonIgnore
-  Organization organization;
+  private Organization organization;
 
   @NotBlank
-  String companyName;
+  private String companyName;
 
   @NotBlank
-  String vatNumber;
+  private String vatNumber;
 
   @NotNull
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-  Address address;
+  private Address address;
 }

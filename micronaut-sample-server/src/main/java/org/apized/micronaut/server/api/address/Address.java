@@ -38,20 +38,20 @@ public class Address extends BaseModel {
   @NotNull
   @JsonIgnore
   @ManyToOne
-  Organization organization;
+  private Organization organization;
 
   @NotBlank
-  String line1;
+  private String line1;
 
-  String line2;
-
-  @NotBlank
-  String city;
+  private String line2;
 
   @NotBlank
-  String postalCode;
+  private String city;
+
+  @NotBlank
+  private String postalCode;
 
   @NotBlank
   @Size(min = 2, max = 2)
-  String country;
+  private String country;
 }

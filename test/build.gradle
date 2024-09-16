@@ -16,6 +16,6 @@ dependencies {
   api 'org.testcontainers:mssqlserver'
   api 'io.micronaut.testresources:micronaut-test-resources-jdbc-mssql'
 
-//  runtimeOnly 'org.junit.jupiter:junit-jupiter'
-//  runtimeOnly 'org.junit.vintage:junit-vintage-engine'
+  runtimeOnly 'org.junit.jupiter:junit-jupiter'
+  runtimeOnly 'org.junit.vintage:junit-vintage-engine'
 }

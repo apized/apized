@@ -31,6 +31,7 @@ import java.util.UUID;
 @Serdeable
 @Federated
 public class Doctor implements Model {
-  UUID id;
-  Long catalogopolisId;
+  private UUID id;
+
+  private Long catalogopolisId;
 }

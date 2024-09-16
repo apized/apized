@@ -61,5 +61,5 @@ public class Employee extends BaseModel {
 
   @TypeDef(type = DataType.JSON)
   @Federation(value = "catalogopolis", type = "Doctor", uri = "/doctors/{catalogopolisId}")
-  Doctor favoriteDoctor;
+  private Doctor favoriteDoctor;
 }
