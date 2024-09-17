@@ -28,6 +28,7 @@ import org.apized.core.model.Action;
 import org.apized.core.model.Model;
 import org.apized.core.model.When;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> {
@@ -45,7 +46,7 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
         .action(type.isAssignableFrom(i.getClass()) ? action : Action.UPDATE)
         .type(i.getClass().getSimpleName().replaceAll("\\$Proxy$", ""))
         .author(ApizedContext.getSecurity().getUser().getId())
-        .reason(ApizedContext.getRequest().getReason())
+        .reason(ApizedContext.getRequest().getHeaders().getOrDefault("X-Reason", new ArrayList<>()).isEmpty() ? null : ApizedContext.getRequest().getHeaders().get("X-Reason").getFirst())
         .target(i.getId())
         .payload(action != Action.DELETE ? modelMapper.createMapOf(model) : Map.of())
         .timestamp(ApizedContext.getRequest().getTimestamp())

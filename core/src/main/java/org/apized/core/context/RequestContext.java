@@ -31,10 +31,10 @@ import java.util.UUID;
 public class RequestContext {
   private final UUID id = UUID.randomUUID();
   private final LocalDateTime timestamp = LocalDateTime.now(ZoneId.of("UTC"));
-  private String reason;
   private Map<String, Object> fields = new HashMap<>();
   private Map<String, UUID> pathVariables = new HashMap<>();
   private Map<String, Object> search = new HashMap<>();
   private Map<String, Object> sort = new HashMap<>();
   private Map<String, List<String>> queryParams = new HashMap<>();
+  private Map<String, List<String>> headers = new HashMap<>();
 }
