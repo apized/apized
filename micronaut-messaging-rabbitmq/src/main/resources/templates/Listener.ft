@@ -76,7 +76,7 @@ class ${type}${d}Listener extends EnvelopeConsumer<${generic}> {
 
   @Override
   @Transactional
-  @Queue(value = "${queue}", numberOfConsumers = "${numberOfConsumers}")
+  @Queue(value = "${queue}", numberOfConsumersValue = "${numberOfConsumers}")
 #if($metrics)
   @Timed(value = "rabbitmq.consumer", extraTags = {"consumer", "${type}"}, histogram = true)
 #end
