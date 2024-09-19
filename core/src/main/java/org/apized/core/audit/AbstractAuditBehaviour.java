@@ -48,7 +48,7 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
         .author(ApizedContext.getSecurity().getUser().getId())
         .reason(ApizedContext.getRequest().getHeaders().getOrDefault("X-Reason", new ArrayList<>()).isEmpty() ? null : ApizedContext.getRequest().getHeaders().get("X-Reason").getFirst())
         .target(i.getId())
-        .payload(action != Action.DELETE ? modelMapper.createMapOf(model) : Map.of())
+        .payload(action != Action.DELETE ? modelMapper.createMapOf(i) : Map.of())
         .timestamp(ApizedContext.getRequest().getTimestamp())
         .epoch(System.nanoTime())
         .build()
