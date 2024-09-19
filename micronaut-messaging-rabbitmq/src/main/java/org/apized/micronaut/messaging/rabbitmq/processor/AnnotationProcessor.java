@@ -88,6 +88,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         bindings.put("argument", String.join(", ", Arrays.stream(genericType.replaceAll("^[^<]+<(.+)>$", "$1").split("[,<>]")).map(t -> t + ".class").toList()));
         bindings.put("exchange", annotation.exchange());
         bindings.put("queue", annotation.queue());
+        bindings.put("numberOfConsumers", annotation.numberOfConsumers());
         bindings.put("bindings", Arrays.stream(annotation.bindings()).map(b -> "\"" + b + "\"").collect(Collectors.joining(", ")));
         bindings.put("metrics", annotation.metrics());
         bindings.put("traced", annotation.traced());

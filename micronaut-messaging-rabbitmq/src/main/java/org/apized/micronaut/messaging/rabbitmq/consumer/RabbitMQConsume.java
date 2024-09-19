@@ -5,6 +5,8 @@ public @interface RabbitMQConsume {
 
   String queue();
 
+  long numberOfConsumers() default 1;
+
   String[] bindings();
 
   /**
