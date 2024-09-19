@@ -51,9 +51,9 @@ public class BehaviourManager {
         .sorted(Comparator.comparingInt(BehaviourEntry::order))
         .forEach(it -> {
           long init = System.currentTimeMillis();
-          log.info("[" + signature + ":" + it.type().getSimpleName() + "] Executing behaviour " + it.name());
+          log.debug("[{}:{}] Executing behaviour {}", signature, it.type().getSimpleName(), it.name());
           it.behaviour().process(type, when, action, execution);
-          log.info("[" + signature + ":" + it.type().getSimpleName() + "] Behaviour {} done in {}ms", it.name(), System.currentTimeMillis() - init);
+          log.debug("[{}:{}] Behaviour {} done in {}ms", signature, it.type().getSimpleName(), it.name(), System.currentTimeMillis() - init);
         });
     } catch (Exception e) {
       if (!(e instanceof ServerException)) {
