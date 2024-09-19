@@ -41,7 +41,7 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
     ScopeHelper.scopeUpUntil(
       model,
       a -> a.booleanValue("audit").orElse(true),
-      i -> save(AuditEntry.builder()
+      i -> ApizedContext.getAudit().add(AuditEntry.builder()
         .transactionId(ApizedContext.getRequest().getId())
         .action(type.isAssignableFrom(i.getClass()) ? action : Action.UPDATE)
         .type(i.getClass().getSimpleName().replaceAll("\\$Proxy$", ""))
@@ -55,6 +55,4 @@ public abstract class AbstractAuditBehaviour implements BehaviourHandler<Model> 
       )
     );
   }
-
-  protected abstract void save(AuditEntry entry);
 }

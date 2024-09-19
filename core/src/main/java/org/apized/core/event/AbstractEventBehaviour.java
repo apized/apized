@@ -44,7 +44,7 @@ public abstract class AbstractEventBehaviour implements BehaviourHandler<Model> 
           String.format(
             "%s.%s.%sd",
             ApizedConfig.getInstance().getSlug(),
-            i.getClass().getSimpleName().replaceAll("\\$Proxy$",""),
+            i.getClass().getSimpleName().replaceAll("\\$Proxy$", ""),
             (type.isAssignableFrom(i.getClass()) ? action.getType() : Action.UPDATE)
           ).toLowerCase(),
           modelMapper.createMapOf(model)
