@@ -40,17 +40,19 @@ class SaveAuditsBeforeCommit {
   @TransactionalEventListener(TransactionalEventListener.TransactionPhase.BEFORE_COMMIT)
   public void beforeCommit(String event) {
     log.debug("Saving {} audits triggered by {}.", ApizedContext.getAudit().getAuditEntries().size(), event);
-    repository.saveAll(ApizedContext.getAudit().getAuditEntries().values());
-    if (log.isDebugEnabled()) {
-      ApizedContext.getAudit().getAuditEntries().values().forEach((it) ->
-        {
-          try {
-            log.debug("{}[{}]: {}", it.getTarget(), it.getId(), mapper.writeValueAsString(it.getPayload()));
-          } catch (IOException e) {
-            //Do nothing
+    if (!ApizedContext.getAudit().getAuditEntries().isEmpty()) {
+      repository.saveAll(ApizedContext.getAudit().getAuditEntries().values());
+      if (log.isDebugEnabled()) {
+        ApizedContext.getAudit().getAuditEntries().values().forEach((it) ->
+          {
+            try {
+              log.debug("{}[{}]: {}", it.getTarget(), it.getId(), mapper.writeValueAsString(it.getPayload()));
+            } catch (IOException e) {
+              //Do nothing
+            }
           }
-        }
-      );
+        );
+      }
     }
   }
 }
