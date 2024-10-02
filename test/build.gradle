@@ -1,6 +1,5 @@
-
 dependencies {
-  api project(":micronaut-core")
+  api project(":core")
 
   api 'org.apache.groovy:groovy'
   api 'org.apache.groovy:groovy-templates'

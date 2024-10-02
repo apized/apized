@@ -12,14 +12,13 @@ dependencies {
   api("org.springframework.boot:spring-boot-starter-validation")
   api("org.springframework.boot:spring-boot-starter-aop")
   api("org.springframework.boot:spring-boot-starter-data-jpa")
-//  api("org.springframework.boot:spring-boot-starter-security")
   api("org.springframework.boot:spring-boot-starter-actuator")
-  api("io.swagger.core.v3:swagger-annotations")
+  api("io.swagger.core.v3:swagger-annotations:2.2.23")
 
   api 'org.flywaydb:flyway-core:8.5.2'
   api('io.hypersistence:hypersistence-utils-hibernate-63:3.8.2')
 
-  implementation("org.apache.velocity:velocity-engine-core")
+  implementation("org.apache.velocity:velocity-engine-core:2.4")
 
   compileOnly("org.projectlombok:lombok:1.18.30")
 }

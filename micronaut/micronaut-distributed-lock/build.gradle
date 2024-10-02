@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-  compileOnly project(":micronaut-core")
+  compileOnly project(":micronaut:micronaut-core")
   api('net.javacrumbs.shedlock:shedlock-provider-jdbc-micronaut:4.42.0') {
     exclude group: 'org.yaml', module: 'snakeyaml'
   }

@@ -18,8 +18,8 @@ dependencies {
   project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor");
 
 
-  annotationProcessor(project(":micronaut-core"))
-  implementation(project(":micronaut-core"))
+  annotationProcessor(project(":micronaut:micronaut-core"))
+  implementation(project(":micronaut:micronaut-core"))
 
 
   implementation('io.micronaut.data:micronaut-data-jdbc')
@@ -28,7 +28,7 @@ dependencies {
   runtimeOnly "io.micronaut.sql:micronaut-jdbc-hikari"
   runtimeOnly "org.yaml:snakeyaml"
 
-  testImplementation(project(':micronaut-test'))
+  testImplementation(project(':micronaut:micronaut-test'))
 
 //  ----------------------------
   annotationProcessor("io.micronaut.openapi:micronaut-openapi")

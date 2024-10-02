@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-  compileOnly project(":spring-core")
+  compileOnly project(":spring:spring-core")
   api project(":test")
 
 //  api "io.micronaut:micronaut-inject-groovy"

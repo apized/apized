@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-  compileOnly project(":micronaut-core")
-  compileOnly project(":micronaut-tracing")
+  compileOnly project(":micronaut:micronaut-core")
+  compileOnly project(":micronaut:micronaut-tracing")
 
   annotationProcessor("org.projectlombok:lombok:1.18.30")
   compileOnly("org.projectlombok:lombok:1.18.30")

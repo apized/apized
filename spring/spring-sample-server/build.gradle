@@ -17,14 +17,14 @@ dependencies {
   project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor:2.11.0")
   project.getDependencies().add("compileOnly", "io.micronaut.data:micronaut-data-model:$micronautVersion")
 
-  annotationProcessor(project(":spring-core"))
-  implementation(project(":spring-core"))
+  annotationProcessor(project(":spring:spring-core"))
+  implementation(project(":spring:spring-core"))
 
 
   runtimeOnly "org.postgresql:postgresql"
   runtimeOnly "org.flywaydb:flyway-database-postgresql"
 
-  testImplementation(project(':spring-test'))
+  testImplementation(project(':spring:spring-test'))
 
 //  ----------------------------
 //  runtimeOnly("io.micronaut.flyway:micronaut-flyway")
