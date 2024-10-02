@@ -8,4 +8,4 @@ pluginManagement {
 rootProject.name = "apized"
 include 'core', 'test',
   'micronaut-core', 'micronaut-test', 'micronaut-gradle-plugin', 'micronaut-distributed-lock', 'micronaut-messaging-rabbitmq', 'micronaut-sample-server', 'micronaut-tracing', 'micronaut-metrics',
-  'spring-core', 'spring-test', 'spring-gradle-plugin', 'spring-sample-server'
+  'spring-core', 'spring-test', 'spring-gradle-plugin', 'spring-distributed-lock', 'spring-sample-server'
