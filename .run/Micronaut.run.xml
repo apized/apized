@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Application" type="MicronautRunConfigurationType" factoryName="Micronaut">
+  <configuration default="false" name="Micronaut" type="MicronautRunConfigurationType" factoryName="Micronaut">
     <option name="MAIN_CLASS_NAME" value="org.apized.micronaut.server.Application" />
     <module name="apized.micronaut-sample-server.main" />
     <option name="shortenCommandLine" value="NONE" />
@@ -7,7 +7,6 @@
     <option name="alternativeJrePathEnabled" value="false" />
     <option name="mainClass" value="org.apized.micronaut.server.Application" />
     <option name="passParentEnvs" value="true" />
-    <option name="programParameters" value="" />
     <option name="vmParameters" />
     <method v="2">
       <option name="Make" enabled="true" />

@@ -1,0 +1,25 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Micronaut Acceptance Tests" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java">
+    <option name="CUCUMBER_CORE_VERSION" value="5" />
+    <envs>
+      <env name="SPRING_MAIN_CLASS" value="org.apized.spring.server.Application" />
+    </envs>
+    <option name="FILE_PATH" value="$PROJECT_DIR$/micronaut-sample-server/src/test/resources/features" />
+    <option name="GLUE" value="org.apized" />
+    <option name="MAIN_CLASS_NAME" value="io.cucumber.core.cli.Main" />
+    <module name="apized.micronaut-sample-server.test" />
+    <option name="PROGRAM_PARAMETERS" value=" --plugin org.jetbrains.plugins.cucumber.java.run.CucumberJvm5SMFormatter" />
+    <shortenClasspath name="NONE" />
+    <option name="SUGGESTED_NAME" value="Feature: department-create" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_WORKING_DIR$" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.apized.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
