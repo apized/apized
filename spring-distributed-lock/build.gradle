@@ -1,0 +1,13 @@
+plugins {
+  id "org.springframework.boot" version "${springBootGradlePluginVersion}"
+  id "io.spring.dependency-management" version "${springDependencyGradlePluginVersion}"
+}
+
+dependencies {
+  compileOnly project(":spring-core")
+  api('net.javacrumbs.shedlock:shedlock-provider-jdbc:4.42.0') {
+    exclude group: 'org.yaml', module: 'snakeyaml'
+  }
+
+  compileOnly "ch.qos.logback:logback-classic"
+}
