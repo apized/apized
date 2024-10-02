@@ -1,8 +1,0 @@
-package ${module};
-
-import io.micronaut.data.jdbc.annotation.JdbcRepository;
-import io.micronaut.data.model.query.builder.sql.Dialect;
-import org.apized.core.audit.AuditEntryRepository;
-
-@JdbcRepository(dialect = Dialect.${dialect})
-public interface MicronautAuditEntryRepository extends AuditEntryRepository {}

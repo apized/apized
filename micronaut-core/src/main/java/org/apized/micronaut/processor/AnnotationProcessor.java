@@ -141,7 +141,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         "enrichers", enrichers
       ));
       generateClassFor(
-        "org.apized.core.init.Initializer",
+        "org.apized.core.init.ApizedMicronautInitializer",
         "Initializer",
         bindings
       );
@@ -417,10 +417,8 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     if (generated.size() > 0) {
       processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Generated %d APIs", generated.size()));
-      Map<String, Object> bindings = getDefaultBindings();
-      bindings.put("module", "org.apized.micronaut.audit");
-      generateClassFor("org.apized.micronaut.audit.MicronautAuditEntryRepository", "audit/Repository", bindings);
     }
+
     return generated;
   }
 

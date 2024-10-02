@@ -141,7 +141,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         "enrichers", enrichers
       ));
       generateClassFor(
-        "org.apized.core.init.Initializer",
+        "org.apized.core.init.ApizedSpringInitializer",
         "Initializer",
         bindings
       );

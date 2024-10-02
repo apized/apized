@@ -16,10 +16,13 @@
 
 package org.apized.micronaut.audit;
 
+import io.micronaut.data.jdbc.annotation.JdbcRepository;
+import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.CrudRepository;
+import org.apized.core.audit.AuditEntryRepository;
 import org.apized.core.audit.model.AuditEntry;
 
 import java.util.UUID;
 
-public interface MicronautAuditEntryRepository extends org.apized.core.audit.AuditEntryRepository, CrudRepository<AuditEntry, UUID> {
-}
+@JdbcRepository(dialect = Dialect.POSTGRES)
+public interface MicronautAuditEntryRepository extends AuditEntryRepository, CrudRepository<AuditEntry, UUID> {}

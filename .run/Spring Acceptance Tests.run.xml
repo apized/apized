@@ -17,6 +17,11 @@
         <option name="PATTERN" value="org.apized.*" />
         <option name="ENABLED" value="true" />
       </pattern>
+      <pattern>
+        <option name="PATTERN" value="org.apized.test.*" />
+        <option name="ENABLED" value="true" />
+        <option name="INCLUDE" value="false" />
+      </pattern>
     </extension>
     <method v="2">
       <option name="Make" enabled="true" />

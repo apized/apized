@@ -27,7 +27,7 @@ import java.util.List;
 @Slf4j
 @Generated
 @Component
-public class Initializer {
+public class ApizedSpringInitializer {
   @Inject
   ApplicationContext applicationContext;
 

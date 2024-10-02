@@ -1,13 +1,22 @@
 plugins {
   id 'net.researchgate.release' version '2.8.1'
   id 'com.github.breadmoirai.github-release' version '2.2.12'
+  id "io.spring.dependency-management" version "${springDependencyGradlePluginVersion}"
+  id 'jacoco-report-aggregation'
   id 'java'
 }
 
-subprojects {
-  apply plugin: 'groovy'
-  apply plugin: 'java-library'
+ext {
+  includedCoverage = [ '**/org/apized/**' ]
+  excludedCoverage = [
+    '**/org/apized/micronaut/processor/**',
+    '**/org/apized/spring/processor/**',
+    '**/*Builder.class',
+    '**/*BuilderImpl.class',
+  ]
+}
 
+allprojects {
   repositories {
     mavenLocal()
     mavenCentral()
@@ -16,6 +25,11 @@ subprojects {
       url = 'https://maven.pkg.github.com/apized/apized'
     }
   }
+}
+
+subprojects {
+  apply plugin: 'groovy'
+  apply plugin: 'java-library'
 
   java {
     sourceCompatibility = JavaVersion.toVersion("21")
@@ -23,7 +37,7 @@ subprojects {
     withSourcesJar()
   }
 
-  if (it.name != 'micronaut-gradle-plugin') {
+  if (![ 'micronaut-gradle-plugin', 'spring-gradle-plugin', 'code-coverage-report' ].contains(it.name)) {
     apply plugin: 'maven-publish'
 
     publishing {
@@ -45,6 +59,85 @@ subprojects {
       }
     }
   }
+
+  apply plugin: 'jacoco'
+
+  jacocoTestReport {
+    dependsOn test
+    reports {
+      html.required.set(true)
+      xml.required.set(true)
+    }
+
+    afterEvaluate {
+      classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(
+          dir: it,
+          includes: includedCoverage,
+          exclude: excludedCoverage
+        )
+      }))
+    }
+  }
+
+  jacocoTestCoverageVerification {
+    dependsOn test
+    violationRules {
+      rule {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+          fileTree(
+            dir: it,
+            includes: includedCoverage,
+            exclude: excludedCoverage
+          )
+        }))
+
+        limit {
+          minimum = 0.5
+        }
+      }
+    }
+  }
+
+  test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+  }
+  jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+  }
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootGradlePluginVersion}"
+  }
+}
+
+dependencies {
+  jacocoAggregation project(':spring-sample-server')
+  jacocoAggregation project(':micronaut-sample-server')
+}
+
+testCodeCoverageReport {
+  classDirectories.setFrom(files(classDirectories.files.collect {
+    fileTree(
+      dir: it,
+      includes: includedCoverage,
+      exclude: excludedCoverage
+    )
+  }))
+}
+
+reporting {
+  reports {
+    testCodeCoverageReport(JacocoCoverageReport) {
+      testType = TestSuiteType.UNIT_TEST
+    }
+  }
+}
+
+tasks.named('check') {
+  dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
 }
 
 release {

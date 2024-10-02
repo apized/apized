@@ -27,7 +27,7 @@ import java.util.List;
 @Generated
 @Singleton
 @Requires(classes = BehaviourManager.class)
-public class Initializer {
+public class ApizedMicronautInitializer {
   @Inject
   ApplicationContext applicationContext;
 
