@@ -9,7 +9,7 @@ import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.core.ApizedConfig;
-import org.apized.micronaut.server.mvc.ApizedRepository;
+import org.apized.core.mvc.ApizedRepository;
 
 @Singleton
 @Requires(bean = Tracer.class)

@@ -24,10 +24,12 @@ import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
 import org.apized.core.model.Model;
 import org.apized.core.model.When;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Slf4j
+@Component
 @Singleton
 public class BehaviourManager {
   Map<String, List<BehaviourEntry>> registry = new HashMap<>();

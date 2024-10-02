@@ -62,8 +62,8 @@ public class ${type}Service extends MicronautModelService<${type}> {
   }
 
   @Override
-  @MicronautBehaviourExecution(execution =
-    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.LIST)
+  @MicronautBehaviourExecution(
+    execution = @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.LIST)
   )
   public Page<${type}> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort) {
   #if($extension.service.actions.containsKey('LIST'))
@@ -74,8 +74,8 @@ public class ${type}Service extends MicronautModelService<${type}> {
   }
 
   @Override
-  @MicronautBehaviourExecution(execution =
-    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.GET)
+  @MicronautBehaviourExecution(
+    execution = @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.GET)
   )
   public ${type} get(UUID id) {
   #if($extension.service.actions.containsKey('GET'))
@@ -86,8 +86,8 @@ public class ${type}Service extends MicronautModelService<${type}> {
   }
 
   @Override
-  @MicronautBehaviourExecution(execution =
-    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.CREATE)
+  @MicronautBehaviourExecution(
+    execution = @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.CREATE)
   )
   public ${type} create(${type} it) {
   #if($extension.service.actions.containsKey('CREATE'))
@@ -98,16 +98,16 @@ public class ${type}Service extends MicronautModelService<${type}> {
   }
 
   @Override
-  @MicronautBulkBehaviourExecution(execution =
-    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.CREATE)
+  @MicronautBulkBehaviourExecution(
+    execution = @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.CREATE)
   )
   public List<${type}> batchCreate(List<${type}> it) {
     return super.batchCreate(it);
   }
 
   @Override
-  @MicronautBehaviourExecution(execution =
-    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.UPDATE)
+  @MicronautBehaviourExecution(
+    execution = @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.UPDATE)
   )
   public ${type} update(UUID id, ${type} it) {
   #if($extension.service.actions.containsKey('UPDATE'))
@@ -118,16 +118,16 @@ public class ${type}Service extends MicronautModelService<${type}> {
   }
 
   @Override
-  @MicronautBulkBehaviourExecution(execution =
-    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.UPDATE)
+  @MicronautBulkBehaviourExecution(
+    execution = @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.UPDATE)
   )
   public List<${type}> batchUpdate(List<${type}> it) {
     return super.batchUpdate(it);
   }
 
   @Override
-  @MicronautBehaviourExecution(execution =
-    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.DELETE)
+  @MicronautBehaviourExecution(
+    execution = @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.DELETE)
   )
   public ${type} delete(UUID id) {
   #if($extension.service.actions.containsKey('DELETE'))
@@ -138,8 +138,8 @@ public class ${type}Service extends MicronautModelService<${type}> {
   }
 
   @Override
-  @MicronautBulkBehaviourExecution(execution =
-    @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.DELETE)
+  @MicronautBulkBehaviourExecution(
+    execution = @BehaviourExecution(model = ${type}.class, layer = Layer.SERVICE, action = Action.DELETE)
   )
   public List<${type}> batchDelete(List<${type}> it) {
     return super.batchDelete(it);

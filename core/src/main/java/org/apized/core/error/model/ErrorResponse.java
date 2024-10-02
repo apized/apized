@@ -28,6 +28,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResponse {
-  protected String message;
-  protected List<? extends ErrorEntry> errors;
+  private String message;
+  private List<? extends ErrorEntry> errors;
 }

@@ -29,6 +29,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
+import org.apized.core.mvc.ApizedRepository;
 import org.apized.core.mvc.ManyToManyTuple;
 import org.apized.core.mvc.ModelRepository;
 import org.apized.core.search.SearchTerm;

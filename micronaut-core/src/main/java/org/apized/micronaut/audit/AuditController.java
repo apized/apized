@@ -24,10 +24,10 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.apized.core.StringHelper;
 import org.apized.core.audit.model.AuditEntry;
 
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,10 +37,10 @@ import java.util.UUID;
 @Controller("/audit/")
 public class AuditController {
   @Inject
-  AuditEntryRepository repository;
+  MicronautAuditEntryRepository repository;
 
   @Get("/{entity}")
-  @Operation(operationId = "Get audits for a given model", tags = {"Audit Controller"})
+  @Operation(operationId = "Get audits for a given model", tags = { "Audit Controller" })
   public HttpResponse<List<AuditEntry>> getAuditForType(@PathVariable(value = "entity") String entity) {
     List<AuditEntry> results = new ArrayList<>();
     Iterable<AuditEntry> entries = repository.findByTypeOrderByEpochAsc(StringHelper.capitalize(StringHelper.singularize(entity)));
@@ -49,7 +49,7 @@ public class AuditController {
   }
 
   @Get("/{entity}/{id}")
-  @Operation(operationId = "Get audits for a given model instance", tags = {"Audit Controller"})
+  @Operation(operationId = "Get audits for a given model instance", tags = { "Audit Controller" })
   public HttpResponse<List<AuditEntry>> getAuditForTypeAndTarget(
     @PathVariable(value = "entity") String entity,
     @PathVariable(value = "id") UUID id

@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.core.model.BaseModel;
 import org.apized.core.model.Model;
+import org.apized.core.mvc.ApizedRepository;
 
 import java.util.Collection;
 import java.util.Optional;

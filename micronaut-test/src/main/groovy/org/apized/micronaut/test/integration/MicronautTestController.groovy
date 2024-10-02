@@ -16,13 +16,24 @@
 
 package org.apized.micronaut.test.integration
 
-
+import io.micronaut.context.ApplicationContext
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.*
+import jakarta.inject.Inject
+import org.apized.micronaut.server.ApizedStartupEvent
 import org.apized.test.integration.AbstractTestController
 
 class MicronautTestController extends AbstractTestController {
+  @Inject
+  ApplicationContext applicationContext
+
+  @Override
+  void clear() {
+    super.clear()
+    applicationContext.getEventPublisher(ApizedStartupEvent.class).publishEvent(new ApizedStartupEvent(config))
+  }
+
   @Delete
   HttpResponse reset() {
     super.clear()

@@ -18,10 +18,12 @@ package org.apized.core.security;
 
 import jakarta.inject.Singleton;
 import org.apized.core.security.model.User;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
+@Component
 @Singleton
 public class MemoryUserResolver implements UserResolver {
 

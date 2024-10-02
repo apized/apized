@@ -19,12 +19,14 @@ package org.apized.core.audit.model;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.DataType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apized.core.model.Action;
 import org.apized.core.model.Model;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -58,7 +60,7 @@ public class AuditEntry implements Model {
 
   private UUID target;
 
-  //  @Type(type = "jsonb")
+  @Type(JsonType.class)
   @TypeDef(type = DataType.JSON)
   private Map<String, Object> payload;
 

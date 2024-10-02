@@ -17,12 +17,10 @@
 package org.apized.test.integration
 
 import groovy.util.logging.Slf4j
-import io.micronaut.context.ApplicationContext
 import jakarta.inject.Inject
 import org.apized.core.ApizedConfig
 import org.apized.core.Dialect
 import org.apized.core.error.exception.BadRequestException
-import org.apized.micronaut.server.ApizedStartupEvent
 import org.apized.test.integration.mocks.AbstractUserResolverMock
 import org.apized.test.integration.service.ServiceIntegrationMock
 
@@ -32,8 +30,6 @@ import java.sql.ResultSet
 
 @Slf4j
 abstract class AbstractTestController {
-  @Inject
-  ApplicationContext applicationContext
 
   @Inject
   abstract List<ServiceIntegrationMock> mocks
@@ -52,7 +48,6 @@ abstract class AbstractTestController {
     mocks.each {
       it.clear()
     }
-    applicationContext.getEventPublisher(ApizedStartupEvent.class).publishEvent(new ApizedStartupEvent(config));
   }
 
   void clearDB() {

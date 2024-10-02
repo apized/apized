@@ -22,11 +22,13 @@ import org.apized.core.error.exception.ServerException;
 import org.apized.core.execution.Execution;
 import org.apized.core.model.Action;
 import org.apized.core.model.Model;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Component
 @Singleton
 public class PermissionEnricherManager {
   List<PermissionEnricherEntry> registry = new ArrayList<>();

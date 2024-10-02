@@ -18,6 +18,7 @@ package org.apized.core.mvc;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanIntrospection;
+import io.micronaut.core.beans.BeanProperty;
 import io.micronaut.core.beans.BeanWrapper;
 import io.micronaut.core.type.Argument;
 import jakarta.persistence.*;
@@ -34,6 +35,7 @@ import org.apized.core.search.SortTerm;
 import org.apized.core.tracing.Traced;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public abstract class AbstractModelService<T extends Model> implements ModelService<T> {
   public abstract Class<T> getType();
@@ -265,7 +267,7 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
     BeanWrapper<T> wrapper = BeanWrapper.getWrapper(it);
     BeanIntrospection<T> introspection = BeanIntrospection.getIntrospection(getType());
 
-    introspection.getBeanProperties().stream()
+    List<BeanProperty<T, Object>> properties = introspection.getBeanProperties().stream()
       .filter(p -> !p.hasAnnotation(Federation.class))
       .filter(p -> it._getModelMetadata().getTouched().contains(p.getName()) || (p.hasAnnotation(OneToMany.class) && it._getModelMetadata().getAction().equals(Action.DELETE)))
       .filter(p -> Model.class.isAssignableFrom(p.getType()) || (Collection.class.isAssignableFrom(p.getType()) && Model.class.isAssignableFrom(p.asArgument().getTypeParameters()[0].getType())))
@@ -275,8 +277,9 @@ public abstract class AbstractModelService<T extends Model> implements ModelServ
             || (p.hasAnnotation(OneToMany.class) && it._getModelMetadata().getAction().equals(Action.DELETE))
             || (p.hasAnnotation(ManyToMany.class) && p.getAnnotation(ManyToMany.class).stringValue("mappedBy").isPresent())
         )
-      )
-      .forEach(p -> {
+      ).toList();
+
+    properties.forEach(p -> {
         Optional<Object> value = wrapper.getProperty(p.getName(), p.getType());
         List<Model> values = new ArrayList<>();
 

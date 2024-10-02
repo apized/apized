@@ -27,6 +27,9 @@ import java.util.Map;
  */
 @ConfigurationProperties("apized")
 public class MicronautApizedConfig extends ApizedConfig {
+  public MicronautApizedConfig() {
+    ApizedConfig.engine = "micronaut";
+  }
 
   /**
    * The slug for this application. This will be used as the base for permissions.

@@ -22,6 +22,7 @@ import io.micronaut.transaction.annotation.TransactionalEventListener;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.audit.AuditEntryRepository;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.event.ESBAdapter;
 
@@ -35,7 +36,7 @@ class SaveAuditsBeforeCommit {
   ObjectMapper mapper;
 
   @Inject
-  AuditEntryRepository repository;
+  MicronautAuditEntryRepository repository;
 
   @TransactionalEventListener(TransactionalEventListener.TransactionPhase.BEFORE_COMMIT)
   public void beforeCommit(String event) {

@@ -39,22 +39,22 @@ import java.util.UUID;
 )
 public class OrgServiceBehaviour implements BehaviourHandler<Organization> {
   @Override
-  public void preGet(Execution execution, UUID id) {
+  public void preGet(Execution<Organization> execution, UUID id) {
     log.info("SERVICE: PRE {}: Get Org", id);
   }
 
   @Override
-  public void postGet(Execution execution, UUID id, Organization output) {
+  public void postGet(Execution<Organization> execution, UUID id, Organization output) {
     log.info("SERVICE: POST: Get Org {}: {}", id, output);
   }
 
   @Override
-  public void preList(Execution execution) {
+  public void preList(Execution<Organization> execution) {
     log.info("SERVICE: PRE: List Org");
   }
 
   @Override
-  public void postList(Execution execution, Page<Organization> output) {
+  public void postList(Execution<Organization> execution, Page<Organization> output) {
     log.info("SERVICE: POST: List Org: {}", output);
   }
 }

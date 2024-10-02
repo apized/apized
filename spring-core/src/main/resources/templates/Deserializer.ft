@@ -1,0 +1,16 @@
+package ${module};
+
+import lombok.Generated;
+import org.apized.core.model.Model;
+import org.apized.spring.server.serde.ModelDeserializer;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
+@Generated
+@Component
+public class ${type}Deserializer extends ModelDeserializer<${type}> {
+  public ${type}Deserializer() {
+    super(${type}.class);
+  }
+}

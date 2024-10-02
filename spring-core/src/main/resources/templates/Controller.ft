@@ -1,0 +1,151 @@
+package ${module};
+
+import io.micronaut.core.annotation.Introspected;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import lombok.Generated;
+import org.apized.core.behaviour.annotation.BehaviourExecution;
+import org.apized.core.model.Action;
+import org.apized.core.model.Layer;
+import org.apized.core.model.Page;
+import org.apized.core.mvc.AbstractModelController;
+import org.apized.core.mvc.ModelService;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
+import org.apized.spring.annotation.SpringBehaviourExecution;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.web.bind.annotation.*;
+#foreach( $it in $extension.controller.imports )
+import $it;
+#end
+
+import java.util.List;
+import java.util.UUID;
+
+@Generated
+@Introspected
+@Transactional
+##For now we can't have multiple @Controller annotations and there's no way to define multiple paths so
+##use the first path until this is resolved - https://github.com/micronaut-projects/micronaut-core/issues/6977
+###foreach( $it in $path )
+##@Controller("$it")
+###end
+@RestController
+@RequestMapping("$path[0]")
+public class ${type}Controller extends AbstractModelController<${type}>{
+  protected final int MAX_PAGE_SIZE = ${maxPageSize};
+
+  @Inject
+  protected ${type}Service service;
+
+  @Inject
+  protected ApplicationEventPublisher eventPublisher;
+#foreach( $it in $extension.controller.injects )
+
+  @Inject
+  ${it};
+#end
+
+  @Override
+  protected ModelService<${type}> getService() {
+    return service;
+  }
+#if($actions.contains('LIST') || $extension.controller.actions.containsKey('LIST'))
+
+  @RequestMapping(method = RequestMethod.GET)
+  @Operation(operationId = "List $type", summary = "List", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
+    $descriptions.get('LIST')
+  """)
+  @SpringBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.LIST)
+  )
+  public Page<${type}> list(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "pageSize", defaultValue = "50") Integer pageSize, @RequestParam(value = "search", defaultValue = "[]") List<SearchTerm> search, @RequestParam(value = "sort", defaultValue = "[]") List<SortTerm> sort) {
+  #if($extension.controller.actions.containsKey('LIST'))
+    Page<$type> = ${extension.controller.actions['LIST'].callee}.${extension.controller.actions['LIST'].name}(${extension.controller.actions['LIST'].arguments});
+  #else
+    Page<$type> result = super.list(page - 1, pageSize <= MAX_PAGE_SIZE ? pageSize : MAX_PAGE_SIZE, search, sort);
+  #end
+    eventPublisher.publishEvent("${type}Controller::list");
+    return result;
+  }
+#end
+#if($actions.contains('GET') || $extension.controller.actions.containsKey('GET'))
+
+  @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+  @Operation(operationId = "Get $type", summary = "Get", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
+    $descriptions.get('GET')
+  """)
+  @SpringBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.GET)
+  )
+  public $type get(@PathVariable("id") UUID id) {
+  #if($extension.controller.actions.containsKey('GET'))
+    $type result = ${extension.controller.actions['GET'].callee}.${extension.controller.actions['GET'].name}(${extension.controller.actions['GET'].arguments});
+  #else
+    $type result = super.get(id);
+  #end
+    eventPublisher.publishEvent("${type}Controller::get");
+    return result;
+  }
+#end
+#if($actions.contains('CREATE') || $extension.controller.actions.containsKey('CREATE'))
+
+  @RequestMapping(method = RequestMethod.POST)
+  @Operation(operationId = "Create $type", summary = "Create", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
+    $descriptions.get('CREATE')
+  """)
+  @SpringBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.CREATE)
+  )
+  public $type create(@Valid @RequestBody $type it) {
+  #if($extension.controller.actions.containsKey('CREATE'))
+    $type result = ${extension.controller.actions['CREATE'].callee}.${extension.controller.actions['CREATE'].name}(${extension.controller.actions['CREATE'].arguments});
+  #else
+    $type result = super.create(it);
+  #end
+    eventPublisher.publishEvent("${type}Controller::create");
+    return result;
+  }
+#end
+#if($actions.contains('UPDATE') || $extension.controller.actions.containsKey('UPDATE'))
+
+  @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+  @Operation(operationId = "Update $type", summary = "Update", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
+    $descriptions.get('UPDATE')
+  """)
+  @SpringBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.UPDATE)
+  )
+  public $type update(@PathVariable("id") UUID id, @Valid @RequestBody $type it) {
+  #if($extension.controller.actions.containsKey('UPDATE'))
+    $type result = ${extension.controller.actions['UPDATE'].callee}.${extension.controller.actions['UPDATE'].name}(${extension.controller.actions['UPDATE'].arguments});
+  #else
+    $type result = super.update(id, it);
+  #end
+    eventPublisher.publishEvent("${type}Controller::update");
+    return result;
+  }
+#end
+#if($actions.contains('DELETE') || $extension.controller.actions.containsKey('DELETE'))
+
+  @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+  @Operation(operationId = "Delete $type", summary = "Delete", tags = {"$type"}, security = @SecurityRequirement(name = "$security"), description = """
+    $descriptions.get('DELETE')
+  """)
+  @SpringBehaviourExecution(execution =
+    @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.DELETE)
+  )
+  public $type delete(@PathVariable("id") UUID id) {
+  #if($extension.controller.actions.containsKey('DELETE'))
+    $type result = ${extension.controller.actions['DELETE'].callee}.${extension.controller.actions['DELETE'].name}(${extension.controller.actions['DELETE'].arguments});
+  #else
+    $type result = super.delete(id);
+  #end
+    eventPublisher.publishEvent("${type}Controller::delete");
+    return result;
+  }
+#end
+}
