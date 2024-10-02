@@ -1,4 +1,4 @@
-package org.apized.spring.lock;
+package org.apized.lock;
 
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 

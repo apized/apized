@@ -7,6 +7,7 @@ import net.javacrumbs.shedlock.core.LockConfiguration;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import net.javacrumbs.shedlock.provider.jdbc.micronaut.MicronautJdbcLockProvider;
 import org.apized.core.error.exception.ServerException;
+import org.apized.lock.LockFactory;
 
 import java.sql.Connection;
 import java.time.Duration;

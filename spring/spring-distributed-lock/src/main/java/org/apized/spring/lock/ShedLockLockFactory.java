@@ -5,6 +5,7 @@ import net.javacrumbs.shedlock.core.LockConfiguration;
 import net.javacrumbs.shedlock.core.LockingTaskExecutor;
 import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider;
 import org.apized.core.error.exception.ServerException;
+import org.apized.lock.LockFactory;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;

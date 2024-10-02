@@ -5,6 +5,8 @@ plugins {
 
 dependencies {
   compileOnly project(":spring:spring-core")
+
+  api project(":distributed-lock")
   api('net.javacrumbs.shedlock:shedlock-provider-jdbc:4.42.0') {
     exclude group: 'org.yaml', module: 'snakeyaml'
   }
