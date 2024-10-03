@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import $it;
 #end
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,7 +67,7 @@ public class ${type}Controller extends AbstractModelController<${type}>{
   #if($extension.controller.actions.containsKey('LIST'))
     Page<$type> = ${extension.controller.actions['LIST'].callee}.${extension.controller.actions['LIST'].name}(${extension.controller.actions['LIST'].arguments});
   #else
-    Page<$type> result = super.list(page, pageSize <= MAX_PAGE_SIZE ? pageSize : MAX_PAGE_SIZE, search, sort);
+    Page<$type> result = super.list(page, pageSize <= MAX_PAGE_SIZE ? pageSize : MAX_PAGE_SIZE, new ArrayList(search), new ArrayList(sort));
   #end
     eventPublisher.publishEvent("${type}Controller::list");
     return result;

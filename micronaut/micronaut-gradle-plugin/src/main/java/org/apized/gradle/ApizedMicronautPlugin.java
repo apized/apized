@@ -33,12 +33,13 @@ import java.util.Properties;
 /**
  * Apized Plugin
  */
-public class ApizedPlugin implements Plugin<Project> {
+@SuppressWarnings("unused")
+public class ApizedMicronautPlugin implements Plugin<Project> {
 
   /**
    * Constructor
    */
-  public ApizedPlugin() {
+  public ApizedMicronautPlugin() {
   }
 
   @Override

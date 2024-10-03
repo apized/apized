@@ -1,14 +1,6 @@
-pluginManagement {
-  repositories {
-    mavenLocal()
-    mavenCentral()
-    gradlePluginPortal()
-  }
-}
+rootProject.buildFileName = 'first-build.gradle'
 rootProject.name = "apized"
 include 'core', 'test', 'distributed-lock',
   'micronaut:micronaut-core', 'micronaut:micronaut-test', 'micronaut:micronaut-gradle-plugin', 'micronaut:micronaut-distributed-lock', 'micronaut:micronaut-messaging-rabbitmq', 'micronaut:micronaut-tracing', 'micronaut:micronaut-metrics',
-  'spring:spring-core', 'spring:spring-test', 'spring:spring-gradle-plugin', 'spring:spring-distributed-lock', 'spring:spring-tracing',
-  'micronaut:micronaut-sample-server',
-  'spring:spring-sample-server'
+  'spring:spring-core', 'spring:spring-test', 'spring:spring-gradle-plugin', 'spring:spring-distributed-lock', 'spring:spring-tracing'
 

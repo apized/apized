@@ -1,6 +1,6 @@
 plugins {
   id 'groovy'
-  id 'io.micronaut.application' version "${micronautGradlePluginVersion}"
+  id 'org.apized.micronaut' version "$version"
 }
 
 repositories {
@@ -9,33 +9,7 @@ repositories {
 }
 
 dependencies {
-  annotationProcessor('org.projectlombok:lombok:1.18.30')
-  compileOnly('org.projectlombok:lombok:1.18.30')
-
-  project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-http-validation");
-  project.getDependencies().add("annotationProcessor", "io.micronaut.validation:micronaut-validation-processor");
-  project.getDependencies().add("annotationProcessor", "io.micronaut.data:micronaut-data-processor");
-  project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor");
-
-
-  annotationProcessor(project(":micronaut:micronaut-core"))
-  implementation(project(":micronaut:micronaut-core"))
-
-
-  implementation('io.micronaut.data:micronaut-data-jdbc')
-  runtimeOnly "org.postgresql:postgresql"
-  runtimeOnly "org.flywaydb:flyway-database-postgresql"
-  runtimeOnly "io.micronaut.sql:micronaut-jdbc-hikari"
-  runtimeOnly "org.yaml:snakeyaml"
-
-  testImplementation(project(':micronaut:micronaut-test'))
-
-//  ----------------------------
   annotationProcessor("io.micronaut.openapi:micronaut-openapi")
-
-  runtimeOnly("io.micronaut.flyway:micronaut-flyway")
-  runtimeOnly("ch.qos.logback:logback-classic")
-  testRuntimeOnly("ch.qos.logback:logback-classic")
 }
 
 application {
@@ -49,14 +23,12 @@ java {
 
 micronaut {
   runtime('netty')
-//  testRuntime('junit5')
 }
 
 graalvmNative {
   toolchainDetection = false
   binaries {
     main {
-//      imageName.set($project.name)
       buildArgs.add('--verbose')
     }
   }

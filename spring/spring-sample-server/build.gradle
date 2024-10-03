@@ -1,7 +1,6 @@
 plugins {
   id 'groovy'
-  id "org.springframework.boot" version "${springBootGradlePluginVersion}"
-  id "io.spring.dependency-management" version "${springDependencyGradlePluginVersion}"
+  id 'org.apized.spring' version "$version"
 }
 
 repositories {
@@ -10,26 +9,7 @@ repositories {
 }
 
 dependencies {
-  annotationProcessor('org.projectlombok:lombok:1.18.30')
-  compileOnly('org.projectlombok:lombok:1.18.30')
-
-  project.getDependencies().add("annotationProcessor", "io.micronaut:micronaut-inject-java:$micronautVersion")
-  project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor:2.11.0")
-  project.getDependencies().add("compileOnly", "io.micronaut.data:micronaut-data-model:$micronautVersion")
-
-  annotationProcessor(project(":spring:spring-core"))
-  implementation(project(":spring:spring-core"))
-//  implementation(project(":spring:spring-tracing"))
-
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-
-  runtimeOnly "org.postgresql:postgresql"
-  runtimeOnly "org.flywaydb:flyway-database-postgresql"
-
-  testImplementation(project(':spring:spring-test'))
-
-//  ----------------------------
-//  runtimeOnly("io.micronaut.flyway:micronaut-flyway")
 }
 
 java {
