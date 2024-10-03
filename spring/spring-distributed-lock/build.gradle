@@ -1,6 +1,11 @@
 plugins {
-  id "org.springframework.boot" version "${springBootGradlePluginVersion}"
   id "io.spring.dependency-management" version "${springDependencyGradlePluginVersion}"
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootGradlePluginVersion}"
+  }
 }
 
 dependencies {

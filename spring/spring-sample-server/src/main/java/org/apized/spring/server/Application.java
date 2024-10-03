@@ -32,9 +32,8 @@ import org.springframework.context.annotation.ComponentScan;
   info = @Info(
     title = "apized - Spring Sample",
     version = "${api.version}",
-    description = "${api.description}",
     license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0"),
-    contact = @Contact(url = "https://www.apized.org", name = "apized", email = "luis@apized.org")
+    contact = @Contact(url = "https://apized.org", name = "apized")
   )
 )
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")

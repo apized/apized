@@ -16,6 +16,7 @@ import org.apized.core.search.SearchOperation;
 import org.apized.core.search.SearchTerm;
 import org.apized.core.search.SortTerm;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.ResolvableType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class ModelResolver {
     BeanProperty<?, Object> property = BeanIntrospection.getIntrospection(clazz).getProperty(field).orElse(null);
 
     Argument<Object> argument = Collection.class.isAssignableFrom(property.getType()) ? Argument.of(property.asArgument().getTypeParameters()[0].getType()) : property.asArgument();
-    ModelService<?> service = applicationContext.getBean(ModelService.class, null, argument);
+    ModelService<?> service = (ModelService<?>) applicationContext.getBean(applicationContext.getBeanNamesForType(ResolvableType.forClassWithGenerics(ModelService.class, argument.getType()))[0]);
 
     if (Collection.class.isAssignableFrom(property.getType())) {
       Optional<AnnotationValue<ManyToMany>> manyToMany = property.getAnnotationMetadata().findAnnotation(ManyToMany.class);

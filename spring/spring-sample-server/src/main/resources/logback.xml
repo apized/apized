@@ -1,10 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>false</withJansi>
         <encoder>
-            <pattern>%cyan(%d{HH:mm:ss.SSS}) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
+            <pattern>%cyan(%d{HH:mm:ss.SSS}) %yellow([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n
+            </pattern>
         </encoder>
     </appender>
+
+<!--    <appender name="OpenTelemetry" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">-->
+<!--        <captureMdcAttributes>*</captureMdcAttributes>-->
+<!--        <captureExperimentalAttributes>true</captureExperimentalAttributes>-->
+<!--        <captureKeyValuePairAttributes>true</captureKeyValuePairAttributes>-->
+<!--    </appender>-->
+
     <root level="info">
         <appender-ref ref="STDOUT"/>
+<!--        <appender-ref ref="OpenTelemetry"/>-->
     </root>
 </configuration>

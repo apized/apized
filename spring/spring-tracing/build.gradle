@@ -1,0 +1,13 @@
+plugins {
+  id "org.springframework.boot" version "${springBootGradlePluginVersion}"
+  id "io.spring.dependency-management" version "${springDependencyGradlePluginVersion}"
+}
+
+dependencies {
+  compileOnly project(":spring:spring-core")
+
+  api 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter:2.3.0-alpha'
+  api 'io.micrometer:micrometer-registry-otlp:1.13.4'
+
+  compileOnly "ch.qos.logback:logback-classic"
+}

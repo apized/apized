@@ -54,7 +54,7 @@ public interface SpringModelRepository<T extends BaseModel> extends ModelReposit
   default Page<T> list(int page, int pageSize, List<SearchTerm> search, List<SortTerm> sort, boolean skipAutoFilters) {
     org.springframework.data.domain.Page<T> result = findAll(
       (Specification<T>) (root, query, criteriaBuilder) -> CriteriaHelper.applySearch(root, query, criteriaBuilder, search, skipAutoFilters),
-      PageRequest.of(page, pageSize, CriteriaHelper.generateSort(sort))
+      PageRequest.of(page - 1, pageSize, CriteriaHelper.generateSort(sort))
     );
 
     return Page.<T>builder()

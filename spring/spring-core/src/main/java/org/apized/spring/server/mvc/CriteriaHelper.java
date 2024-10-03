@@ -91,7 +91,7 @@ public abstract class CriteriaHelper {
           continue termLoop;
         }
 
-//          from = ((PersistentEntityFrom<?, ?>) root).join(split.get(0), Join.Type.INNER);
+        from = root.join(split.get(0),JoinType.INNER);
         field = split.get(1);
 
         if (Model.class.isAssignableFrom(property.get().getType())) {
@@ -142,8 +142,8 @@ public abstract class CriteriaHelper {
           }
         }
         case like -> criteria.add((builder).like(
-          from.get(field),
-          builder.literal("%" + value.toString() + "%"))
+          builder.lower(from.get(field)),
+          builder.literal("%" + value.toString().toLowerCase() + "%"))
         );
         case gt -> criteria.add(builder.greaterThan(from.get(field), (Comparable) value));
         case gte -> criteria.add(builder.greaterThanOrEqualTo(from.get(field), (Comparable) value));

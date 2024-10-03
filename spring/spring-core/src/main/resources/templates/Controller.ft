@@ -62,11 +62,11 @@ public class ${type}Controller extends AbstractModelController<${type}>{
   @SpringBehaviourExecution(execution =
     @BehaviourExecution(model = ${type}.class, layer = Layer.CONTROLLER, action = Action.LIST)
   )
-  public Page<${type}> list(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "pageSize", defaultValue = "50") Integer pageSize, @RequestParam(value = "search", defaultValue = "[]") List<SearchTerm> search, @RequestParam(value = "sort", defaultValue = "[]") List<SortTerm> sort) {
+  public Page<${type}> list(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "pageSize", defaultValue = "50") Integer pageSize, @RequestParam(value = "search", defaultValue = "") List<SearchTerm> search, @RequestParam(value = "sort", defaultValue = "") List<SortTerm> sort) {
   #if($extension.controller.actions.containsKey('LIST'))
     Page<$type> = ${extension.controller.actions['LIST'].callee}.${extension.controller.actions['LIST'].name}(${extension.controller.actions['LIST'].arguments});
   #else
-    Page<$type> result = super.list(page - 1, pageSize <= MAX_PAGE_SIZE ? pageSize : MAX_PAGE_SIZE, search, sort);
+    Page<$type> result = super.list(page, pageSize <= MAX_PAGE_SIZE ? pageSize : MAX_PAGE_SIZE, search, sort);
   #end
     eventPublisher.publishEvent("${type}Controller::list");
     return result;
