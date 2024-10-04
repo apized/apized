@@ -69,12 +69,13 @@ public class TracedInterceptor {
           spanBuilder.setAttribute(
             attr.key(),
             !arg.isBlank() && Arrays.stream(method.getParameters()).map(Parameter::getName).toList().contains(arg) ?
-              List.of(call.getArgs()).get(0).toString() // todo need to match the index and not just say get(0)
+              List.of(call.getArgs()).get(Arrays.stream(method.getParameters()).map(Parameter::getName).toList().indexOf(arg)).toString()
               : value
           );
         });
       },
       (span) -> {
+        //todo spring otel context propagation
 //        PropagatedContext.Scope ignore = PropagatedContext.getOrEmpty()
 //          .plus(new OpenTelemetryPropagationContext(Context.current().with(Span.current())))
 //          .propagate();
@@ -85,6 +86,7 @@ public class TracedInterceptor {
         }
       },
       (span) -> {
+        //todo spring otel context propagation
 //        PropagatedContext.Scope ignore = PropagatedContext.getOrEmpty()
 //          .plus(new OpenTelemetryPropagationContext(Context.current().with(parentSpan)))
 //          .propagate();
