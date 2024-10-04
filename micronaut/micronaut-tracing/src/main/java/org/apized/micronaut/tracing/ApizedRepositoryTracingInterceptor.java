@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.core.ApizedConfig;
 import org.apized.core.mvc.ApizedRepository;
+import org.apized.tracing.TraceUtils;
 
 @Singleton
 @Requires(bean = Tracer.class)

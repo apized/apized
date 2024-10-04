@@ -30,8 +30,8 @@ import jakarta.validation.ElementKind;
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.error.ExceptionNotifier;
 import org.apized.core.error.exception.ServerException;
-import org.apized.micronaut.server.error.model.MicronautErrorEntry;
-import org.apized.micronaut.server.error.model.MicronautErrorResponse;
+import org.apized.core.error.model.ErrorEntry;
+import org.apized.core.error.model.ErrorResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,14 +40,14 @@ import java.util.stream.StreamSupport;
 @Slf4j
 @Singleton
 @Replaces(ConstraintExceptionHandler.class)
-public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResponse<MicronautErrorResponse>> {
+public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResponse<ErrorResponse>> {
   @Inject
   List<ExceptionNotifier> notifiers;
 
   List<ElementKind> excludedPathKinds = List.of(ElementKind.METHOD, ElementKind.PARAMETER, ElementKind.CONSTRUCTOR);
 
   @Override
-  public HttpResponse<MicronautErrorResponse> handle(HttpRequest request, Throwable exception) {
+  public HttpResponse<ErrorResponse> handle(HttpRequest request, Throwable exception) {
     if (exception instanceof ServerException) {
       log.info(exception.getMessage());
     } else {
@@ -55,12 +55,12 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
     }
     return switch (exception.getClass().getSimpleName()) {
       case "ConstraintViolationException" -> HttpResponse.badRequest(
-        MicronautErrorResponse
+        ErrorResponse
           .builder()
           .message("Bad Request")
           .errors(
             ((ConstraintViolationException) exception).getConstraintViolations().stream().map(v ->
-              MicronautErrorEntry
+              ErrorEntry
                 .builder()
                 .entity(v.getLeafBean().getClass().getSimpleName().replaceAll("\\$Proxy$", ""))
                 .field(
@@ -76,11 +76,11 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
           .build()
       );
       case "BadRequestException" -> HttpResponse.badRequest(
-        MicronautErrorResponse
+        ErrorResponse
           .builder()
           .errors(
             List.of(
-              MicronautErrorEntry
+              ErrorEntry
                 .builder()
                 .message(exception.getMessage())
                 .build()
@@ -89,11 +89,11 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
           .build()
       );
       case "ForbiddenException" -> HttpResponseFactory.INSTANCE.status(HttpStatus.FORBIDDEN).body(
-        MicronautErrorResponse
+        ErrorResponse
           .builder()
           .errors(
             List.of(
-              MicronautErrorEntry
+              ErrorEntry
                 .builder()
                 .message(exception.getMessage())
                 .build()
@@ -102,11 +102,11 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
           .build()
       );
       case "NotImplementedException", "NotFoundException" -> HttpResponse.notFound(
-        MicronautErrorResponse
+        ErrorResponse
           .builder()
           .errors(
             List.of(
-              MicronautErrorEntry
+              ErrorEntry
                 .builder()
                 .message(exception.getMessage())
                 .build()
@@ -115,11 +115,11 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
           .build()
       );
       case "ServiceUnavailableException" -> HttpResponseFactory.INSTANCE.status(HttpStatus.SERVICE_UNAVAILABLE).body(
-        MicronautErrorResponse
+        ErrorResponse
           .builder()
           .errors(
             List.of(
-              MicronautErrorEntry
+              ErrorEntry
                 .builder()
                 .message(exception.getMessage())
                 .build()
@@ -127,17 +127,17 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
           )
           .build()
       );
-      case "UnauthorizedException" -> HttpResponse.unauthorized().body(MicronautErrorResponse.builder().errors(
+      case "UnauthorizedException" -> HttpResponse.unauthorized().body(ErrorResponse.builder().errors(
         List.of(
-          MicronautErrorEntry
+          ErrorEntry
             .builder()
             .message(exception.getMessage())
             .build()
         )
       ).build());
-      case "IllegalArgumentException", "IllegalStateException" -> HttpResponse.badRequest().body(MicronautErrorResponse.builder().errors(
+      case "IllegalArgumentException", "IllegalStateException" -> HttpResponse.badRequest().body(ErrorResponse.builder().errors(
         List.of(
-          MicronautErrorEntry
+          ErrorEntry
             .builder()
             .message(exception.getMessage())
             .build()
@@ -146,11 +146,11 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
       default -> {
         notifiers.forEach(n -> n.report(exception));
         yield HttpResponse.serverError(
-          MicronautErrorResponse
+          ErrorResponse
             .builder()
             .errors(
               List.of(
-                MicronautErrorEntry
+                ErrorEntry
                   .builder()
                   .message(
                     String.format(

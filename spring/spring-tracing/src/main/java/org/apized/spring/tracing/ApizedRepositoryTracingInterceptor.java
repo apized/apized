@@ -4,7 +4,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Inject;
 import org.apized.core.ApizedConfig;
-import org.apized.spring.tracing.TraceUtils;
+import org.apized.tracing.TraceUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

@@ -7,7 +7,7 @@ import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.apized.micronaut.tracing.TraceUtils;
+import org.apized.tracing.TraceUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

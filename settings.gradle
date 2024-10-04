@@ -6,9 +6,9 @@ pluginManagement {
   }
 }
 rootProject.name = "apized"
-include 'core', 'test', 'distributed-lock',
-  'micronaut:micronaut-core', 'micronaut:micronaut-test', 'micronaut:micronaut-gradle-plugin', 'micronaut:micronaut-distributed-lock', 'micronaut:micronaut-messaging-rabbitmq', 'micronaut:micronaut-tracing', 'micronaut:micronaut-metrics',
-  'spring:spring-core', 'spring:spring-test', 'spring:spring-gradle-plugin', 'spring:spring-distributed-lock', 'spring:spring-tracing',
-  'micronaut:micronaut-sample-server',
-  'spring:spring-sample-server'
+include 'core', 'distributed-lock', 'test', 'tracing',
+  'micronaut:micronaut-core', 'micronaut:micronaut-distributed-lock', 'micronaut:micronaut-test', 'micronaut:micronaut-tracing', 'micronaut:micronaut-messaging-rabbitmq',
+  'spring:spring-core', 'spring:spring-distributed-lock', 'spring:spring-test', 'spring:spring-tracing',
+  'micronaut:micronaut-gradle-plugin', 'spring:spring-gradle-plugin',
+  'micronaut:micronaut-sample-server', 'spring:spring-sample-server'
 

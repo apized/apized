@@ -11,6 +11,7 @@ dependencyManagement {
 dependencies {
   compileOnly project(":spring:spring-core")
 
+  api project(':tracing')
   api 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter:2.3.0-alpha'
   api 'io.micrometer:micrometer-registry-otlp:1.13.4'
 

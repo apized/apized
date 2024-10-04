@@ -1,4 +1,4 @@
-package org.apized.micronaut.tracing;
+package org.apized.spring.tracing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.api.trace.Tracer;

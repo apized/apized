@@ -17,17 +17,12 @@
 package org.apized.micronaut.federation;
 
 import io.micronaut.serde.ObjectMapper;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.core.ApizedConfig;
 import org.apized.core.federation.AbstractFederationResolver;
 import org.apized.core.model.Model;
 import org.apized.core.mvc.AbstractModelService;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -36,34 +31,18 @@ import java.util.Map;
 // this will also bring potential challenges regarding distributed transactions (and determining the execution order)
 @Singleton
 public class FederationResolver extends AbstractFederationResolver {
-  private final ApizedConfig config;
-  HttpClient client = HttpClient.newHttpClient();
-
   ObjectMapper mapper;
 
   public FederationResolver(ApizedConfig config, ObjectMapper mapper, List<AbstractModelService<? extends Model>> services) {
-    super(
-      config.getSlug(),
-      config.getFederation(),
-      services
-    );
-    this.config = config;
+    super(config, services);
     this.mapper = mapper;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  protected Map<String, Object> performRequest(URI url) throws Exception {
-    HttpRequest request = HttpRequest.newBuilder()
-      .uri(url)
-      .header("AUTHORIZATION", String.format("Bearer %s", config.getToken()))
-      .build();
-
+  protected Map<String, Object> parseResponse(String body) throws Exception {
     return mapper.readValue(
-      client.send(
-        request,
-        HttpResponse.BodyHandlers.ofString()
-      ).body(),
+      body,
       Map.class
     );
   }

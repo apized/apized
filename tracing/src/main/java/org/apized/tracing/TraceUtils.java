@@ -1,4 +1,4 @@
-package org.apized.spring.tracing;
+package org.apized.tracing;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;

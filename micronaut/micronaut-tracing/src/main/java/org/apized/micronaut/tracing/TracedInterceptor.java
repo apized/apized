@@ -16,6 +16,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apized.core.tracing.TraceKind;
 import org.apized.core.tracing.Traced;
+import org.apized.tracing.TraceUtils;
 
 import java.util.Optional;
 

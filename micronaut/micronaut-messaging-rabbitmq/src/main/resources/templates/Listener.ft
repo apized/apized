@@ -31,7 +31,7 @@ import org.apized.core.security.UserResolver;
 import org.apized.micronaut.messaging.rabbitmq.consumer.EnvelopeConsumer;
 import org.apized.micronaut.messaging.rabbitmq.consumer.QueueConfig;
 #if($traced)
-import org.apized.micronaut.tracing.TraceUtils;
+import org.apized.tracing.TraceUtils;
 #end
 
 import java.util.List;

@@ -17,6 +17,7 @@
 package org.apized.core.federation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.ApizedConfig;
 import org.apized.core.ModelMapper;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.model.Apized;
@@ -25,6 +26,9 @@ import org.apized.core.mvc.AbstractModelService;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,20 +36,33 @@ import java.util.Set;
 
 @Slf4j
 public abstract class AbstractFederationResolver {
-  private final String slug;
-  private final Map<String, String> apis;
+
+  private final ApizedConfig config;
+
   private final List<AbstractModelService<? extends Model>> services;
+
+  HttpClient client = HttpClient.newHttpClient();
+
   ModelMapper mapper;
 
-  public AbstractFederationResolver(String slug, Map<String, String> apis, List<AbstractModelService<? extends Model>> services) {
-    this.slug = slug;
-    this.apis = apis;
+  public AbstractFederationResolver(ApizedConfig config, List<AbstractModelService<? extends Model>> services) {
+    this.config = config;
     this.services = services;
 
     this.mapper = new ModelMapper(Apized.class, Apized.class);
   }
 
-  protected abstract Map<String, Object> performRequest(URI url) throws Exception;
+  protected abstract Map<String, Object> parseResponse(String body) throws Exception;
+
+  protected Map<String, Object> performRequest(URI url) throws Exception {
+    HttpRequest request = HttpRequest.newBuilder()
+      .uri(url)
+      .header("AUTHORIZATION", String.format("Bearer %s", config.getToken()))
+      .build();
+
+    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    return parseResponse(response.body());
+  }
 
   public Object resolve(String service, String type, String uri, Object target, Set<String> fields) {
 
@@ -57,7 +74,7 @@ public abstract class AbstractFederationResolver {
       return target;
     }
 
-    if (service.equals(slug)) {
+    if (service.equals(config.getSlug())) {
       log.info("Resolve {} (local) with id {}", type, target);
       return services
         .stream()
@@ -68,7 +85,7 @@ public abstract class AbstractFederationResolver {
     } else {
       try {
         URI url = createUri(
-          apis.get(service) + uri + "?fields=" + String.join(",", fields),
+          config.getFederation().get(service) + uri + "?fields=" + String.join(",", fields),
           mapper.createMapOf(target)
         );
 

@@ -3,5 +3,7 @@ plugins {
 }
 
 dependencies {
-  api "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus"
+  compileOnly project(":core")
+
+  compileOnly 'io.opentelemetry:opentelemetry-api:1.40.0'
 }
