@@ -21,10 +21,6 @@ java {
   targetCompatibility = JavaVersion.toVersion("21")
 }
 
-micronaut {
-  runtime('netty')
-}
-
 graalvmNative {
   toolchainDetection = false
   binaries {
@@ -34,7 +30,14 @@ graalvmNative {
   }
 }
 
-tasks.named("dockerfile") {
-  args("-Xms64m -Xmx128m")
-  instruction """HEALTHCHECK CMD curl -s localhost:8080/health | grep '"status":"UP"' """
+dockerfile {
+  baseImage("alpine:3.20")
+  runCommand('apk --no-cache add openjdk21')
+  args('-Xms256m', '-Xmx512m')
+}
+
+dockerfileNative {
+  setGraalImage("ghcr.io/graalvm/native-image-community:21")
+  baseImage('alpine:3.17')
+  runCommand('apk add gcompat libstdc++')
 }

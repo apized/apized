@@ -2,6 +2,7 @@ plugins {
   id 'net.researchgate.release' version '2.8.1'
   id 'com.github.breadmoirai.github-release' version '2.2.12'
   id "io.spring.dependency-management" version "${springDependencyGradlePluginVersion}"
+  id 'com.bmuschko.docker-remote-api' version '9.4.0' apply false
   id 'jacoco-report-aggregation'
   id 'java'
 }

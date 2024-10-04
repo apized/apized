@@ -10,6 +10,7 @@ repositories {
 dependencies {
   api "org.springframework.boot:org.springframework.boot.gradle.plugin:$springBootGradlePluginVersion"
   api "io.spring.dependency-management:io.spring.dependency-management.gradle.plugin:$springDependencyGradlePluginVersion"
+  api "com.bmuschko:gradle-docker-plugin:9.4.0"
 }
 
 gradlePlugin {

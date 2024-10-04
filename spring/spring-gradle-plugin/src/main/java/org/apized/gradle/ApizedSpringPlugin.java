@@ -16,6 +16,7 @@
 
 package org.apized.gradle;
 
+import com.bmuschko.gradle.docker.DockerSpringBootApplicationPlugin;
 import io.spring.gradle.dependencymanagement.DependencyManagementPlugin;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
@@ -54,6 +55,7 @@ public class ApizedSpringPlugin implements Plugin<Project> {
 
       project.getPlugins().apply(SpringBootPlugin.class);
       project.getPlugins().apply(DependencyManagementPlugin.class);
+      project.getPlugins().apply(DockerSpringBootApplicationPlugin.class);
       project.getPlugins().withType(JavaPlugin.class, plugin -> {
         project.getDependencies().add("annotationProcessor", "org.projectlombok:lombok:1.18.30");
         project.getDependencies().add("compileOnly", "org.projectlombok:lombok:1.18.30");

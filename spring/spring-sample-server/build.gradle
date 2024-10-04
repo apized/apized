@@ -1,3 +1,5 @@
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
 plugins {
   id 'groovy'
   id 'org.apized.spring' version "$version"
@@ -23,4 +25,19 @@ springBoot {
 
 tasks.withType(Test).configureEach {
   environment "SPRING_MAIN_CLASS", springBoot.mainClass.get()
+}
+
+tasks.withType(Dockerfile) {
+  instructions.set(
+    new ArrayList<Dockerfile.Instruction>(instructions.get()).collectMany {
+      if (it.keyword == Dockerfile.FromInstruction.KEYWORD) {
+        [
+          new Dockerfile.FromInstruction(new Dockerfile.From('alpine:3.20')),
+          new Dockerfile.RunCommandInstruction('apk --no-cache add openjdk21')
+        ]
+      } else {
+        [ it ]
+      }
+    }.flatten() as List<Dockerfile.Instruction>
+  )
 }
