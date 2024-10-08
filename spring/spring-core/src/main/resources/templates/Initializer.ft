@@ -60,6 +60,8 @@ public class ApizedSpringInitializer {
   @Order(-Integer.MAX_VALUE)
   void onStartup(ApplicationStartedEvent event) {
     log.info("Initializing apized");
+    long start = System.currentTimeMillis();
+
     ApizedContext.provider = new SpringContextProvider();
     config.setDialect(Dialect.${dialect});
     ApizedConfig.setInstance(config);
@@ -74,5 +76,6 @@ public class ApizedSpringInitializer {
     #end
 
     publisher.publishEvent(new ApizedStartupEvent(config));
+    log.info("Apized initialized in {}ms", System.currentTimeMillis() - start);
   }
 }

@@ -81,6 +81,7 @@ public class ApizedSpringPlugin implements Plugin<Project> {
       project.getDependencies().add("annotationProcessor", String.format("io.micronaut:micronaut-inject-java:%s", micronautVersion));
       project.getDependencies().add("annotationProcessor", "io.micronaut.serde:micronaut-serde-processor:2.11.0");
       project.getDependencies().add("compileOnly", String.format("io.micronaut.data:micronaut-data-model:%s", micronautVersion));
+      project.getDependencies().add("runtimeOnly", String.format("io.micronaut:micronaut-aop:%s", micronautVersion));
 
       project.getDependencies().add("testImplementation", String.format("org.apized:spring-test:%s", apizedVersion));
 

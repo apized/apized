@@ -1,6 +1,6 @@
 rootProject.buildFileName = 'first-build.gradle'
 rootProject.name = "apized"
-include 'core', 'test', 'distributed-lock',
+include 'core', 'test', 'distributed-lock', 'tracing',
   'micronaut:micronaut-core', 'micronaut:micronaut-test', 'micronaut:micronaut-gradle-plugin', 'micronaut:micronaut-distributed-lock', 'micronaut:micronaut-messaging-rabbitmq', 'micronaut:micronaut-tracing', 'micronaut:micronaut-metrics',
   'spring:spring-core', 'spring:spring-test', 'spring:spring-gradle-plugin', 'spring:spring-distributed-lock', 'spring:spring-tracing'
 

@@ -17,6 +17,7 @@
 package org.apized.spring.test.integration
 
 import jakarta.inject.Inject
+import org.apized.spring.server.ApizedStartupEvent
 import org.apized.test.integration.AbstractTestController
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.ResponseEntity
@@ -32,7 +33,7 @@ class SpringTestController extends AbstractTestController {
   @Override
   void clear() {
     super.clear()
-// todo   publisher.publishEvent(new ApizedStartupEvent(config))
+    publisher.publishEvent(new ApizedStartupEvent(config))
   }
 
   @RequestMapping(method = RequestMethod.DELETE)

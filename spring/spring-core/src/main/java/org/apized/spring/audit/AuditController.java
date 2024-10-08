@@ -16,9 +16,9 @@
 
 package org.apized.spring.audit;
 
+import io.micronaut.context.annotation.Import;
 import io.micronaut.core.annotation.Introspected;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.apized.core.StringHelper;
 import org.apized.core.audit.AuditEntryRepository;
@@ -44,7 +44,7 @@ public class AuditController {
   AuditEntryRepository repository;
 
   @RequestMapping(path = "/{entity}", method = RequestMethod.GET)
-  @Operation(operationId = "Get audits for a given model", tags = { "Audit Controller" })
+  @Operation(operationId = "Get audits for a given model", tags = {"Audit Controller"})
   public ResponseEntity<List<AuditEntry>> getAuditForType(@PathVariable(value = "entity") String entity) {
     List<AuditEntry> results = new ArrayList<>();
     Iterable<AuditEntry> entries = repository.findByTypeOrderByEpochAsc(StringHelper.capitalize(StringHelper.singularize(entity)));
@@ -53,7 +53,7 @@ public class AuditController {
   }
 
   @RequestMapping(path = "/{entity}/{id}", method = RequestMethod.GET)
-  @Operation(operationId = "Get audits for a given model instance", tags = { "Audit Controller" })
+  @Operation(operationId = "Get audits for a given model instance", tags = {"Audit Controller"})
   public ResponseEntity<List<AuditEntry>> getAuditForTypeAndTarget(
     @PathVariable(value = "entity") String entity,
     @PathVariable(value = "id") UUID id

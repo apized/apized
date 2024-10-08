@@ -18,11 +18,11 @@ package org.apized.spring.audit;
 
 import org.apized.core.audit.AuditEntryRepository;
 import org.apized.core.audit.model.AuditEntry;
-import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 @Repository
-public interface SpringAuditEntryRepository extends AuditEntryRepository, JpaRepositoryImplementation<AuditEntry, UUID> {
+public interface SpringAuditEntryRepository extends AuditEntryRepository, CrudRepository<AuditEntry, UUID> {
 }

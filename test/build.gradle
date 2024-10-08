@@ -1,3 +1,7 @@
+plugins {
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
+}
+
 dependencies {
   api project(":core")
 

@@ -16,7 +16,6 @@
 
 package org.apized.core.audit.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -52,7 +51,6 @@ public class AuditEntry implements Model {
 
   private String type;
 
-  @JsonIdentityReference(alwaysAsId = true)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private UUID author;
 

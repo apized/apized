@@ -18,7 +18,6 @@ package org.apized.spring.core;
 
 import org.apized.core.ApizedConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.Map;
  * Properties to configure apized.
  */
 @Configuration
-@ComponentScan(basePackages = "org.apized")
 @ConfigurationProperties("apized")
 public class SpringApizedConfig extends ApizedConfig {
 

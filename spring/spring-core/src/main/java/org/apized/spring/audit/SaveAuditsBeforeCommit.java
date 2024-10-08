@@ -17,7 +17,6 @@
 package org.apized.spring.audit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apized.core.context.ApizedContext;
 import org.springframework.beans.factory.annotation.Autowired;

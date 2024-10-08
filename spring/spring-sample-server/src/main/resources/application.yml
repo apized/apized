@@ -52,5 +52,4 @@ apized:
 logging:
   level:
     root: info
-    io.micronaut.data.query: debug
 

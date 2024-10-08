@@ -22,10 +22,7 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import org.apized.spring.core.SpringApizedConfig;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
 @OpenAPIDefinition(
@@ -37,8 +34,7 @@ import org.springframework.context.annotation.ComponentScan;
   )
 )
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
-@EnableConfigurationProperties(SpringApizedConfig.class)
-@SpringBootApplication
+@ComponentScan(basePackages = "org.apized")
 public class Application {
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
