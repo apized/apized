@@ -22,6 +22,7 @@ import io.micronaut.data.model.DataType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.apized.core.federation.Federation;
@@ -30,8 +31,6 @@ import org.apized.core.model.BaseModel;
 import org.apized.micronaut.server.api.address.Address;
 import org.apized.micronaut.server.api.department.Department;
 import org.apized.micronaut.server.api.organization.Organization;
-
-import jakarta.validation.constraints.NotNull;
 
 @Getter
 @Setter

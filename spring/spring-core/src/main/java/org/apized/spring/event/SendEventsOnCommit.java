@@ -42,14 +42,12 @@ class SendEventsOnCommit {
   public void afterCommit(String event) {
     log.debug("Sending {} events triggered by {}.", ApizedContext.getEvent().getEvents().size(), event);
     ApizedContext.getEvent().getEvents().values().forEach(esb::send);
-    if (log.isDebugEnabled()) {
-      ApizedContext.getEvent().getEvents().values().forEach(it -> {
-        try {
-          log.debug("{}: {}", it.getTopic(), mapper.writeValueAsString(it.getPayload()));
-        } catch (IOException e) {
-          //Do nothing
-        }
-      });
-    }
+    ApizedContext.getEvent().getEvents().values().forEach(it -> {
+      try {
+        log.debug("{}: {}", it.getTopic(), mapper.writeValueAsString(it.getPayload()));
+      } catch (IOException e) {
+        //Do nothing
+      }
+    });
   }
 }

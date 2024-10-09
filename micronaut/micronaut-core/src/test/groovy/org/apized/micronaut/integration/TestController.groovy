@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.apized.spring.server
+package org.apized.micronaut.integration
 
-import io.cucumber.junit.Cucumber
-import io.cucumber.junit.CucumberOptions
-import org.junit.runner.RunWith
 
-@RunWith(Cucumber)
-@CucumberOptions(
-  plugin = [ "pretty", "html:target/features" ],
-  features = [ "src/test/resources/features" ],
-  glue = [ "org.apized" ]
-)
-class IntegrationTests {}
+import io.micronaut.http.annotation.Controller
+import org.apized.micronaut.test.integration.MicronautTestController
+
+import jakarta.transaction.Transactional
+
+@Controller('/integration')
+@Transactional
+class TestController extends MicronautTestController {
+}

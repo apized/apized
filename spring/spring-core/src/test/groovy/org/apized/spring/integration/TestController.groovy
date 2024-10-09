@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.apized.micronaut.server.integration.apized
-
-
-import io.micronaut.http.annotation.Controller
-import org.apized.micronaut.test.integration.MicronautTestController
+package org.apized.spring.integration
 
 import jakarta.transaction.Transactional
+import org.apized.spring.test.integration.SpringTestController
+import org.springframework.context.annotation.Profile
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
-@Controller('/integration')
 @Transactional
-class TestController extends MicronautTestController {
-}
+@Profile('test')
+@RestController
+@RequestMapping('/integration')
+class TestController extends SpringTestController {}

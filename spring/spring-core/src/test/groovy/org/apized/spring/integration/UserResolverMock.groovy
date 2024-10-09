@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package org.apized.spring.server.integration.apized
+package org.apized.spring.integration
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.apized.spring.test.integration.mocks.AbstractServiceIntegrationMock
+import org.apized.core.security.model.User
+import org.apized.spring.test.integration.mocks.AbstractSpringUserResolverMock
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 
 @Component
-class DummyMock extends AbstractServiceIntegrationMock {
-  String mockedServiceName = 'dummy'
-
-  DummyMock(ObjectMapper mapper) {
-    super(mapper)
+@Primary
+class UserResolverMock extends AbstractSpringUserResolverMock {
+  @Override
+  Map<String, User> getKnownUsers() {
+    [ admin: new User(username: "admin@apized.com", name: "Apized Admin", permissions: [ '*' ]) ]
   }
 }

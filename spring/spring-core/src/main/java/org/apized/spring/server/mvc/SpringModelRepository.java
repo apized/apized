@@ -107,7 +107,7 @@ public interface SpringModelRepository<T extends BaseModel> extends ModelReposit
 
   @Override
   default void delete(UUID it) {
-    delete(it);
+    deleteById(it);
   }
 
   @Override

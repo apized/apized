@@ -12,6 +12,9 @@ ext {
   excludedCoverage = [
     '**/org/apized/micronaut/processor/**',
     '**/org/apized/spring/processor/**',
+    '**/org/apized/test/**',
+    '**/org/apized/micronaut/test/**',
+    '**/org/apized/spring/test/**',
     '**/*Builder.class',
     '**/*BuilderImpl.class',
   ]

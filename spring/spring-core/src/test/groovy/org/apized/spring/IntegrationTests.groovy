@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.apized.spring.server.integration.apized
+package org.apized.spring
 
-import jakarta.transaction.Transactional
-import org.apized.spring.test.integration.SpringTestController
-import org.springframework.context.annotation.Profile
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import io.cucumber.junit.Cucumber
+import io.cucumber.junit.CucumberOptions
+import org.junit.runner.RunWith
 
-@Transactional
-@Profile('test')
-@RestController
-@RequestMapping('/integration')
-class TestController extends SpringTestController {}
+@RunWith(Cucumber)
+@CucumberOptions(
+  plugin = [ "pretty", "html:target/features" ],
+  features = [ "../../core/src/test/resources/features" ],
+  glue = [ "org.apized" ]
+)
+class IntegrationTests {}

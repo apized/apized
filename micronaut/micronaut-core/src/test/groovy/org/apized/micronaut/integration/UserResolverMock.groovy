@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package org.apized.spring.server.integration.apized
+package org.apized.micronaut.integration
 
+
+import io.micronaut.context.annotation.Replaces
+import jakarta.inject.Singleton
+import org.apized.core.security.UserResolver
 import org.apized.core.security.model.User
-import org.apized.spring.test.integration.mocks.AbstractSpringUserResolverMock
-import org.springframework.context.annotation.Primary
-import org.springframework.stereotype.Component
+import org.apized.micronaut.test.integration.mocks.AbstractMicronautUserResolverMock
 
-@Component
-@Primary
-class UserResolverMock extends AbstractSpringUserResolverMock {
+@Singleton
+@Replaces(UserResolver)
+class UserResolverMock extends AbstractMicronautUserResolverMock {
   @Override
   Map<String, User> getKnownUsers() {
     [ admin: new User(username: "admin@apized.com", name: "Apized Admin", permissions: [ '*' ]) ]

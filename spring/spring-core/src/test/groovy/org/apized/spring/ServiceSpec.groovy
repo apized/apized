@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-package org.apized.micronaut.server.integration.apized
+package org.apized.spring
 
+import org.apized.spring.server.api.employee.Employee
+import org.apized.spring.server.api.employee.EmployeeRepository
+import org.apized.spring.server.api.employee.EmployeeService
+import spock.lang.Specification
 
-import io.micronaut.context.annotation.Replaces
-import jakarta.inject.Singleton
-import org.apized.core.security.UserResolver
-import org.apized.core.security.model.User
-import org.apized.micronaut.test.integration.mocks.AbstractMicronautUserResolverMock
+class ServiceSpec extends Specification {
 
-@Singleton
-@Replaces(UserResolver)
-class UserResolverMock extends AbstractMicronautUserResolverMock {
-  @Override
-  Map<String, User> getKnownUsers() {
-    [ admin: new User(username: "admin@apized.com", name: "Apized Admin", permissions: [ '*' ]) ]
+  EmployeeService service
+
+  void setup() {
+    service = new EmployeeService()
+    service.repository = Mock(EmployeeRepository) {
+      get(_ as UUID) >> Optional.ofNullable(new Employee())
+    }
+  }
+
+  void "serv"() {
+    when:
+    Employee employee = service.get(UUID.randomUUID())
+
+    then:
+    employee != null
   }
 }

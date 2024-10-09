@@ -16,21 +16,19 @@
 
 package org.apized.micronaut.server.api.organization;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apized.core.model.Apized;
 import org.apized.core.model.BaseModel;
 import org.apized.core.model.Layer;
 import org.apized.micronaut.server.api.address.Address;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.micronaut.serde.annotation.Serdeable;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Getter
 @Setter

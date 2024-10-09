@@ -4,7 +4,7 @@
     <envs>
       <env name="SPRING_MAIN_CLASS" value="org.apized.spring.server.Application" />
     </envs>
-    <option name="FILE_PATH" value="$PROJECT_DIR$/spring/spring-core/src/test/resources/features" />
+    <option name="FILE_PATH" value="$PROJECT_DIR$/core/src/test/resources/features" />
     <option name="GLUE" value="org.apized" />
     <option name="MAIN_CLASS_NAME" value="io.cucumber.core.cli.Main" />
     <module name="apized.spring.spring-core.test" />
@@ -14,8 +14,28 @@
     <option name="WORKING_DIRECTORY" value="$MODULE_WORKING_DIR$" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="io.cucumber.core.cli.*" />
+        <option name="PATTERN" value="org.apized.*" />
         <option name="ENABLED" value="true" />
+      </pattern>
+      <pattern>
+        <option name="PATTERN" value="org.apized.test.*" />
+        <option name="ENABLED" value="true" />
+        <option name="INCLUDE" value="false" />
+      </pattern>
+      <pattern>
+        <option name="PATTERN" value="org.apized.spring.processor.AnnotationProcessor" />
+        <option name="ENABLED" value="true" />
+        <option name="INCLUDE" value="false" />
+      </pattern>
+      <pattern>
+        <option name="PATTERN" value="org.apized.spring.test.*" />
+        <option name="ENABLED" value="true" />
+        <option name="INCLUDE" value="false" />
+      </pattern>
+      <pattern>
+        <option name="PATTERN" value="org.apized.micronaut.test.*" />
+        <option name="ENABLED" value="true" />
+        <option name="INCLUDE" value="false" />
       </pattern>
     </extension>
     <method v="2">

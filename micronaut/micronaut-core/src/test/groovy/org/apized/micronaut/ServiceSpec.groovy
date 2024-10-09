@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apized.micronaut.server
+package org.apized.micronaut
 
 
 import org.apized.micronaut.server.api.employee.EmployeeRepository

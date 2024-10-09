@@ -16,7 +16,6 @@
 
 package org.apized.micronaut.server.api.organization;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;

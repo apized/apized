@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Micronaut Acceptance Tests" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java">
     <option name="CUCUMBER_CORE_VERSION" value="5" />
-    <option name="FILE_PATH" value="$PROJECT_DIR$/micronaut/micronaut-core/src/test/resources/features" />
+    <option name="FILE_PATH" value="$PROJECT_DIR$/core/src/test/resources/features" />
     <option name="GLUE" value="org.apized" />
     <option name="MAIN_CLASS_NAME" value="io.cucumber.core.cli.Main" />
     <module name="apized.micronaut.micronaut-core.test" />
@@ -16,6 +16,21 @@
       </pattern>
       <pattern>
         <option name="PATTERN" value="org.apized.test.*" />
+        <option name="ENABLED" value="true" />
+        <option name="INCLUDE" value="false" />
+      </pattern>
+      <pattern>
+        <option name="PATTERN" value="org.apized.micronaut.processor.AnnotationProcessor" />
+        <option name="ENABLED" value="true" />
+        <option name="INCLUDE" value="false" />
+      </pattern>
+      <pattern>
+        <option name="PATTERN" value="org.apized.micronaut.test.*" />
+        <option name="ENABLED" value="true" />
+        <option name="INCLUDE" value="false" />
+      </pattern>
+      <pattern>
+        <option name="PATTERN" value="org.apized.spring.test.*" />
         <option name="ENABLED" value="true" />
         <option name="INCLUDE" value="false" />
       </pattern>

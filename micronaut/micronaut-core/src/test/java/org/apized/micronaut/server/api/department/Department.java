@@ -16,17 +16,19 @@
 
 package org.apized.micronaut.server.api.department;
 
-import org.apized.core.model.Apized;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.apized.core.model.ApiContext;
+import org.apized.core.model.Apized;
 import org.apized.core.model.BaseModel;
 import org.apized.micronaut.server.api.employee.Employee;
 import org.apized.micronaut.server.api.organization.Organization;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter

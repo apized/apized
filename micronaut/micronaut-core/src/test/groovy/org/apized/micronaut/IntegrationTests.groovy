@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apized.micronaut.server
+package org.apized.micronaut
 
 import io.cucumber.junit.Cucumber
 import io.cucumber.junit.CucumberOptions
@@ -25,7 +25,7 @@ import org.junit.runner.RunWith
 @RunWith(Cucumber)
 @CucumberOptions(
   plugin = ["pretty", "html:target/features"],
-  features = ["src/test/resources/features"],
+  features = ["../../core/src/test/resources/features"],
   glue = ["org.apized"]
 )
 class IntegrationTests {}

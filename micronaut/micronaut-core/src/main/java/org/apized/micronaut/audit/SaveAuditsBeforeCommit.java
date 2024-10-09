@@ -22,7 +22,6 @@ import io.micronaut.transaction.annotation.TransactionalEventListener;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.apized.core.audit.AuditEntryRepository;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.event.ESBAdapter;
 
@@ -43,17 +42,15 @@ class SaveAuditsBeforeCommit {
     log.debug("Saving {} audits triggered by {}.", ApizedContext.getAudit().getAuditEntries().size(), event);
     if (!ApizedContext.getAudit().getAuditEntries().isEmpty()) {
       repository.saveAll(ApizedContext.getAudit().getAuditEntries().values());
-      if (log.isDebugEnabled()) {
-        ApizedContext.getAudit().getAuditEntries().values().forEach((it) ->
-          {
-            try {
-              log.debug("{}[{}]: {}", it.getTarget(), it.getId(), mapper.writeValueAsString(it.getPayload()));
-            } catch (IOException e) {
-              //Do nothing
-            }
+      ApizedContext.getAudit().getAuditEntries().values().forEach((it) ->
+        {
+          try {
+            log.debug("{}[{}]: {}", it.getTarget(), it.getId(), mapper.writeValueAsString(it.getPayload()));
+          } catch (IOException e) {
+            //Do nothing
           }
-        );
-      }
+        }
+      );
     }
   }
 }
