@@ -17,7 +17,7 @@
 package org.apized.spring.test.integration
 
 import io.cucumber.java.BeforeAll
-import org.apized.spring.server.mvc.SpringModelService
+import org.apized.core.mvc.AbstractModelService
 import org.apized.test.integration.core.IntegrationConfig
 import org.apized.test.integration.core.IntegrationContext
 import org.apized.test.integration.core.RestIntegrationTest
@@ -55,7 +55,7 @@ class SpringBootTestServer {
 
     new ServerConfig(
       baseUrl: "http://localhost:${webApplicationContext.webServer.port}",
-      types: webApplicationContext.getBeansOfType(SpringModelService).values().collect { it.getType() }
+      types: webApplicationContext.getBeansOfType(AbstractModelService).values().collect { it.getType() }
     )
   }
 }

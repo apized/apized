@@ -10,5 +10,5 @@ include 'core', 'distributed-lock', 'test', 'tracing',
   'micronaut:micronaut-core', 'micronaut:micronaut-distributed-lock', 'micronaut:micronaut-test', 'micronaut:micronaut-tracing', 'micronaut:micronaut-messaging-rabbitmq',
   'spring:spring-core', 'spring:spring-distributed-lock', 'spring:spring-test', 'spring:spring-tracing',
   'micronaut:micronaut-gradle-plugin', 'spring:spring-gradle-plugin',
-  'micronaut:micronaut-sample-server', 'spring:spring-sample-server'
+  'micronaut:micronaut-sample-server'
 

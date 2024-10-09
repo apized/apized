@@ -9,6 +9,9 @@ dependencyManagement {
 }
 
 dependencies {
-  compileOnly project(":spring:spring-core")
+  compileOnly project(":core")
+//  compileOnly("org.springframework.boot:spring-boot")
+//  compileOnly("com.fasterxml.jackson.core:jackson-databind")
+  compileOnly("org.springframework.boot:spring-boot-starter-web")
   api project(":test")
 }

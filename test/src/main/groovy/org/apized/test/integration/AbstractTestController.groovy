@@ -44,6 +44,7 @@ abstract class AbstractTestController {
   AbstractUserResolverMock userResolverMock
 
   void clear() {
+
     clearDB()
     mocks.each {
       it.clear()

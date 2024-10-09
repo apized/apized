@@ -115,7 +115,7 @@ dependencyManagement {
 }
 
 dependencies {
-  jacocoAggregation project(':spring:spring-sample-server')
+  jacocoAggregation project(':spring:spring-core')
   jacocoAggregation project(':micronaut:micronaut-sample-server')
 }
 

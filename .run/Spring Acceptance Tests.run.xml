@@ -4,23 +4,18 @@
     <envs>
       <env name="SPRING_MAIN_CLASS" value="org.apized.spring.server.Application" />
     </envs>
-    <option name="FILE_PATH" value="$PROJECT_DIR$/spring/spring-sample-server/src/test/resources/features" />
+    <option name="FILE_PATH" value="$PROJECT_DIR$/spring/spring-core/src/test/resources/features" />
     <option name="GLUE" value="org.apized" />
     <option name="MAIN_CLASS_NAME" value="io.cucumber.core.cli.Main" />
-    <module name="apized.spring.spring-sample-server.test" />
+    <module name="apized.spring.spring-core.test" />
     <option name="PROGRAM_PARAMETERS" value=" --plugin org.jetbrains.plugins.cucumber.java.run.CucumberJvm5SMFormatter" />
     <shortenClasspath name="NONE" />
     <option name="SUGGESTED_NAME" value="Feature: department-create" />
     <option name="WORKING_DIRECTORY" value="$MODULE_WORKING_DIR$" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.apized.*" />
+        <option name="PATTERN" value="io.cucumber.core.cli.*" />
         <option name="ENABLED" value="true" />
-      </pattern>
-      <pattern>
-        <option name="PATTERN" value="org.apized.test.*" />
-        <option name="ENABLED" value="true" />
-        <option name="INCLUDE" value="false" />
       </pattern>
     </extension>
     <method v="2">

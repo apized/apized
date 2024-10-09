@@ -1,0 +1,55 @@
+server:
+  port: 0
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+  server:
+    port: 0
+
+spring:
+  application:
+    name: Apized Sample Server
+
+  flyway:
+    enabled: true
+
+  datasource:
+    url: jdbc:tc:postgresql:12:///postgres
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
+
+  jpa:
+    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+
+otel:
+  exporter:
+    otlp:
+      endpoint: ${OTEL_COLLECTOR_ENDPOINT:http://localhost:4317}
+      protocol: ${OTEL_PROTOCOL:grpc}
+  sdk:
+    disabled: ${OTEL_DISABLED:false}
+  propagators:
+    - tracecontext
+
+apized:
+  slug: server
+  token: ${AUTH_TOKEN:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJ3ZWJzdW1taXQiLCJzdWIiOiJkNTY4NzA1YS1hNTgxLTQ5MjMtODI4Yi0wZjk3YzA4OTExNjMiLCJpc3MiOiJ3ZWJzdW1taXQiLCJpYXQiOjE2NjEyNDcyNzMsImp0aSI6IjdhNjM3ZmFkLWY5NTctNDg4Yy04MWY1LTVhM2Y0YmY4MmUxYSJ9.LJh7I4Ma9s8DYJwFWsJ4u9VG-J9tC5MTHEJR4e3NqXE}
+  federation:
+    auth: ${AUTH_API:`https://auth.apized.com`}
+    catalogopolis: https://api.restful-api.dev
+
+logging:
+  level:
+    root: info
