@@ -13,12 +13,12 @@ import org.apized.core.ApizedConfig;
 import org.apized.core.Dialect;
 import org.apized.core.behaviour.BehaviourManager;
 import org.apized.core.context.ApizedContext;
+import org.apized.core.micronaut.ApizedStartupEvent;
 import org.apized.core.model.Action;
 import org.apized.core.model.Layer;
 import org.apized.core.model.When;
 import org.apized.core.security.enricher.PermissionEnricherManager;
 import org.apized.micronaut.context.MicronautContextProvider;
-import org.apized.micronaut.server.ApizedStartupEvent;
 import org.apized.micronaut.server.ModelResolver;
 import org.apized.micronaut.server.mvc.ProxyRegistry;
 

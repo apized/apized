@@ -131,7 +131,7 @@ public class AnnotationProcessor extends AbstractProcessor {
       Properties prop = new Properties();
       prop.load(new FileInputStream(Paths.get(
         processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", "apized.properties").toUri()
-      ).toString().replace("/build/classes/java/main", "")));
+      ).toString().replaceAll("/build/classes/java/(main|test)", "")));
       prop.entrySet().stream().forEach(e -> bindings.put(e.getKey().toString(), e.getValue()));
     } catch (IOException e) {
       throw new RuntimeException(e);

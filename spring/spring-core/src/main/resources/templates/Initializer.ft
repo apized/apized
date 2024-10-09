@@ -13,7 +13,7 @@ import org.apized.core.model.Layer;
 import org.apized.core.model.When;
 import org.apized.core.security.enricher.PermissionEnricherManager;
 import org.apized.spring.context.SpringContextProvider;
-import org.apized.spring.server.ApizedStartupEvent;
+import org.apized.core.spring.ApizedStartupEvent;
 import org.apized.spring.server.ModelResolver;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationContext;

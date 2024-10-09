@@ -15,11 +15,11 @@ micronaut:
         mapping: /redoc/**
 
   server:
-    port: ${PORT:8080}
+    port: 0
 
 endpoints:
   all:
-    port: ${MANAGEMENT_PORT:8080}
+    port: 0
   health:
     details-visible: ANONYMOUS
     enabled: true
@@ -50,9 +50,10 @@ netty:
 
 datasources:
   default:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:org}
-    username: ${POSTGRES_USERNAME:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
+    url: jdbc:tc:postgresql:12:///postgres
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
 
 jpa:
   default:

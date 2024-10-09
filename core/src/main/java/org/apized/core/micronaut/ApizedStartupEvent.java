@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apized.spring.server;
+package org.apized.core.micronaut;
 
 import io.micronaut.context.event.ApplicationEvent;
 import org.apized.core.ApizedConfig;

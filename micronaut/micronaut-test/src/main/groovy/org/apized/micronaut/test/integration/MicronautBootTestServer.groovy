@@ -19,16 +19,14 @@ package org.apized.micronaut.test.integration
 import io.cucumber.java.BeforeAll
 import io.micronaut.context.ApplicationContext
 import io.micronaut.context.ApplicationContextBuilder
-import io.micronaut.core.reflect.GenericTypeUtils
 import io.micronaut.http.server.netty.NettyEmbeddedServer
 import io.micronaut.runtime.server.EmbeddedServer
-import org.apized.core.mvc.ModelService
+import org.apized.core.mvc.AbstractModelService
 import org.apized.test.integration.core.IntegrationConfig
 import org.apized.test.integration.core.IntegrationContext
 import org.apized.test.integration.core.RestIntegrationTest
 import org.apized.test.integration.core.ServerConfig
 import org.apized.test.integration.mocks.AbstractUserResolverMock
-import org.testcontainers.containers.GenericContainer
 
 @SuppressWarnings('unused')
 class MicronautBootTestServer {
@@ -60,9 +58,7 @@ class MicronautBootTestServer {
     application = builder.run(NettyEmbeddedServer)
     new ServerConfig(
       baseUrl: "http://localhost:${application.port}",
-      types: application.applicationContext.getBeansOfType(ModelService).collect {
-        GenericTypeUtils.resolveSuperGenericTypeArgument(it.class.superclass).get()
-      }
+      types: application.applicationContext.getBeansOfType(AbstractModelService).collect { it.getType() }
     )
   }
 }

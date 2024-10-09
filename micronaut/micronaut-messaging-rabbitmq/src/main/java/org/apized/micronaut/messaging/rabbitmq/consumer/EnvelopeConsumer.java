@@ -16,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apized.core.ApizedConfig;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.error.ExceptionNotifier;
+import org.apized.core.micronaut.ApizedStartupEvent;
 import org.apized.core.security.UserResolver;
-import org.apized.micronaut.server.ApizedStartupEvent;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

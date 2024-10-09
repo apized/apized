@@ -26,9 +26,4 @@ import org.springframework.web.bind.annotation.RestController
 @Profile('test')
 @RestController
 @RequestMapping('/integration')
-class TestController extends SpringTestController {
-  @Override
-  void clearDB() {
-    clearPostgresDB()
-  }
-}
+class TestController extends SpringTestController {}

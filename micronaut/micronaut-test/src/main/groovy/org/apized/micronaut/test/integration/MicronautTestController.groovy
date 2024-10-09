@@ -21,7 +21,7 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.*
 import jakarta.inject.Inject
-import org.apized.micronaut.server.ApizedStartupEvent
+import org.apized.core.micronaut.ApizedStartupEvent
 import org.apized.test.integration.AbstractTestController
 
 class MicronautTestController extends AbstractTestController {

@@ -15,16 +15,34 @@ dependencies {
   api("jakarta.validation:jakarta.validation-api")
   api("io.micronaut:micronaut-runtime")
   api("io.swagger.core.v3:swagger-annotations")
+  //https://github.com/micronaut-projects/micronaut-core/issues/5323
+  api("com.google.code.findbugs:jsr305")
 
   implementation("org.apache.velocity:velocity-engine-core")
 
-  compileOnly("org.projectlombok:lombok:1.18.30")
-  compileOnly("io.micronaut.data:micronaut-data-model")
-  compileOnly("io.micronaut.data:micronaut-data-runtime")
-  compileOnly("io.micronaut.data:micronaut-data-jdbc")
-  compileOnly("io.micronaut.serde:micronaut-serde-jackson")
-  compileOnly("io.micronaut:micronaut-http-server")
+  implementation("org.projectlombok:lombok:1.18.30")
+  implementation("io.micronaut.data:micronaut-data-model")
+  implementation("io.micronaut.data:micronaut-data-runtime")
+  implementation("io.micronaut.data:micronaut-data-jdbc")
+  implementation("io.micronaut.serde:micronaut-serde-jackson")
+  implementation("io.micronaut:micronaut-http-server")
 
-  //https://github.com/micronaut-projects/micronaut-core/issues/5323
-  api("com.google.code.findbugs:jsr305")
+
+
+  testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+  testAnnotationProcessor project(':micronaut:micronaut-core')
+  testAnnotationProcessor 'io.micronaut:micronaut-http-validation'
+  testAnnotationProcessor 'io.micronaut.validation:micronaut-validation-processor'
+  testAnnotationProcessor 'io.micronaut.data:micronaut-data-processor'
+  testAnnotationProcessor 'io.micronaut.serde:micronaut-serde-processor'
+
+  testImplementation project(':micronaut:micronaut-test')
+
+  testRuntimeOnly 'org.yaml:snakeyaml'
+  testRuntimeOnly 'ch.qos.logback:logback-classic'
+  testRuntimeOnly 'io.micronaut.sql:micronaut-jdbc-hikari'
+  testRuntimeOnly 'io.micronaut.flyway:micronaut-flyway'
+  testRuntimeOnly 'org.postgresql:postgresql'
+  testRuntimeOnly 'org.flywaydb:flyway-database-postgresql'
+  testRuntimeOnly 'org.springframework:spring-context:6.1.13'
 }

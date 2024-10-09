@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.apized.micronaut.server;
+package org.apized.core.spring;
 
-import io.micronaut.context.event.ApplicationEvent;
 import org.apized.core.ApizedConfig;
+import org.springframework.context.ApplicationEvent;
 
 public class ApizedStartupEvent extends ApplicationEvent {
   public ApizedStartupEvent(ApizedConfig source) {

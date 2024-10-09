@@ -494,7 +494,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     try {
       prop.load(new FileInputStream(Paths.get(
         processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", "apized.properties").toUri()
-      ).toString().replace("/build/classes/java/main", "")));
+      ).toString().replaceAll("/build/classes/java/(main|test)", "")));
     } catch (IOException e) {
       prop.setProperty("dialect", "ANSI");
     }
