@@ -26,6 +26,7 @@ import org.apized.core.tracing.Traced;
 import java.util.UUID;
 
 public interface BehaviourHandler<T extends Model> {
+  @SuppressWarnings("unchecked")
   @Traced(
     attributes = {
       @Traced.Attribute(key = "behaviour.when", arg = "when"),
@@ -53,33 +54,33 @@ public interface BehaviourHandler<T extends Model> {
     }
   }
 
-  default void preCreate(Execution execution, T input) {
+  default void preCreate(Execution<T> execution, T input) {
   }
 
-  default void postCreate(Execution execution, T input, T output) {
+  default void postCreate(Execution<T> execution, T input, T output) {
   }
 
-  default void preList(Execution execution) {
+  default void preList(Execution<T> execution) {
   }
 
-  default void postList(Execution execution, Page<T> output) {
+  default void postList(Execution<T> execution, Page<T> output) {
   }
 
-  default void preGet(Execution execution, UUID id) {
+  default void preGet(Execution<T> execution, UUID id) {
   }
 
-  default void postGet(Execution execution, UUID id, T output) {
+  default void postGet(Execution<T> execution, UUID id, T output) {
   }
 
-  default void preUpdate(Execution execution, UUID id, T input) {
+  default void preUpdate(Execution<T> execution, UUID id, T input) {
   }
 
-  default void postUpdate(Execution execution, UUID id, T input, T output) {
+  default void postUpdate(Execution<T> execution, UUID id, T input, T output) {
   }
 
-  default void preDelete(Execution execution, UUID id) {
+  default void preDelete(Execution<T> execution, UUID id) {
   }
 
-  default void postDelete(Execution execution, UUID id, T output) {
+  default void postDelete(Execution<T> execution, UUID id, T output) {
   }
 }

@@ -1,0 +1,102 @@
+#set ( $d = "$")
+package ${module};
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.beans.BeanWrapper;
+import lombok.Generated;
+import org.apized.spring.server.ModelResolver;
+
+import java.util.*;
+
+@Generated
+@Introspected
+public class ${type}${d}Proxy extends ${type} {
+  private boolean building = true;
+  private boolean originalHasResolution = true;
+
+  private Map<String, Object> resolutions = new HashMap<>();
+
+  @JsonIgnore
+  public Map<String, Object> _getResolutions(){
+    return resolutions;
+  }
+
+  public ${type}${d}Proxy(@Nullable $type it) {
+    if (it != null) {
+      BeanWrapper<${type}${d}Proxy> self = BeanWrapper.getWrapper(this);
+      BeanWrapper<${type}> wrapper = BeanWrapper.getWrapper(it);
+
+      wrapper.getBeanProperties().stream().filter(prop-> !prop.isReadOnly()).forEach(prop -> {
+          var value = wrapper.getProperty(prop.getName(), prop.asArgument()).orElse(null);
+          this.originalHasResolution = it instanceof ${type}${d}Proxy && ((${type}${d}Proxy)it)._getResolutions().containsKey(prop.getName());
+          self.setProperty(prop.getName(), value);
+        }
+      );
+    }
+    building = false;
+  }
+
+#foreach( $it in $subModels )
+  @Override
+#if($it.isCollection)
+  public void set${it.Name}($it.type<${it.typeParam}> it) {
+    if(building) {
+      if (originalHasResolution || (it != null && it.size() > 0 && it.get(0) instanceof ${it.typeParam}${d}Proxy)){
+#else
+  public void set${it.Name}($it.type it) {
+    if(building) {
+      if (it != null && it instanceof ${it.type}${d}Proxy){
+#end
+        resolutions.put(
+          "${it.name}",
+          it
+        );
+      } else {
+        super.set${it.Name}(it);
+      }
+    } else {
+      resolutions.put(
+        "${it.name}",
+        it
+      );
+      _getModelMetadata().getTouched().add("${it.name}");
+    }
+  }
+
+#if($it.isCollection)
+  @Override
+  public $it.type<${it.typeParam}> get${it.Name}() {
+    if (!resolutions.containsKey("${it.name}")) {
+      resolutions.put(
+        "${it.name}",
+        ModelResolver.getModelValue(
+          ${type}.class,
+          "${it.name}",
+          getId()
+        )
+      );
+    }
+    return ($it.type<${it.typeParam}>) resolutions.get("${it.name}");
+  }
+#else
+  @Override
+  public $it.type get${it.Name}(){
+    if (!resolutions.containsKey("${it.name}")) {
+      resolutions.put(
+        "${it.name}",
+        ModelResolver.getModelValue(
+          ${type}.class,
+          "${it.name}",
+          getId(),
+          Optional.ofNullable(super.get${it.Name}()).orElse(new ${it.type}()).getId()
+        )
+      );
+    }
+    return ($it.type) resolutions.get("${it.name}");
+  }
+#end
+
+#end
+}

@@ -20,8 +20,4 @@ public class NotFoundException extends ServerException {
   public NotFoundException() {
     super("Not Found");
   }
-
-  public NotFoundException(String message) {
-    super(message);
-  }
 }

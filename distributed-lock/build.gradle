@@ -1,0 +1,10 @@
+plugins {
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
+}
+
+dependencies {
+  compileOnly project(":core")
+  compileOnly 'net.javacrumbs.shedlock:shedlock-core:4.42.0'
+
+  compileOnly "ch.qos.logback:logback-classic"
+}

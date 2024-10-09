@@ -1,0 +1,17 @@
+plugins {
+  id "io.spring.dependency-management" version "${springDependencyGradlePluginVersion}"
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootGradlePluginVersion}"
+  }
+}
+
+dependencies {
+  compileOnly project(":core")
+//  compileOnly("org.springframework.boot:spring-boot")
+//  compileOnly("com.fasterxml.jackson.core:jackson-databind")
+  compileOnly("org.springframework.boot:spring-boot-starter-web")
+  api project(":test")
+}

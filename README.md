@@ -26,3 +26,11 @@ and will run on top of:
 ## Example applications
 
 Example applications can be found [here](https://github.com/apized/samples).
+
+## Developing
+
+Start by publishing the packages to the local repo:
+
+```
+./gradlew -c first-settings.gradle publishToMavenLocal
+```

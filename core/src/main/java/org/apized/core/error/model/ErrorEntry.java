@@ -16,13 +16,13 @@
 
 package org.apized.core.error.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@Serdeable
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorEntry {

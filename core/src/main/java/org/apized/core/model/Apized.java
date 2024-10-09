@@ -73,7 +73,6 @@ public @interface Apized {
   @interface Extension {
     /**
      * The layer this is extending.
-     * todo do controllers actually need this or can I simply declare a new controller
      */
     Layer layer();
 

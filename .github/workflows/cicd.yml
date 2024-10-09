@@ -25,7 +25,8 @@ jobs:
           java-version: '21'
           distribution: 'adopt'
       - name: Run tests
-        run: ./gradlew clean :micronaut-sample-server:test
+        run: ./gradlew clean testCodeCoverageReport --info
+
 
   publish:
     needs: test

@@ -1,7 +1,0 @@
-plugins {
-  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
-}
-
-dependencies {
-  api "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus"
-}

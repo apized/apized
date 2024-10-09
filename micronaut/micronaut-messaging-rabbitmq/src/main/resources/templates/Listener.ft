@@ -1,0 +1,132 @@
+#set ( $d = "$")
+package $module;
+
+import com.rabbitmq.client.BasicProperties;
+import com.rabbitmq.client.Envelope;
+#if($metrics)
+import io.micrometer.core.annotation.Timed;
+#end
+import io.micronaut.context.BeanContext;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.env.Environment;
+import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.core.type.Argument;
+import io.micronaut.rabbitmq.annotation.Queue;
+import io.micronaut.rabbitmq.annotation.RabbitListener;
+import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
+import io.micronaut.rabbitmq.connect.ChannelPool;
+import io.micronaut.serde.ObjectMapper;
+#if($traced)
+import io.opentelemetry.api.trace.*;
+import io.opentelemetry.context.Context;
+#end
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import lombok.Generated;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apized.core.ApizedConfig;
+import org.apized.core.error.ExceptionNotifier;
+import org.apized.core.security.UserResolver;
+import org.apized.micronaut.messaging.rabbitmq.consumer.EnvelopeConsumer;
+import org.apized.micronaut.messaging.rabbitmq.consumer.QueueConfig;
+#if($traced)
+import org.apized.tracing.TraceUtils;
+#end
+
+import java.util.List;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Generated
+@Slf4j
+@RabbitListener
+@Requires(notEnv = Environment.TEST)
+class ${type}${d}Listener extends EnvelopeConsumer<${generic}> {
+
+  @Inject
+  @Getter
+  ${type} consumer;
+#if($traced)
+
+  @Inject
+  BeanContext context;
+#end
+
+  public ${type}${d}Listener(
+    ChannelPool pool,
+    ObjectMapper mapper,
+    UserResolver resolver,
+    ApizedConfig config,
+    ApplicationEventPublisher<String> eventPublisher,
+    List<ExceptionNotifier> notifiers
+  ) {
+    super(
+      new QueueConfig("${exchange}", "${queue}", ${bindings}),
+      pool,
+      mapper,
+      resolver,
+      config,
+      eventPublisher,
+      notifiers
+    );
+  }
+
+  @Override
+  @Transactional
+  @Queue(value = "${queue}", numberOfConsumersValue = "${numberOfConsumers}")
+#if($metrics)
+  @Timed(value = "rabbitmq.consumer", extraTags = {"consumer", "${type}"}, histogram = true)
+#end
+  protected void consume(byte[] data, Envelope envelope, BasicProperties properties, RabbitAcknowledgement acknowledgement) {
+#if($traced)
+    Optional<Tracer> tracer = context.findBean(Tracer.class);
+    if(tracer.isPresent()) {
+      try {
+        Map<String, Object> message = Optional.ofNullable(mapper.readValue(data, Argument.of(Map.class, String.class, Object.class))).orElseGet(HashMap::new);
+        Map<String, Object> header = (Map<String, Object>) message.getOrDefault("header", new HashMap<>());
+        String traceId = (String) header.getOrDefault("traceId","");
+        String spanId = (String) header.getOrDefault("spanId","");
+
+        TraceUtils.wrap(
+          tracer.get(),
+          "${type}",
+          SpanKind.CONSUMER,
+          (spanBuilder)->{
+            spanBuilder.setParent(Context.current().with(Span.wrap(
+              SpanContext.createFromRemoteParent(
+                traceId,
+                spanId,
+                TraceFlags.getSampled(),
+                TraceState.getDefault()
+              )
+            )));
+            spanBuilder.setAttribute("messaging.system", "rabbitmq");
+            spanBuilder.setAttribute("messaging.operation.type", "receive");
+            spanBuilder.setAttribute("messaging.rabbitmq.destination.routing_key", envelope.getRoutingKey());
+          },
+          (span)->{
+            super.consume(data, envelope, properties, acknowledgement);
+            return null;
+          }
+        );
+      } catch (Throwable t){
+        if(!(t instanceof RuntimeException)){
+          t = new RuntimeException(t);
+        }
+        throw (RuntimeException)t;
+      }
+    } else {
+      super.consume(data, envelope, properties, acknowledgement);
+    }
+#else
+    super.consume(data, envelope, properties, acknowledgement);
+#end
+  }
+
+  protected Argument<?> getType() {
+    return Argument.of(${argument});
+  }
+}

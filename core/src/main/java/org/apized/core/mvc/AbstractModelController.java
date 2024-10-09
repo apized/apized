@@ -31,7 +31,6 @@ public abstract class AbstractModelController<T extends Model> implements ModelC
   @Traced
   @Override
   public Page<T> list(Integer page, Integer pageSize, List<SearchTerm> search, List<SortTerm> sort) {
-    if (page < 1) page = 1;
     return getService().list(page, pageSize, search, sort);
   }
 
