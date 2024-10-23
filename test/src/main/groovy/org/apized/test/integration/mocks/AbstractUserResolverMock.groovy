@@ -36,16 +36,26 @@ abstract class AbstractUserResolverMock implements UserResolver {
 
   @Override
   User getUser(String token) {
-    users.get(StringHelper.convertStringToUUID(token))
+    def user =
+      Optional.ofNullable(
+        users.get(StringHelper.convertStringToUUID(token))
+      ).orElse(
+        new User(id: StringHelper.convertStringToUUID(token), name: "Anonymous user", username: "anonymous@apized.com")
+      )
+    user.inferredPermissions = [ ]
+    user
   }
 
   @Override
   User getUser(UUID userId) {
-    Optional.ofNullable(
+    Proxy
+    def user = Optional.ofNullable(
       users.get(userId)
     ).orElse(
       new User(id: userId, name: "Anonymous user", username: "anonymous@apized.com")
     )
+    user.inferredPermissions = [ ]
+    user
   }
 
   @Override

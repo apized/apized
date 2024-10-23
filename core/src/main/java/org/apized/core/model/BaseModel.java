@@ -98,6 +98,7 @@ public abstract class BaseModel implements Model {
     createdBy = ApizedContext.getSecurity().getUser().getId();
     lastUpdatedAt = LocalDateTime.now(ZoneId.of("UTC"));
     lastUpdatedBy = ApizedContext.getSecurity().getUser().getId();
+    validate();
     _getModelMetadata().setSaved(true);
   }
 
@@ -105,6 +106,10 @@ public abstract class BaseModel implements Model {
   public void beforeUpdate() {
     lastUpdatedAt = LocalDateTime.now(ZoneId.of("UTC"));
     lastUpdatedBy = ApizedContext.getSecurity().getUser().getId();
+    validate();
     _getModelMetadata().setSaved(true);
+  }
+
+  protected void validate() {
   }
 }

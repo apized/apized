@@ -29,9 +29,9 @@ import org.apized.test.integration.core.ServerConfig
 import org.apized.test.integration.mocks.AbstractUserResolverMock
 
 @SuppressWarnings('unused')
-class MicronautBootTestServer {
-  static boolean initialized = false
-  static private EmbeddedServer application
+class MicronautTestServer {
+  public static boolean initialized = false
+  public static EmbeddedServer application
 
   @BeforeAll(order = 1)
   static void setup() {

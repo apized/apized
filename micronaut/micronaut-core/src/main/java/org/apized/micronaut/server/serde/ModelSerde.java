@@ -31,10 +31,12 @@ import io.micronaut.serde.*;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.persistence.ManyToOne;
+import org.apized.core.ApizedConfig;
 import org.apized.core.MapHelper;
 import org.apized.core.StringHelper;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.context.SerdeStackEntry;
+import org.apized.core.error.exception.ForbiddenException;
 import org.apized.core.federation.Federation;
 import org.apized.core.model.*;
 import org.apized.core.mvc.ModelService;
@@ -49,6 +51,9 @@ import java.util.*;
 
 @Singleton
 public class ModelSerde implements Serde<Model> {
+  @Inject
+  ApizedConfig config;
+
   @Inject
   ApplicationContext appContext;
 
@@ -136,7 +141,7 @@ public class ModelSerde implements Serde<Model> {
         propOpt.isPresent()
           && propOpt.get().getAnnotation(JsonIgnore.class) == null
           && (
-            key.equals("id") ||
+          key.equals("id") ||
             propOpt.get().getAnnotation(JsonProperty.class) == null
             || !propOpt.get().getAnnotation(JsonProperty.class)
             .enumValue("access", JsonProperty.Access.class)
@@ -164,8 +169,7 @@ public class ModelSerde implements Serde<Model> {
 
           deserializationWrapper.setProperty(key, subValues);
         } else if (Model.class.isAssignableFrom(property.getType())) {
-          Deserializer<?> deserializer = context.findDeserializer(property.getType());
-          deserializationWrapper.setProperty(key, deserializer.deserialize(decoder, context, Argument.of(property.getType())));
+          deserializationWrapper.setProperty(key, defaultDeserialize(decoder, context, property));
         } else if (Map.class.isAssignableFrom(property.getType())) {
           deserializationWrapper.setProperty(key, decoder.decodeArbitrary());
         } else {
@@ -191,15 +195,19 @@ public class ModelSerde implements Serde<Model> {
       model._getModelMetadata().setAction(Action.CREATE);
     }
 
+    model._getModelMetadata().getTouched().addAll(touched.stream().map(Named::getName).toList());
+
     for (BeanProperty<? super Model, Object> property : introspection.getBeanProperties().stream().filter(p -> p.getAnnotation(Owner.class) != null).toList()) {
       BeanWrapper<Model> wrapper = BeanWrapper.getWrapper(model);
-      boolean replace = property.getAnnotation(Owner.class).isTrue("replace");
-      if (replace || wrapper.getProperty(property.getName(), UUID.class).isEmpty()) {
+      if (wrapper.getProperty(property.getName(), UUID.class).isEmpty()) {
         wrapper.setProperty(property.getName(), ApizedContext.getSecurity().getUser().getId());
+      } else if (model._getModelMetadata().getTouched().contains(property.getName())) {
+        String perm = String.format("%s.%s", config.getSlug(), StringHelper.uncapitalize(type.getSimpleName()));
+        if (!ApizedContext.getSecurity().getUser().equals(property.get(model)) && !ApizedContext.getSecurity().getUser().isAllowed(perm)) {
+          throw new ForbiddenException("Forbidden", perm);
+        }
       }
     }
-
-    model._getModelMetadata().getTouched().addAll(touched.stream().map(Named::getName).toList());
 
     return model;
   }
