@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 @RunWith(Cucumber)
 @CucumberOptions(
   plugin = [ "pretty", "html:target/features" ],
-  features = [ "../../core/src/test/resources/features" ],
+  features = [ "../../test/src/main/resources/features" ],
   glue = [ "org.apized" ]
 )
 class IntegrationTests {}

@@ -44,5 +44,5 @@ dependencies {
   testRuntimeOnly 'io.micronaut.flyway:micronaut-flyway'
   testRuntimeOnly 'org.postgresql:postgresql'
   testRuntimeOnly 'org.flywaydb:flyway-database-postgresql'
-  testRuntimeOnly 'org.springframework:spring-context:6.1.13'
+  testRuntimeOnly 'org.springframework:spring-context:6.1.14'
 }

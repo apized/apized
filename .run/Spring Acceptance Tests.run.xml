@@ -4,7 +4,7 @@
     <envs>
       <env name="SPRING_MAIN_CLASS" value="org.apized.spring.server.Application" />
     </envs>
-    <option name="FILE_PATH" value="$PROJECT_DIR$/core/src/test/resources/features" />
+    <option name="FILE_PATH" value="$PROJECT_DIR$/test/src/main/resources/features" />
     <option name="GLUE" value="org.apized" />
     <option name="MAIN_CLASS_NAME" value="io.cucumber.core.cli.Main" />
     <module name="apized.spring.spring-core.test" />
