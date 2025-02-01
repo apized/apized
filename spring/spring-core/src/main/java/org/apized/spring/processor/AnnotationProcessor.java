@@ -392,6 +392,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 //        generateClassFor(bindings.get("module") + "." + bindings.get("type") + "$Proxy", "Proxy", bindings);
 
         if (Arrays.stream(annotation.layers()).toList().contains(Layer.REPOSITORY)) {
+          processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Repository %s", bindings));
           generateClassFor(bindings.get("module") + "." + bindings.get("type") + "Repository", "Repository", bindings);
         }
 
@@ -475,10 +476,11 @@ public class AnnotationProcessor extends AbstractProcessor {
       JavaFileObject file = processingEnv.getFiler().createSourceFile(fullyQualifiedName);
       Writer w = file.openWriter();
       VelocityEngine engine = new VelocityEngine();
-      engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-      engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+      engine.setProperty(RuntimeConstants.RESOURCE_LOADERS, "classpath");
+      engine.setProperty("resource.loader.classpath.class", ClasspathResourceLoader.class.getName());
       engine.init();
       Template vTemplate = engine.getTemplate("/templates/" + template + ".ft");
+      processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Generating %s",template));
       vTemplate.merge(new VelocityContext(bindings), w);
       w.flush();
       w.close();

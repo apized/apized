@@ -23,9 +23,9 @@ dependencies {
   api 'org.flywaydb:flyway-core'
   api('io.hypersistence:hypersistence-utils-hibernate-63:3.8.2')
 
-  implementation("org.apache.velocity:velocity-engine-core:2.4")
+  implementation 'org.apache.velocity:velocity-engine-core'
 
-  compileOnly("org.projectlombok:lombok:1.18.30")
+  compileOnly 'org.projectlombok:lombok:1.18.30'
 
   testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
   testAnnotationProcessor project(':spring:spring-core')
