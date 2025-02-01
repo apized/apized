@@ -13,7 +13,6 @@ dependencies {
 
   api project(':tracing')
   api 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter:2.3.0-alpha'
-  api 'io.micrometer:micrometer-registry-otlp:1.13.4'
 
   compileOnly "ch.qos.logback:logback-classic"
 }
