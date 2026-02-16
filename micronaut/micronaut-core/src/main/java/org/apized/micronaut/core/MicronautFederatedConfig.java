@@ -17,21 +17,20 @@
 package org.apized.micronaut.core;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
+import io.micronaut.context.annotation.EachProperty;
+import io.micronaut.core.convert.format.MapFormat;
 import lombok.Getter;
-import org.apized.core.ApizedConfig;
+import lombok.Setter;
+import org.apized.core.FederationConfig;
 
 import java.util.Map;
 
-/**
- * Properties to configure apized.
- */
-@ConfigurationProperties("apized")
-public class MicronautApizedConfig extends ApizedConfig {
-  public MicronautApizedConfig(Map<String, MicronautFederatedConfig> federatedConfigs) {
-    ApizedConfig.engine = "micronaut";
-    this.federation = federatedConfigs;
-  }
+import static io.micronaut.core.naming.conventions.StringConvention.RAW;
 
-  @Getter
-  Map<String, MicronautFederatedConfig> federation;
+
+/**
+ * Properties to configure federation.
+ */
+@EachProperty(value = "apized.federation")
+public class MicronautFederatedConfig extends FederationConfig {
 }

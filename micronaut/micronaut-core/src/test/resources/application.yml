@@ -73,6 +73,7 @@ apized:
   federation:
     auth: ${AUTH_API:`https://auth.apized.com`}
     catalogopolis: https://api.restful-api.dev
+  cookie:
 
 logger:
   levels:

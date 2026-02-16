@@ -42,7 +42,7 @@ public abstract class StringHelper {
   }
 
   public static String pluralize(String name) {
-    if (name.endsWith("ry")) {
+    if (name.endsWith("ry") || name.endsWith("ty")) {
       return name.substring(0, name.length() - 1) + "ies";
     } else if (name.endsWith("x")) {
       return name.substring(0, name.length() - 1) + "xes";

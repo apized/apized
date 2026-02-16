@@ -73,7 +73,6 @@ public abstract class BaseModel implements Model {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime lastUpdatedAt;
 
-  @SuppressWarnings("JpaAttributeTypeInspection")
   @TypeDef(type = DataType.JSON)
   @Type(JsonType.class)
   protected Map<String, Object> metadata = new HashMap<>();

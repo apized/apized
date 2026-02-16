@@ -33,7 +33,7 @@ public class TracedFederationResolver extends FederationResolver {
       @Traced.Attribute(key = "http.url", arg = "url")
     }
   )
-  protected Map<String, Object> performRequest(URI url) throws Exception {
-    return super.performRequest(url);
+  protected Map<String, Object> performRequest(URI url, Map<String, String> stringStringMap) throws Exception {
+    return super.performRequest(url, stringStringMap);
   }
 }

@@ -66,5 +66,5 @@ public class ApizedConfig {
   /**
    * Known apis that can be used for federation.
    */
-  private Map<String, String> federation = new HashMap<>();
+  protected Map<String, ? extends FederationConfig> federation = new HashMap<>();
 }

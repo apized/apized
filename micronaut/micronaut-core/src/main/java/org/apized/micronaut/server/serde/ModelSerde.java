@@ -115,18 +115,21 @@ public class ModelSerde implements Serde<Model> {
     for (Class<?> scope : scopes) {
       BeanIntrospection<?> scopeIntrospection = BeanIntrospection.getIntrospection(scope);
       String scopeTypeName = StringHelper.uncapitalize(scope.getSimpleName());
-      UUID scopeId = ApizedContext.getRequest().getPathVariables().get(scopeTypeName);
-      if (scopeId != null) {
-        deserializationWrapper.setProperty(
-          scopeTypeName,
-          appContext.getBean(new DefaultArgument<>(ModelService.class, scopeIntrospection.getAnnotationMetadata(), Argument.of(scope)))
-            .get(scopeId)
-        );
-      } else if (ApizedContext.getSerde().getStack().stream().anyMatch(e -> StringHelper.uncapitalize(e.getValue().getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName))) {
-        deserializationWrapper.setProperty(
-          scopeTypeName,
-          ApizedContext.getSerde().getStack().stream().map(SerdeStackEntry::getValue).filter(e -> StringHelper.uncapitalize(e.getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName)).findFirst().orElse(null)
-        );
+
+      if (deserializationWrapper.getProperty(scopeTypeName, scope).isEmpty()) {
+        UUID scopeId = ApizedContext.getRequest().getPathVariables().get(scopeTypeName);
+        if (scopeId != null) {
+          deserializationWrapper.setProperty(
+            scopeTypeName,
+            appContext.getBean(new DefaultArgument<>(ModelService.class, scopeIntrospection.getAnnotationMetadata(), Argument.of(scope)))
+              .get(scopeId)
+          );
+        } else if (ApizedContext.getSerde().getStack().stream().anyMatch(e -> StringHelper.uncapitalize(e.getValue().getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName))) {
+          deserializationWrapper.setProperty(
+            scopeTypeName,
+            ApizedContext.getSerde().getStack().stream().map(SerdeStackEntry::getValue).filter(e -> StringHelper.uncapitalize(e.getClass().getSimpleName().replaceAll("\\$Proxy", "")).equals(scopeTypeName)).findFirst().orElse(null)
+          );
+        }
       }
     }
 
@@ -332,13 +335,13 @@ public class ModelSerde implements Serde<Model> {
     return subType;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private Object defaultDeserialize(Decoder decoder, DecoderContext context, BeanProperty property) throws IOException {
     Deserializer deserializer = context.findDeserializer(property.asArgument());
     return deserializer.deserializeNullable(decoder, context, property.asArgument());
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   private void defaultSerialize(Encoder encoder, EncoderContext context, Argument type, Object val) throws IOException {
     final Serializer<? super Object> serializer = context.findSerializer(type).createSpecific(context, type);
     serializer.serialize(encoder, context, type, val);
