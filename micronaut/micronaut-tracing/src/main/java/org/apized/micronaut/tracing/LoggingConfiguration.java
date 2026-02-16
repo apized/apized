@@ -10,7 +10,7 @@ import io.opentelemetry.sdk.logs.LogLimits;
 import io.opentelemetry.sdk.logs.SdkLoggerProvider;
 import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
 import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.semconv.ResourceAttributes;
+import io.opentelemetry.semconv.ServiceAttributes;
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -36,8 +36,8 @@ public class LoggingConfiguration {
   public static void addLoggingExporter(String name, String endpoint, String key, String instance) {
 
     var resource = Resource.getDefault().toBuilder()
-      .put(ResourceAttributes.SERVICE_NAME, name.toLowerCase().replaceAll("\\s", "-"))
-      .put(ResourceAttributes.SERVICE_INSTANCE_ID, instance)
+      .put(ServiceAttributes.SERVICE_NAME, name.toLowerCase().replaceAll("\\s", "-"))
+//      .put(ServiceAttributes.SERVICE_INSTANCE_ID, instance)
       .build();
 
     var logExporter =
