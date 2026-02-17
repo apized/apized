@@ -100,4 +100,6 @@ public interface ModelService<T extends Model> {
   default List<T> batchDelete(List<T> id) {
     throw new NotImplementedException();
   }
+
+  void planExecutions(ExecutionPlan plan, T it, boolean b);
 }
