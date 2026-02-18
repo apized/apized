@@ -40,52 +40,52 @@ import java.util.UUID;
 public class OrgControllerBehaviour implements BehaviourHandler<Organization> {
   @Override
   public void preList(Execution<Organization> execution) {
-    log.info("CONTROLLER: PRE: List Org");
+    log.debug("CONTROLLER: PRE: List Org");
   }
 
   @Override
   public void postList(Execution<Organization> execution, Page<Organization> output) {
-    log.info("CONTROLLER: POST: List Org: {}", output);
+    log.debug("CONTROLLER: POST: List Org: {}", output);
   }
 
   @Override
   public void preGet(Execution<Organization> execution, UUID id) {
-    log.info("CONTROLLER: PRE {}: Get Org", id);
+    log.debug("CONTROLLER: PRE {}: Get Org", id);
   }
 
   @Override
   public void postGet(Execution<Organization> execution, UUID id, Organization output) {
-    log.info("CONTROLLER: POST: Get Org {}: {}", id, output);
+    log.debug("CONTROLLER: POST: Get Org {}: {}", id, output);
   }
 
   @Override
   public void preCreate(Execution<Organization> execution, Organization input) {
-    log.info("CONTROLLER: PRE: Create Org: {}", input);
+    log.debug("CONTROLLER: PRE: Create Org: {}", input);
   }
 
   @Override
   public void postCreate(Execution<Organization> execution, Organization input, Organization output) {
-    log.info("CONTROLLER: POST: Create Org: {}", output);
+    log.debug("CONTROLLER: POST: Create Org: {}", output);
   }
 
   @Override
   public void preUpdate(Execution<Organization> execution, UUID id, Organization input) {
-    log.info("CONTROLLER: PRE {}: Update Org: {}", id, input);
+    log.debug("CONTROLLER: PRE {}: Update Org: {}", id, input);
   }
 
   @Override
   public void postUpdate(Execution<Organization> execution, UUID id, Organization input, Organization output) {
-    log.info("CONTROLLER: POST {}: Update Org: {}", id, output);
+    log.debug("CONTROLLER: POST {}: Update Org: {}", id, output);
   }
 
   @Override
   public void preDelete(Execution<Organization> execution, UUID id) {
-    log.info("CONTROLLER: PRE {}: Delete Org", id);
+    log.debug("CONTROLLER: PRE {}: Delete Org", id);
   }
 
   @Override
   public void postDelete(Execution<Organization> execution, UUID id, Organization output) {
-    log.info("CONTROLLER: POST {}: Delete Org: {}", id, output);
+    log.debug("CONTROLLER: POST {}: Delete Org: {}", id, output);
   }
 
 }

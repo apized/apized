@@ -20,8 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apized.core.model.Model;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Data
@@ -49,5 +48,18 @@ public class ExecutionStep {
 
   public void execute() {
     consumer.accept(this);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    sb.append("kind: ").append(kind);
+    sb.append(", propertyName: '").append(propertyName).append("'");
+    sb.append(", type: ").append(models.getFirst().getClass().getSuperclass().getSimpleName());
+    sb.append(", models: ").append(models.stream().map((m) -> Map.of(Optional.ofNullable(m.getId()).orElse(UUID.fromString("00000000-0000-0000-0000-000000000000")), m._getModelMetadata().getTouched())).toList());
+    Optional.ofNullable(other).ifPresent((model) -> sb.append(", other: ").append(model.getId()));
+    sb.append("}");
+    return sb.toString();
   }
 }

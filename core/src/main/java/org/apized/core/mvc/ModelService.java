@@ -17,6 +17,7 @@
 package org.apized.core.mvc;
 
 import org.apized.core.error.exception.NotImplementedException;
+import org.apized.core.model.Action;
 import org.apized.core.model.Model;
 import org.apized.core.model.Page;
 import org.apized.core.search.SearchTerm;
@@ -101,5 +102,5 @@ public interface ModelService<T extends Model> {
     throw new NotImplementedException();
   }
 
-  void planExecutions(ExecutionPlan plan, T it, boolean b);
+  void planExecutions(ExecutionPlan plan, Action action, T model, boolean isBefore);
 }

@@ -124,6 +124,6 @@ public class ExecutionPlan {
 
   @Override
   public String toString() {
-    return "\n{" + executionSteps.stream().map(ExecutionStep::toString).collect(Collectors.joining("\n")) + "}\n";
+    return "\n[\n\t" + executionSteps.stream().map(ExecutionStep::toString).collect(Collectors.joining("\n\t")) + "\n]";
   }
 }
