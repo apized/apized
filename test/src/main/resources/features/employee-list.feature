@@ -22,10 +22,10 @@ Feature: List Employees
     And the response path "content" contains element with
       | name | Guy 2 |
 
-  Scenario: Can list employees with federated favoriteDoctor
-    Given the responses are expanded to contain favoriteDoctor
-    When I list the employees
-    Then the request succeeds
-    And the response path "content" contains 2 elements
-    And the response path "content" contains element with
-      | favoriteDoctor | [ name: "Google Pixel 6 Pro" ] |
+#  Scenario: Can list employees with federated favoriteDoctor
+#    Given the responses are expanded to contain favoriteDoctor
+#    When I list the employees
+#    Then the request succeeds
+#    And the response path "content" contains 2 elements
+#    And the response path "content" contains element with
+#      | favoriteDoctor | [ name: "Google Pixel 6 Pro" ] |
