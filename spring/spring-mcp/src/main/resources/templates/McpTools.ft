@@ -1,0 +1,139 @@
+package ${module};
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
+import lombok.Generated;
+import org.apized.core.context.ApizedContext;
+import org.apized.spring.mcp.McpContextInitializer;
+import org.apized.core.model.Page;
+import org.apized.core.search.SearchHelper;
+import org.apized.core.search.SearchTerm;
+import org.apized.core.search.SortTerm;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Generated
+@Component
+public class ${type}McpTools {
+
+  @Inject
+  ${type}Controller controller;
+
+  @Inject
+  McpContextInitializer contextInitializer;
+
+  @Inject
+  ObjectMapper objectMapper;
+#if($actions.contains('LIST'))
+
+  @Tool(name = "${snakeName}_list", description = "List ${type} records")
+  public String list(
+    @ToolParam(description = "Page number, 1-based (default: 1)") Integer page,
+    @ToolParam(description = "Number of records per page (default: 50)") Integer pageSize,
+    @ToolParam(description = "Comma-separated search terms. Exact match: field=value. Contains: field~=value. Supports nested fields: relation.field=value") String search,
+    @ToolParam(description = "Comma-separated sort terms. Append > for ASC or < for DESC. Example: name>,createdAt<") String sort,
+    @ToolParam(description = "Comma-separated fields to return. Supports dot-notation to drill into relations. Example: name,employees.name") String fields
+  ) throws Exception {
+    try {
+      if (contextInitializer != null) contextInitializer.init();
+      List<SearchTerm> searchTerms = search != null && !search.isBlank()
+        ? Arrays.stream(search.split(",")).map(SearchHelper::convertTerm).filter(Objects::nonNull).collect(Collectors.toList())
+        : List.of();
+      List<SortTerm> sortTerms = sort != null && !sort.isBlank()
+        ? Arrays.stream(sort.split(",")).map(SearchHelper::convertSort).filter(Objects::nonNull).collect(Collectors.toList())
+        : List.of();
+      ApizedContext.getRequest().setFields(parseFields(fields));
+      Page<${type}> result = controller.list(page != null ? page : 1, pageSize != null ? pageSize : 50, new java.util.ArrayList<>(searchTerms), new java.util.ArrayList<>(sortTerms));
+      return objectMapper.writeValueAsString(result);
+    } catch (Exception e) {
+      return "Error: " + e.getMessage();
+    }
+  }
+#end
+#if($actions.contains('GET'))
+
+  @Tool(name = "${snakeName}_get", description = "Get a ${type} by ID")
+  public String get(
+    @ToolParam(description = "UUID of the ${type} to retrieve") String id,
+    @ToolParam(description = "Comma-separated fields to return. Supports dot-notation to drill into relations. Example: name,employees.name") String fields
+  ) throws Exception {
+    try {
+      if (contextInitializer != null) contextInitializer.init();
+      ApizedContext.getRequest().setFields(parseFields(fields));
+      return objectMapper.writeValueAsString(controller.get(UUID.fromString(id)));
+    } catch (Exception e) {
+      return "Error: " + e.getMessage();
+    }
+  }
+#end
+#if($actions.contains('CREATE'))
+
+  @Tool(name = "${snakeName}_create", description = "Create a new ${type}")
+  public String create(
+    @ToolParam(description = "${type} data to create") ${type} it,
+    @ToolParam(description = "Comma-separated fields to return in the response. Supports dot-notation to drill into relations.") String fields
+  ) throws Exception {
+    try {
+      if (contextInitializer != null) contextInitializer.init();
+      ApizedContext.getRequest().setFields(parseFields(fields));
+      return objectMapper.writeValueAsString(controller.create(it));
+    } catch (Exception e) {
+      return "Error: " + e.getMessage();
+    }
+  }
+#end
+#if($actions.contains('UPDATE'))
+
+  @Tool(name = "${snakeName}_update", description = "Update an existing ${type}")
+  public String update(
+    @ToolParam(description = "UUID of the ${type} to update") String id,
+    @ToolParam(description = "${type} data to update") ${type} it,
+    @ToolParam(description = "Comma-separated fields to return in the response. Also controls which fields are updated (partial update). Example: name,status") String fields
+  ) throws Exception {
+    try {
+      if (contextInitializer != null) contextInitializer.init();
+      ApizedContext.getRequest().setFields(parseFields(fields));
+      return objectMapper.writeValueAsString(controller.update(UUID.fromString(id), it));
+    } catch (Exception e) {
+      return "Error: " + e.getMessage();
+    }
+  }
+#end
+#if($actions.contains('DELETE'))
+
+  @Tool(name = "${snakeName}_delete", description = "Delete a ${type} by ID")
+  public String delete(
+    @ToolParam(description = "UUID of the ${type} to delete") String id
+  ) throws Exception {
+    try {
+      if (contextInitializer != null) contextInitializer.init();
+      return objectMapper.writeValueAsString(controller.delete(UUID.fromString(id)));
+    } catch (Exception e) {
+      return "Error: " + e.getMessage();
+    }
+  }
+#end
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> parseFields(String fields) {
+    Map<String, Object> result = new HashMap<>();
+    if (fields == null || fields.isBlank()) return result;
+    for (String path : fields.split(",")) {
+      Map<String, Object> loc = result;
+      for (String part : path.trim().split("\\.")) {
+        loc.putIfAbsent(part, new HashMap<>());
+        loc = (Map<String, Object>) loc.get(part);
+      }
+    }
+    return result;
+  }
+}

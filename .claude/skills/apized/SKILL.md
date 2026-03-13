@@ -27,6 +27,7 @@ Apized is an annotation-driven JVM framework that auto-generates REST API infras
 | [Controller Extensions](#controller-extensions) | Override generated actions |
 | [Behaviour Pipeline on Custom Endpoints](#triggering-the-behaviour-pipeline-from-custom-endpoints) | `@MicronautBehaviourExecution` / `@SpringBehaviourExecution` |
 | [Custom Controllers](#custom-controllers) | Fully custom endpoints |
+| [MCP Module](#mcp-module) | Auto-generated MCP tools via `spring-mcp` / `micronaut-mcp` |
 | [Tracing](#tracing-module) | `@Traced` + OpenTelemetry |
 | [Distributed Lock](#distributed-lock-module) | `LockFactory` + ShedLock |
 | [Testing](#test-module) | Cucumber BDD integration tests |
@@ -48,6 +49,7 @@ dependencies {
   implementation "org.apized:micronaut-tracing:$apizedVersion"              // optional: OTEL tracing
   implementation "org.apized:micronaut-messaging-rabbitmq:$apizedVersion"   // optional: RabbitMQ events
   implementation "org.apized:micronaut-distributed-lock:$apizedVersion"     // optional: distributed locks
+  implementation "org.apized:micronaut-mcp:$apizedVersion"                  // optional: MCP server tools
 }
 ```
 
@@ -68,6 +70,7 @@ dependencies {
   implementation "org.apized:spring-tracing:$apizedVersion"              // optional: OTEL tracing
   implementation "org.apized:spring-messaging-rabbitmq:$apizedVersion"   // optional: RabbitMQ events
   implementation "org.apized:spring-distributed-lock:$apizedVersion"     // optional: distributed locks
+  implementation "org.apized:spring-mcp:$apizedVersion"                  // optional: MCP server tools
 }
 ```
 
@@ -836,6 +839,79 @@ public interface DepartmentRepositoryExtension {
 ```
 
 Reference it via `@Apized(extensions = DepartmentRepositoryExtension.class)` on the model.
+
+---
+
+## MCP Module (`spring-mcp` / `micronaut-mcp`)
+
+Adding `spring-mcp` or `micronaut-mcp` as a dependency causes the annotation processor to generate a `${type}McpTools` class for every `@Apized` model, exposing each operation as a named MCP tool. The MCP server endpoint (`POST /mcp`, HTTP Streamable transport) is auto-configured by the underlying framework library — no extra code required.
+
+### Gradle setup
+
+**Spring:**
+```groovy
+dependencies {
+  annotationProcessor "org.apized:spring-mcp:$apizedVersion"
+  implementation "org.apized:spring-mcp:$apizedVersion"
+}
+```
+
+**Micronaut:**
+```groovy
+dependencies {
+  annotationProcessor "org.apized:micronaut-mcp:$apizedVersion"
+  implementation "org.apized:micronaut-mcp:$apizedVersion"
+}
+```
+
+Both the `annotationProcessor` and `implementation` lines are required — the module generates code at compile time and provides the runtime dependency.
+
+### Required `application.yml`
+
+**Spring** (via `spring-ai-starter-mcp-server-webmvc`):
+```yaml
+spring:
+  ai:
+    mcp:
+      server:
+        name: my-server
+        version: 1.0.0
+```
+
+**Micronaut** (via `micronaut-mcp-server-java-sdk`):
+```yaml
+micronaut:
+  mcp:
+    server:
+      transport: HTTP
+      info:
+        name: my-server
+        version: 1.0.0
+```
+
+### What gets generated
+
+For a model `Organization` with all five operations, the processor emits `OrganizationMcpTools` in the same package. Tool names follow the pattern `{snake_case_type}_{action}`:
+
+| Tool name | Description |
+|---|---|
+| `organization_list` | List organization records |
+| `organization_get` | Get an organization by ID |
+| `organization_create` | Create a new organization |
+| `organization_update` | Update an existing organization |
+| `organization_delete` | Delete an organization by ID |
+
+Only tools for operations present in `@Apized(operations = {...})` are generated.
+
+All tools accept a `fields` parameter (comma-separated, dot-notation supported) that maps directly to the `?fields=` REST query parameter — enabling field filtering and relation drilling. The `list` tool additionally accepts `page`, `pageSize`, `search`, and `sort`. Search/sort string format matches the REST query syntax (`field=value`, `field~=value`, `field>`, `field<`).
+
+Each tool delegates directly to the generated `${type}Controller`, so both **CONTROLLER-layer and SERVICE-layer behaviours** fire for every MCP tool call, identical to an HTTP request.
+
+Exceptions (including `ForbiddenException`) are caught and returned as `"Error: <message>"` strings in the tool result rather than propagating into the MCP SDK's opaque error handler.
+
+### Security
+
+The `Authorization: Bearer <token>` header is read and the user resolved via `McpContextInitializer` at the start of each tool call. This is necessary because MCP tool methods may execute on a different thread than the HTTP filters — without it, the `ApizedContext` security context would be empty on that thread. `McpContextInitializer` only activates when a `UserResolver` bean is present. Permission checks in behaviours apply identically to REST requests.
 
 ---
 

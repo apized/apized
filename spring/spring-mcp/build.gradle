@@ -1,0 +1,21 @@
+plugins {
+  id "io.spring.dependency-management" version "${springDependencyGradlePluginVersion}"
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootGradlePluginVersion}"
+    mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+  }
+}
+
+dependencies {
+  annotationProcessor("org.projectlombok:lombok:1.18.30")
+
+  compileOnly 'org.projectlombok:lombok:1.18.30'
+
+  api project(':spring:spring-core')
+  api 'org.springframework.ai:spring-ai-starter-mcp-server-webmvc'
+
+  implementation 'org.apache.velocity:velocity-engine-core'
+}

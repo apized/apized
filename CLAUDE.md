@@ -40,6 +40,7 @@ spring/
   spring-distributed-lock/
   spring-test/
   spring-tracing/
+  spring-mcp/
   spring-gradle-plugin/
 micronaut/
   micronaut-core/            # Micronaut 4 implementation
@@ -47,6 +48,7 @@ micronaut/
   micronaut-test/
   micronaut-tracing/
   micronaut-messaging-rabbitmq/
+  micronaut-mcp/
   micronaut-gradle-plugin/
 ```
 
@@ -119,3 +121,7 @@ Permission format: `[project].[model].[action].[id].[field].[value]` (wildcards 
 - Micronaut 4.10.6 (micronaut modules)
 - Spock + JUnit Jupiter for tests; REST Assured + Testcontainers (MySQL, PostgreSQL, Oracle XE, MSSQL) for integration tests — **Docker is required** to run integration tests
 - JaCoCo code coverage enforced at ≥ 50%
+
+## Updating the skill
+
+When updating the skill, ensure that the metadata.last_synced_commit is updated to reflect the last commit that has affected it. Check what other changes have happened since the current commit in the file and the new commit hash you're adding.

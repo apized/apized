@@ -13,3 +13,4 @@ out/
 .classpath
 .factorypath
 .envrc
+.mcp.json

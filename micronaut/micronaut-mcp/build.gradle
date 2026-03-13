@@ -1,0 +1,25 @@
+plugins {
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
+}
+
+configurations.all {
+  resolutionStrategy.eachDependency { details ->
+    if (details.requested.group == 'io.micronaut') {
+      details.useVersion micronautVersion
+      details.because 'Pin to Micronaut 4.x; micronaut-mcp SDK pulls in 5.0.0-M13'
+    }
+  }
+}
+
+dependencies {
+  annotationProcessor("org.projectlombok:lombok:1.18.30")
+  annotationProcessor("io.micronaut:micronaut-inject-java")
+
+  compileOnly 'org.projectlombok:lombok:1.18.30'
+
+  api project(':micronaut:micronaut-core')
+  api "io.micronaut.mcp:micronaut-mcp-server-java-sdk"
+
+  implementation 'org.apache.velocity:velocity-engine-core'
+  implementation("org.projectlombok:lombok:1.18.30")
+}
