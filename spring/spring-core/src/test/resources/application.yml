@@ -51,8 +51,10 @@ apized:
     - /actuator/.*
     - /swagger.*
   federation:
-    auth: ${AUTH_API:`https://auth.apized.com`}
-    catalogopolis: https://api.restful-api.dev
+    auth:
+      base-url: ${AUTH_API:`https://auth.apized.com`}
+    catalogopolis:
+      base-url: https://api.restful-api.dev
 
 logging:
   level:
