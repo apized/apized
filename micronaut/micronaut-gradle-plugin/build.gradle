@@ -1,0 +1,51 @@
+plugins {
+  id 'com.gradle.plugin-publish' version '1.2.0'
+}
+
+repositories {
+  mavenCentral()
+  gradlePluginPortal()
+}
+
+dependencies {
+  api "io.micronaut.gradle:micronaut-gradle-plugin:${project.micronautGradlePluginVersion}"
+}
+
+gradlePlugin {
+  website = 'https://apized.org/'
+  vcsUrl = 'https://github.com/apized/apized'
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/apized/apized")
+      credentials {
+        username = System.getenv("GITHUB_ACTOR")
+        password = System.getenv("GITHUB_TOKEN")
+      }
+    }
+  }
+  plugins {
+    apizedProjectPlugin {
+      id = 'org.apized.micronaut'
+      displayName = 'Apized Plugin'
+      description = 'Gradle plugin to develop servers using apized'
+      implementationClass = 'org.apized.gradle.ApizedMicronautPlugin'
+      tags.set(List.of('apized'))
+    }
+  }
+}
+
+tasks.register('generateResources') {
+  ext {
+    propFile = file("$buildDir/generated/apized.properties")
+  }
+  outputs.file propFile
+  doLast {
+    mkdir propFile.parentFile
+    propFile.text = "version=$project.version\nmicronautVersion=$project.micronautVersion"
+  }
+}
+
+processResources {
+  from files(generateResources)
+}

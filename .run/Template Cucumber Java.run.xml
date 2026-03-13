@@ -1,5 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="true" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java">
+    <envs>
+      <env name="SPRING_MAIN_CLASS" value="org.apized.spring.server.Application" />
+    </envs>
     <option name="GLUE" value="org.apized" />
     <shortenClasspath name="NONE" />
     <option name="WORKING_DIRECTORY" value="$MODULE_WORKING_DIR$" />

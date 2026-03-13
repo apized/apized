@@ -118,7 +118,7 @@ class CommonSteps extends AbstractSteps {
 
   @Given('^I update an? ([^\\s]+) with id ([^\\s]+) as ([^\\s]+) with$')
   def update(String type, String id, String alias, DataTable table) {
-    testRunner.put(context, type, id, table.asMaps(String, Object).collect { convertTypesFromTable(it as Map<String, Object>) }, alias)
+    testRunner.put(context, type, id, generatePayload(table.asMap(String, Object)), alias)
   }
   // </editor-fold>
 

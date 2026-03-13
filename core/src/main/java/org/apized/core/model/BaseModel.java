@@ -18,6 +18,7 @@ package org.apized.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.data.annotation.TypeDef;
 import io.micronaut.data.model.DataType;
@@ -27,6 +28,7 @@ import org.apized.core.audit.annotation.AuditIgnore;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.event.annotation.EventIgnore;
 import org.apized.core.federation.Federation;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -49,7 +51,7 @@ public abstract class BaseModel implements Model {
   @AuditIgnore
   @EventIgnore
   @Version
-  private Long version = 0L;
+  private Long version;
 
   @AuditIgnore
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -71,8 +73,8 @@ public abstract class BaseModel implements Model {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private LocalDateTime lastUpdatedAt;
 
-  @SuppressWarnings("JpaAttributeTypeInspection")
   @TypeDef(type = DataType.JSON)
+  @Type(JsonType.class)
   protected Map<String, Object> metadata = new HashMap<>();
 
   @JsonIgnore
@@ -95,6 +97,7 @@ public abstract class BaseModel implements Model {
     createdBy = ApizedContext.getSecurity().getUser().getId();
     lastUpdatedAt = LocalDateTime.now(ZoneId.of("UTC"));
     lastUpdatedBy = ApizedContext.getSecurity().getUser().getId();
+    validate();
     _getModelMetadata().setSaved(true);
   }
 
@@ -102,6 +105,10 @@ public abstract class BaseModel implements Model {
   public void beforeUpdate() {
     lastUpdatedAt = LocalDateTime.now(ZoneId.of("UTC"));
     lastUpdatedBy = ApizedContext.getSecurity().getUser().getId();
+    validate();
     _getModelMetadata().setSaved(true);
+  }
+
+  protected void validate() {
   }
 }

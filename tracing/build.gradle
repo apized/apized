@@ -1,0 +1,9 @@
+plugins {
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
+}
+
+dependencies {
+  compileOnly project(":core")
+
+  compileOnly 'io.opentelemetry:opentelemetry-api:1.40.0'
+}

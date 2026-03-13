@@ -1,0 +1,72 @@
+package ${module};
+
+#if(${manyToMany})
+import io.micronaut.data.annotation.Query;
+import org.apized.core.mvc.ManyToManyTuple;
+#end
+import org.apized.spring.server.mvc.SpringModelRepository;
+import org.springframework.stereotype.Repository;
+#foreach( $it in ${extension.repository.imports})
+import $it;
+#end
+
+#if(${manyToMany})
+import java.util.List;
+#end
+import java.util.UUID;
+
+@Repository
+public interface ${type}Repository extends SpringModelRepository<${type}>#foreach( $it in ${extension.repository.implements}), $it #end {
+#if(${manyToMany})
+
+    @Override
+    default void add(String field, UUID self, UUID other){
+        switch(field) {
+#foreach( $it in ${manyToMany})
+            case "${it.name}" -> add${it.Name}(self, other);
+#end
+        }
+    }
+
+    @Override
+    default void addMany(String field, List<ManyToManyTuple> adds){
+        switch(field) {
+#foreach( $it in ${manyToMany})
+##            case "${it.name}" -> addMany${it.Name}(adds);
+#end
+        }
+    }
+
+    @Override
+    default void remove(String field, UUID self, UUID other){
+        switch(field) {
+#foreach( $it in ${manyToMany})
+            case "${it.name}" -> remove${it.Name}(self, other);
+#end
+        }
+    }
+
+    @Override
+    default void removeMany(String field, List<ManyToManyTuple> removes){
+        switch(field) {
+#foreach( $it in ${manyToMany})
+##            case "${it.name}" -> removeMany${it.Name}(removes);
+#end
+        }
+    }
+#end
+#foreach( $it in ${manyToMany})
+
+    @Query("insert into ${it.table}(${it.self},${it.other}) values(:self,:other)")
+    void add${it.Name}(UUID self, UUID other);
+
+    @Query(value = "insert into ${it.table}(${it.self},${it.other}) values(:adds.self,:adds.other)", nativeQuery = true)
+    void addMany${it.Name}(List<ManyToManyTuple> adds);
+
+    @Query("delete from ${it.table} where ${it.self}=:self and ${it.other}=:other")
+    void remove${it.Name}(UUID self, UUID other);
+
+    @Query(value = "delete from ${it.table} where ${it.self}=:removes.self and ${it.other}=:removes.other", nativeQuery = true)
+    void removeMany${it.Name}(List<ManyToManyTuple> removes);
+#end
+}

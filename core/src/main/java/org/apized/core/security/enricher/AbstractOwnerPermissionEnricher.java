@@ -10,7 +10,6 @@ import org.apized.core.context.ApizedContext;
 import org.apized.core.error.exception.NotFoundException;
 import org.apized.core.execution.Execution;
 import org.apized.core.model.Action;
-import org.apized.core.model.DummyModel;
 import org.apized.core.model.Model;
 import org.apized.core.mvc.ModelRepository;
 import org.apized.core.security.annotation.Owner;
@@ -93,7 +92,7 @@ public abstract class AbstractOwnerPermissionEnricher implements PermissionEnric
     if (UUID.class.isAssignableFrom(prop.getType())) {
       ownerId = wrapper.getProperty(prop.getName(), UUID.class).orElse(null);
     } else if (Model.class.isAssignableFrom(prop.getType())) {
-      ownerId = wrapper.getProperty(prop.getName(), Model.class).orElse(new DummyModel()).getId();
+      ownerId = wrapper.getProperty(prop.getName(), Model.class).map(Model::getId).orElse(null);
     }
 
     return ApizedContext.getSecurity().getUser().getId().equals(ownerId);

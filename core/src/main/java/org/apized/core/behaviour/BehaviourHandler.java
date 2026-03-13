@@ -25,6 +25,7 @@ import org.apized.core.tracing.Traced;
 
 import java.util.UUID;
 
+@SuppressWarnings("unchecked")
 public interface BehaviourHandler<T extends Model> {
   @Traced(
     attributes = {
@@ -35,51 +36,59 @@ public interface BehaviourHandler<T extends Model> {
   )
   default void process(Class<T> type, When when, Action action, Execution<T> execution) {
     if (when == When.BEFORE) {
-      switch (action) {
-        case CREATE -> preCreate(execution, execution.getInput());
-        case LIST -> preList(execution);
-        case GET -> preGet(execution, execution.getId());
-        case UPDATE -> preUpdate(execution, execution.getId(), execution.getInput());
-        case DELETE -> preDelete(execution, execution.getId());
-      }
+      preProcess(execution, action);
     } else {
-      switch (action) {
-        case CREATE -> postCreate(execution, execution.getInput(), execution.getOutput());
-        case LIST -> postList(execution, (Page<T>) execution.getOutput());
-        case GET -> postGet(execution, execution.getId(), execution.getOutput());
-        case UPDATE -> postUpdate(execution, execution.getId(), execution.getInput(), execution.getOutput());
-        case DELETE -> postDelete(execution, execution.getId(), execution.getOutput());
-      }
+      postProcess(execution, action);
     }
   }
 
-  default void preCreate(Execution execution, T input) {
+  default void preProcess(Execution<T> execution, Action action) {
+    switch (action) {
+      case CREATE -> preCreate(execution, execution.getInput());
+      case LIST -> preList(execution);
+      case GET -> preGet(execution, execution.getId());
+      case UPDATE -> preUpdate(execution, execution.getId(), execution.getInput());
+      case DELETE -> preDelete(execution, execution.getId());
+    }
   }
 
-  default void postCreate(Execution execution, T input, T output) {
+  default void postProcess(Execution<T> execution, Action action) {
+    switch (action) {
+      case CREATE -> postCreate(execution, execution.getInput(), execution.getOutput());
+      case LIST -> postList(execution, (Page<T>) execution.getOutput());
+      case GET -> postGet(execution, execution.getId(), execution.getOutput());
+      case UPDATE -> postUpdate(execution, execution.getId(), execution.getInput(), execution.getOutput());
+      case DELETE -> postDelete(execution, execution.getId(), execution.getOutput());
+    }
   }
 
-  default void preList(Execution execution) {
+  default void preCreate(Execution<T> execution, T input) {
   }
 
-  default void postList(Execution execution, Page<T> output) {
+  default void postCreate(Execution<T> execution, T input, T output) {
   }
 
-  default void preGet(Execution execution, UUID id) {
+  default void preList(Execution<T> execution) {
   }
 
-  default void postGet(Execution execution, UUID id, T output) {
+  default void postList(Execution<T> execution, Page<T> output) {
   }
 
-  default void preUpdate(Execution execution, UUID id, T input) {
+  default void preGet(Execution<T> execution, UUID id) {
   }
 
-  default void postUpdate(Execution execution, UUID id, T input, T output) {
+  default void postGet(Execution<T> execution, UUID id, T output) {
   }
 
-  default void preDelete(Execution execution, UUID id) {
+  default void preUpdate(Execution<T> execution, UUID id, T input) {
   }
 
-  default void postDelete(Execution execution, UUID id, T output) {
+  default void postUpdate(Execution<T> execution, UUID id, T input, T output) {
+  }
+
+  default void preDelete(Execution<T> execution, UUID id) {
+  }
+
+  default void postDelete(Execution<T> execution, UUID id, T output) {
   }
 }

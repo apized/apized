@@ -67,8 +67,8 @@ class RestIntegrationTest extends AbstractIntegrationTest {
     //noinspection GroovyUnusedAssignment
     Class scope = clazz
     while (scope) {
-      Class[] subScopes = scope.getAnnotation(Apized).scope()
-      scope = subScopes.length ? subScopes[0] : null
+      Class[] subScopes = scope.getAnnotation(Apized)?.scope()
+      scope = subScopes?.length ? subScopes[0] : null
       if (scope) {
         scopes.add(scope.simpleName.toLowerCase())
       }

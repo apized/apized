@@ -17,6 +17,8 @@
 package org.apized.core;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,15 +31,12 @@ import java.util.Map;
 @Data
 public class ApizedConfig {
 
+  @Setter
+  @Getter
   private static ApizedConfig instance;
 
-  public static ApizedConfig getInstance() {
-    return instance;
-  }
-
-  public static void setInstance(ApizedConfig config) {
-    instance = config;
-  }
+  @Getter
+  protected static String engine;
 
   /**
    * The SQL dialect for this application.
@@ -67,5 +66,5 @@ public class ApizedConfig {
   /**
    * Known apis that can be used for federation.
    */
-  private Map<String, String> federation = new HashMap<>();
+  protected Map<String, ? extends FederationConfig> federation = new HashMap<>();
 }

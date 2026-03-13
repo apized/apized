@@ -17,6 +17,8 @@
 package org.apized.core.federation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apized.core.ApizedConfig;
+import org.apized.core.FederationConfig;
 import org.apized.core.ModelMapper;
 import org.apized.core.context.ApizedContext;
 import org.apized.core.model.Apized;
@@ -25,27 +27,44 @@ import org.apized.core.mvc.AbstractModelService;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.*;
 
 
 @Slf4j
 public abstract class AbstractFederationResolver {
-  private final String slug;
-  private final Map<String, String> apis;
+
+  private final ApizedConfig config;
+
   private final List<AbstractModelService<? extends Model>> services;
+
+  HttpClient client = HttpClient.newHttpClient();
+
   ModelMapper mapper;
 
-  public AbstractFederationResolver(String slug, Map<String, String> apis, List<AbstractModelService<? extends Model>> services) {
-    this.slug = slug;
-    this.apis = apis;
+  public AbstractFederationResolver(ApizedConfig config, List<AbstractModelService<? extends Model>> services) {
+    this.config = config;
     this.services = services;
 
     this.mapper = new ModelMapper(Apized.class, Apized.class);
   }
 
-  protected abstract Map<String, Object> performRequest(URI url) throws Exception;
+  protected abstract Map<String, Object> parseResponse(String body) throws Exception;
+
+  protected Map<String, Object> performRequest(URI url, Map<String, String> headers) throws Exception {
+    if (!headers.containsKey("Authorization")) {
+      headers.put("Authorization", String.format("Bearer %s", config.getToken()));
+    }
+
+    HttpRequest.Builder builder = HttpRequest.newBuilder()
+      .uri(url);
+    headers.forEach(builder::header);
+
+    HttpResponse<String> response = client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+    return parseResponse(response.body());
+  }
 
   public Object resolve(String service, String type, String uri, Object target, Set<String> fields) {
 
@@ -57,18 +76,24 @@ public abstract class AbstractFederationResolver {
       return target;
     }
 
-    if (service.equals(slug)) {
+    if (service.equals(config.getSlug())) {
       log.info("Resolve {} (local) with id {}", type, target);
       return services
         .stream()
         .filter(it -> it.getType().getSimpleName().equals(type))
         .findFirst()
         .get()
-        .get(((Model)target).getId());
+        .get(((Model) target).getId());
     } else {
       try {
+        FederationConfig federationConfig = config.getFederation().get(service);
+        List<String> queryParams = new ArrayList<>(List.of(
+          "fields=" + String.join(",", fields)
+        ));
+        queryParams.addAll(Optional.ofNullable(federationConfig.getQueryParams()).orElse(List.of()));
         URI url = createUri(
-          apis.get(service) + uri + "?fields=" + String.join(",", fields),
+          federationConfig.getBaseUrl() + uri,
+          queryParams,
           mapper.createMapOf(target)
         );
 
@@ -77,7 +102,7 @@ public abstract class AbstractFederationResolver {
           return ApizedContext.getFederation().getCache().get(url);
         } else {
           log.info("Resolve {} (remote) with id {} - {}", type, target, url);
-          Map<String, Object> federated = performRequest(url);
+          Map<String, Object> federated = performRequest(url, Optional.ofNullable(federationConfig.getHeaders()).orElse(new HashMap<>()));
           ApizedContext.getFederation().getCache().put(url, federated);
           return federated;
         }
@@ -88,8 +113,8 @@ public abstract class AbstractFederationResolver {
     }
   }
 
-  protected URI createUri(String url, Map<String, Object> variables) throws URISyntaxException {
-    String uri = url;
+  protected URI createUri(String url, List<String> queryParams, Map<String, Object> variables) throws URISyntaxException {
+    String uri = url + "?" + String.join("&", queryParams);
     for (String var : variables.keySet()) {
       uri = uri.replaceAll("\\{" + var + "}", variables.get(var).toString());
     }

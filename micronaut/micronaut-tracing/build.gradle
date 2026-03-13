@@ -1,0 +1,18 @@
+plugins {
+  id "io.micronaut.library" version "${micronautGradlePluginVersion}"
+}
+
+dependencies {
+  compileOnly project(":micronaut:micronaut-core")
+
+  api project(':tracing')
+  api 'io.opentelemetry:opentelemetry-exporter-otlp'
+  api 'io.opentelemetry:opentelemetry-exporter-logging'
+  api 'io.opentelemetry:opentelemetry-exporter-otlp-common'
+  api 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0'
+
+  api 'io.micronaut.micrometer:micronaut-micrometer-registry-otlp'
+  api 'io.micronaut.tracing:micronaut-tracing-opentelemetry-http'
+
+  compileOnly "ch.qos.logback:logback-classic"
+}
