@@ -3,7 +3,7 @@ name: apized
 description: This skill should be used when the user asks to build an API, add a model, add an endpoint, create a new entity, implement a behavior, configure security, add federation, write a repository extension, or work with any part of the apized framework. Activates on questions like "how do I add a new model", "create a REST endpoint", "add a behavior", "configure permissions", or "use @Apized".
 metadata:
   version: 1.0.0
-  last_synced_commit: 317df29cc68a8e7277b1f5b14b4a910e9ca2cd09
+  last_synced_commit: 492217a
 ---
 
 # Apized Framework Guide
