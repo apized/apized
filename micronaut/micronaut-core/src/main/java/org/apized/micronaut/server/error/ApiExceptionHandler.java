@@ -17,11 +17,17 @@
 package org.apized.micronaut.server.error;
 
 import io.micronaut.context.annotation.Replaces;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.convert.exceptions.ConversionErrorException;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpResponseFactory;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.server.exceptions.ConversionErrorHandler;
+import io.micronaut.http.server.exceptions.ErrorExceptionHandler;
 import io.micronaut.http.server.exceptions.ExceptionHandler;
+import io.micronaut.http.server.exceptions.response.Error;
+import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
 import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -34,6 +40,8 @@ import org.apized.core.error.model.ErrorEntry;
 import org.apized.core.error.model.ErrorResponse;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -41,6 +49,8 @@ import java.util.stream.StreamSupport;
 @Singleton
 @Replaces(ConstraintExceptionHandler.class)
 public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResponse<ErrorResponse>> {
+  Pattern p = Pattern.compile(".*(Expected one of [^\n]+)\n.*", Pattern.DOTALL | Pattern.MULTILINE);
+
   @Inject
   List<ExceptionNotifier> notifiers;
 
@@ -54,6 +64,33 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
       log.error(exception.getMessage(), exception);
     }
     return switch (exception.getClass().getSimpleName()) {
+      case "ConversionErrorException" -> {
+        Matcher matcher = p.matcher(exception.getCause().getMessage());
+        if (matcher.matches()) {
+          yield HttpResponse.badRequest(
+            ErrorResponse
+              .builder()
+              .message("Bad Request")
+              .errors(
+                List.of(
+                  ErrorEntry
+                    .builder()
+                    .message(matcher.group(1).trim())
+                    .build()
+                )
+              )
+              .build()
+          );
+        } else {
+          yield HttpResponse.badRequest(
+            ErrorResponse
+              .builder()
+              .message("Bad Request")
+              .errors(List.of(ErrorEntry.builder().message(exception.getMessage()).build()))
+              .build()
+          );
+        }
+      }
       case "ConstraintViolationException" -> HttpResponse.badRequest(
         ErrorResponse
           .builder()
@@ -135,14 +172,15 @@ public class ApiExceptionHandler implements ExceptionHandler<Throwable, HttpResp
             .build()
         )
       ).build());
-      case "IllegalArgumentException", "IllegalStateException" -> HttpResponse.badRequest().body(ErrorResponse.builder().errors(
-        List.of(
-          ErrorEntry
-            .builder()
-            .message(exception.getMessage())
-            .build()
-        )
-      ).build());
+      case "IllegalArgumentException", "IllegalStateException" ->
+        HttpResponse.badRequest().body(ErrorResponse.builder().errors(
+          List.of(
+            ErrorEntry
+              .builder()
+              .message(exception.getMessage())
+              .build()
+          )
+        ).build());
       default -> {
         notifiers.forEach(n -> n.report(exception));
         yield HttpResponse.serverError(

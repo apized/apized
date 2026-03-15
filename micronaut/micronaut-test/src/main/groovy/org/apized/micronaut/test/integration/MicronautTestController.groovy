@@ -36,7 +36,7 @@ class MicronautTestController extends AbstractTestController {
 
   @Delete
   HttpResponse reset() {
-    super.clear()
+    clear()
     HttpResponse.status(HttpStatus.OK)
   }
 

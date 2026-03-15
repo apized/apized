@@ -337,7 +337,7 @@ public class ModelSerde implements Serde<Model> {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private Object defaultDeserialize(Decoder decoder, DecoderContext context, BeanProperty property) throws IOException {
-    Deserializer deserializer = context.findDeserializer(property.asArgument());
+    final Deserializer<? super Object> deserializer = context.findDeserializer(property.getType()).createSpecific(context, property.asArgument());
     return deserializer.deserializeNullable(decoder, context, property.asArgument());
   }
 
