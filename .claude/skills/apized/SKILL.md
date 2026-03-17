@@ -3,7 +3,7 @@ name: apized
 description: This skill should be used when the user asks to build an API, add a model, add an endpoint, create a new entity, implement a behavior, configure security, add federation, write a repository extension, or work with any part of the apized framework. Activates on questions like "how do I add a new model", "create a REST endpoint", "add a behavior", "configure permissions", or "use @Apized".
 metadata:
   version: 1.0.0
-  last_synced_commit: 492217a
+  last_synced_commit: 43f59a4a0a13da2eb5fda99aff4fe2da4d0f8a2e
 ---
 
 # Apized Framework Guide
@@ -27,10 +27,10 @@ Apized is an annotation-driven JVM framework that auto-generates REST API infras
 | [Controller Extensions](#controller-extensions) | Override generated actions |
 | [Behaviour Pipeline on Custom Endpoints](#triggering-the-behaviour-pipeline-from-custom-endpoints) | `@MicronautBehaviourExecution` / `@SpringBehaviourExecution` |
 | [Custom Controllers](#custom-controllers) | Fully custom endpoints |
-| [MCP Module](#mcp-module) | Auto-generated MCP tools via `spring-mcp` / `micronaut-mcp` |
 | [Tracing](#tracing-module) | `@Traced` + OpenTelemetry |
 | [Distributed Lock](#distributed-lock-module) | `LockFactory` + ShedLock |
 | [Testing](#test-module) | Cucumber BDD integration tests |
+| [MCP Integration](#mcp-integration-micronaut-mcp--spring-mcp) | Auto-generated AI tool endpoints via `mcp = true` |
 
 ## Core Concept
 
@@ -49,7 +49,7 @@ dependencies {
   implementation "org.apized:micronaut-tracing:$apizedVersion"              // optional: OTEL tracing
   implementation "org.apized:micronaut-messaging-rabbitmq:$apizedVersion"   // optional: RabbitMQ events
   implementation "org.apized:micronaut-distributed-lock:$apizedVersion"     // optional: distributed locks
-  implementation "org.apized:micronaut-mcp:$apizedVersion"                  // optional: MCP server tools
+  implementation "org.apized:micronaut-mcp:$apizedVersion"                  // optional: MCP tool generation
 }
 ```
 
@@ -70,7 +70,7 @@ dependencies {
   implementation "org.apized:spring-tracing:$apizedVersion"              // optional: OTEL tracing
   implementation "org.apized:spring-messaging-rabbitmq:$apizedVersion"   // optional: RabbitMQ events
   implementation "org.apized:spring-distributed-lock:$apizedVersion"     // optional: distributed locks
-  implementation "org.apized:spring-mcp:$apizedVersion"                  // optional: MCP server tools
+  implementation "org.apized:spring-mcp:$apizedVersion"                  // optional: MCP tool generation
 }
 ```
 
@@ -87,6 +87,7 @@ The apized Gradle plugin handles annotation processor wiring and code generation
   audit = true,
   event = true,
   maxPageSize = 50,
+  mcp = true,
   extensions = MyRepositoryExtension.class
 )
 public class Product extends BaseModel {
@@ -111,6 +112,7 @@ public class Product extends BaseModel {
 - `operations` controls which CRUD endpoints are exposed. Default: all five (`LIST`, `GET`, `CREATE`, `UPDATE`, `DELETE`).
 - Request bodies for `CREATE` and `UPDATE` are automatically validated with Bean Validation (`@Valid`). Annotate model fields with `@NotBlank`, `@NotNull`, `@Size`, etc. as needed.
 - `@ManyToMany` relationships are managed automatically — the framework generates `add/remove` methods for the join table and calls them when the relationship field is included in a PUT request. No custom code needed.
+- `mcp` — when `true` (default), generates a `{Type}McpTools` bean that exposes all enabled CRUD operations as MCP tool calls. Set `mcp = false` to suppress generation for a specific model. Requires `micronaut-mcp` / `spring-mcp` on the classpath to activate.
 - `extensions` accepts an array — pass multiple extension classes: `extensions = {RepoExtension.class, ServiceExtension.class}`.
 - Use `scope` in `@Apized` to define the parent model and establish a hierarchy (used for endpoint URL nesting and integration test tooling):
 
@@ -628,6 +630,7 @@ For a model `Product`, the processor generates:
 - `ProductService` (implements `ModelService<Product>`) — also exposes `batchCreate`, `batchUpdate`, `batchDelete` for bulk operations (service-layer only, not exposed as HTTP endpoints)
 - `ProductController` (implements `ModelController<Product>`)
 - `ProductDeserializer`
+- `ProductMcpTools` — only when `mcp = true` (default) and `micronaut-mcp` / `spring-mcp` is on the classpath
 
 All are annotated with `@Generated` — do not edit them directly. Use extensions and behaviors instead.
 
@@ -842,79 +845,6 @@ Reference it via `@Apized(extensions = DepartmentRepositoryExtension.class)` on 
 
 ---
 
-## MCP Module (`spring-mcp` / `micronaut-mcp`)
-
-Adding `spring-mcp` or `micronaut-mcp` as a dependency causes the annotation processor to generate a `${type}McpTools` class for every `@Apized` model, exposing each operation as a named MCP tool. The MCP server endpoint (`POST /mcp`, HTTP Streamable transport) is auto-configured by the underlying framework library — no extra code required.
-
-### Gradle setup
-
-**Spring:**
-```groovy
-dependencies {
-  annotationProcessor "org.apized:spring-mcp:$apizedVersion"
-  implementation "org.apized:spring-mcp:$apizedVersion"
-}
-```
-
-**Micronaut:**
-```groovy
-dependencies {
-  annotationProcessor "org.apized:micronaut-mcp:$apizedVersion"
-  implementation "org.apized:micronaut-mcp:$apizedVersion"
-}
-```
-
-Both the `annotationProcessor` and `implementation` lines are required — the module generates code at compile time and provides the runtime dependency.
-
-### Required `application.yml`
-
-**Spring** (via `spring-ai-starter-mcp-server-webmvc`):
-```yaml
-spring:
-  ai:
-    mcp:
-      server:
-        name: my-server
-        version: 1.0.0
-```
-
-**Micronaut** (via `micronaut-mcp-server-java-sdk`):
-```yaml
-micronaut:
-  mcp:
-    server:
-      transport: HTTP
-      info:
-        name: my-server
-        version: 1.0.0
-```
-
-### What gets generated
-
-For a model `Organization` with all five operations, the processor emits `OrganizationMcpTools` in the same package. Tool names follow the pattern `{snake_case_type}_{action}`:
-
-| Tool name | Description |
-|---|---|
-| `organization_list` | List organization records |
-| `organization_get` | Get an organization by ID |
-| `organization_create` | Create a new organization |
-| `organization_update` | Update an existing organization |
-| `organization_delete` | Delete an organization by ID |
-
-Only tools for operations present in `@Apized(operations = {...})` are generated.
-
-All tools accept a `fields` parameter (comma-separated, dot-notation supported) that maps directly to the `?fields=` REST query parameter — enabling field filtering and relation drilling. The `list` tool additionally accepts `page`, `pageSize`, `search`, and `sort`. Search/sort string format matches the REST query syntax (`field=value`, `field~=value`, `field>`, `field<`).
-
-Each tool delegates directly to the generated `${type}Controller`, so both **CONTROLLER-layer and SERVICE-layer behaviours** fire for every MCP tool call, identical to an HTTP request.
-
-Exceptions (including `ForbiddenException`) are caught and returned as `"Error: <message>"` strings in the tool result rather than propagating into the MCP SDK's opaque error handler.
-
-### Security
-
-The `Authorization: Bearer <token>` header is read and the user resolved via `McpContextInitializer` at the start of each tool call. This is necessary because MCP tool methods may execute on a different thread than the HTTP filters — without it, the `ApizedContext` security context would be empty on that thread. `McpContextInitializer` only activates when a `UserResolver` bean is present. Permission checks in behaviours apply identically to REST requests.
-
----
-
 ## Tracing Module (`micronaut-tracing` / `spring-tracing`)
 
 Apply `@Traced` to any method or class to create an OpenTelemetry span automatically:
@@ -1070,3 +1000,34 @@ Values in DataTable cells support:
 - `/regex/` — regex match in assertions
 - `true` / `false` — parsed as boolean
 - Numeric strings — parsed as numbers
+
+---
+
+## MCP Integration (`micronaut-mcp` / `spring-mcp`)
+
+When `mcp = true` (the default) and the MCP module is on the classpath, the annotation processor generates a `{Type}McpTools` bean that exposes each enabled CRUD operation as an MCP tool callable by AI agents.
+
+### Generated tools
+
+For a model `Product` with all five operations enabled, the following MCP tools are registered:
+
+| Tool name | Operation |
+|---|---|
+| `product_list` | LIST — with `page`, `pageSize`, `search`, `sort`, `fields` params |
+| `product_get` | GET — with `id`, `fields` params |
+| `product_create` | CREATE — with `it` (the model object), `fields` params |
+| `product_update` | UPDATE — with `id`, `it`, `fields` params |
+| `product_delete` | DELETE — with `id` param |
+
+Tool names are `{snake_case_type}_{action}`. Only operations declared in `@Apized(operations = ...)` are generated.
+
+### Authentication
+
+The `McpContextInitializer` bean (provided by the MCP module) re-initialises the apized security context from the `Authorization: Bearer <token>` header of the incoming MCP request, delegating to the registered `UserResolver`. It is only active when a `UserResolver` bean is present.
+
+### Disabling MCP for a specific model
+
+```java
+@Apized(mcp = false)
+public class InternalModel extends BaseModel { ... }
+```

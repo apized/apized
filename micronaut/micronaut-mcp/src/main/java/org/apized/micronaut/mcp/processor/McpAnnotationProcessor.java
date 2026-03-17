@@ -80,8 +80,10 @@ public class McpAnnotationProcessor extends AbstractProcessor {
         bindings.put("snakeName", snakeName);
         bindings.put("actions", Arrays.stream(annotation.operations()).map(Enum::toString).collect(Collectors.toList()));
 
-        generateClassFor(module + "." + type + "McpTools", bindings);
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Generated McpTools for %s", type));
+        if (annotation.mcp()) {
+          generateClassFor(module + "." + type + "McpTools", bindings);
+          processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("Generated McpTools for %s", type));
+        }
       });
     }
     return false;

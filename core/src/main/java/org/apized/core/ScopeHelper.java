@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ScopeHelper {
+  @SuppressWarnings("unchecked")
   public static <T extends Model> void scopeUpUntil(T instance, Function<AnnotationValue<Apized>, Boolean> condition, Consumer<T> consumer) {
     if (instance == null) {
       return;

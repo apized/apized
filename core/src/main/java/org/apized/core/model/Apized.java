@@ -68,6 +68,13 @@ public @interface Apized {
    */
   int maxPageSize() default 50;
 
+  /**
+   * Determines if the model should include MCP (Model-Controller-Processor) behavior.
+   *
+   * @return true if the MCP behavior is enabled, false otherwise
+   */
+  boolean mcp() default true;
+
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
   @interface Extension {
